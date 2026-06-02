@@ -1,9 +1,7 @@
 {
-  "name": "lion-pay-backend",
+  "name": "lion-pay-api",
   "version": "1.0.0",
-  "engines": {
-    "node": "18.x"
-  },
+  "type": "module",
   "dependencies": {
     "firebase": "^10.8.0"
   }
