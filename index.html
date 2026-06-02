@@ -26,41 +26,49 @@
 
             document.documentElement.style.setProperty('--accent-main', savedColor);
             document.documentElement.style.setProperty('--accent-glow', hexToRgba(savedColor, 0.4));
+            document.documentElement.style.setProperty('--accent-light', hexToRgba(savedColor, 0.15));
             document.documentElement.style.setProperty('--premium-grad-1', hexToRgba(savedColor, 0.15));
             document.documentElement.style.setProperty('--premium-grad-2', hexToRgba(savedColor, 0.05));
         })();
     </script>
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
         :root { 
-            --theme-bg: #fdfbf7; 
+            --theme-bg: #f3f4f6; 
             --theme-text: #1f2937; 
             --theme-card: #ffffff; 
         }
         
-        html.dark-mode body { --theme-bg: #0f172a; --theme-text: #f8fafc; --theme-card: #1e293b; background-color: var(--theme-bg); color: var(--theme-text); }
+        /* Modern Dark Mode - Deep Slate/Navy instead of pure black */
+        html.dark-mode body { --theme-bg: #0b0f19; --theme-text: #f8fafc; --theme-card: #151b2b; background-color: var(--theme-bg); color: var(--theme-text); }
         html.dark-mode .theme-card { background-color: var(--theme-card) !important; border-color: rgba(255,255,255,0.05) !important; }
         
-        body { background-color: var(--theme-bg); color: var(--theme-text); transition: background-color 0.3s ease, color 0.3s ease; }
+        body { background-color: var(--theme-bg); color: var(--theme-text); font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease, color 0.3s ease; -webkit-tap-highlight-color: transparent;}
         .theme-card { background-color: var(--theme-card); color: var(--theme-text); border-color: rgba(128,128,128,0.1); transition: background-color 0.3s ease, border-color 0.3s ease; }
         
         .accent-bg { background-color: var(--accent-main) !important; color: white !important; }
         .accent-text { color: var(--accent-main) !important; }
         .accent-border { border-color: var(--accent-main) !important; }
-        .accent-shadow { box-shadow: 0 4px 15px var(--accent-glow) !important; }
+        .accent-shadow { box-shadow: 0 8px 25px var(--accent-glow) !important; }
         .focus-accent:focus { border-color: var(--accent-main) !important; box-shadow: 0 0 0 2px var(--accent-glow) !important; }
+        .accent-light-bg { background-color: var(--accent-light) !important; color: var(--accent-main) !important; }
 
         .transition-transform { transition: transform 0.3s ease-in-out; }
         ::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .view-section { display: none; opacity: 0; }
+        
+        /* Smooth View Transitions */
+        .view-section { display: none; opacity: 0; padding-bottom: 100px; }
         .view-section.active { display: block; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes slideUpFade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideDown { from { transform: translate(-50%, -100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
         
         .btn-animate { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform, box-shadow; }
         .btn-animate:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 20px var(--accent-glow); }
         .btn-animate:active { transform: scale(0.95); }
+        .icon-hover-bounce:active i { transform: scale(1.2); transition: 0.2s; }
         
         .tab-btn.active { background-color: var(--accent-main); color: white; }
         .tab-btn { background-color: transparent; color: #6b7280; }
@@ -70,6 +78,56 @@
         .keeper-tab-btn.active { background-color: var(--theme-card); color: var(--accent-main); box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-weight: bold;}
         .keeper-tab-content { display: none; }
         .keeper-tab-content.active { display: block; animation: slideUpFade 0.3s ease forwards; }
+
+        /* Floating Nav Styling */
+        .floating-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 5%;
+            width: 90%;
+            border-radius: 100px;
+            padding: 8px 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 80;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        html.dark-mode .floating-nav { box-shadow: 0 10px 40px rgba(0,0,0,0.5); background: rgba(21, 27, 43, 0.85); border: 1px solid rgba(255,255,255,0.05); }
+
+        .nav-item { position: relative; padding: 10px; transition: 0.3s; }
+        .nav-item.active { color: var(--accent-main); transform: translateY(-5px); }
+        .nav-item.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 6px; height: 6px; background: var(--accent-main); border-radius: 50%; }
+
+        /* Glass Credit Card Style */
+        .glass-credit-card {
+            background: linear-gradient(135deg, var(--accent-main), rgba(0,0,0,0.8));
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 15px 35px var(--accent-glow);
+            position: relative;
+            overflow: hidden;
+            border-radius: 24px;
+        }
+        .glass-credit-card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            transform: rotate(30deg); pointer-events: none;
+        }
+
+        .action-circle {
+            width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 24px; transition: 0.3s; background-color: var(--accent-light); color: var(--accent-main);
+        }
+        html.premium-mode .action-circle { border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 0 15px var(--accent-glow); }
+
+        /* Game Coins */
+        .game-coin { transition: all 0.2s; cursor: pointer; }
+        .game-coin.selected { transform: scale(1.15) translateY(-5px); border-color: var(--accent-main); box-shadow: 0 10px 15px -3px var(--accent-glow); background-color: var(--theme-card); }
+        .game-coin.disabled { filter: grayscale(100%); opacity: 0.4; cursor: not-allowed; pointer-events: none; transform: scale(0.95); }
+        @keyframes popInCrown { 0% { transform: scale(0) translateY(20px) rotate(-20deg); opacity: 0; } 70% { transform: scale(1.3) translateY(-10px) rotate(10deg); opacity: 1; } 100% { transform: scale(1) translateY(0) rotate(0); opacity: 1; } }
+        .crown-icon { display: none; position: absolute; top: -40px; left: 50%; margin-left: -24px; font-size: 3rem; color: #fbbf24; animation: popInCrown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); z-index: 20; }
+        .crown-icon.show { display: block; }
 
         html.premium-mode body {
             background: linear-gradient(135deg, var(--premium-grad-1), var(--premium-grad-2), var(--theme-bg));
@@ -88,17 +146,11 @@
         @keyframes premiumBg { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
         
         html.premium-mode .theme-card {
-            background: rgba(var(--theme-card), 0.8) !important;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(var(--theme-card), 0.7) !important;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 8px 32px 0 var(--premium-grad-2);
-        }
-        html.premium-mode #home-main-card {
-            background: linear-gradient(135deg, var(--accent-main), var(--theme-bg));
-            box-shadow: 0 15px 35px var(--accent-glow);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
         }
         
         .premium-border { border: 2px solid var(--accent-main) !important; box-shadow: 0 0 20px var(--accent-glow) !important; animation: borderGlow 2s infinite alternate; }
@@ -126,51 +178,31 @@
         html.colorful-mode #grid-container-actions button:nth-child(15) div { background-color: #64748b; color: white; border: none; box-shadow: 0 4px 15px rgba(100,116,139,0.4); }
 
         .privacy-blur { filter: blur(8px); user-select: none; transition: filter 0.3s ease; }
-        
-        /* Stats specific styling */
-        .filter-chip { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--accent-main); color: var(--theme-text); cursor: pointer; white-space: nowrap; font-size: 12px; font-weight: bold; opacity: 0.7; transition: 0.3s; }
-        .filter-chip.active { background-color: var(--accent-main); color: white; opacity: 1; }
-        .stat-card { background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.05)); border-left: 4px solid var(--accent-main); }
     </style>
 </head>
 <body class="font-sans pb-20 text-gray-800 transition-all duration-500">
 
-    <div id="public-lifafa-wrapper" class="fixed inset-0 theme-card z-[1000] hidden flex-col items-center justify-center p-6 text-center overflow-y-auto bg-cover">
-        <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-3xl mx-auto flex items-center justify-center text-4xl mb-6 shadow-inner border border-amber-100"><i class="fas fa-gift"></i></div>
-        <h1 class="text-3xl font-black italic tracking-tight mb-2">CLAIM <span class="text-amber-500">LIFAFA</span> 🎉</h1>
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-8">Follow steps to unlock</p>
+    <div id="public-lifafa-wrapper" class="fixed inset-0 theme-card z-[1000] hidden flex-col items-center justify-center p-6 text-center overflow-y-auto">
+        <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-3xl mx-auto flex items-center justify-center text-4xl mb-6 shadow-inner border border-amber-100"><i class="fas fa-envelope-open-text"></i></div>
+        <h1 class="text-3xl font-black italic tracking-tight mb-2">LIFAFA <span class="text-amber-500">CLAIM</span></h1>
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-8">Claim your free reward</p>
 
-        <div id="lif-claim-step-1" class="w-full max-w-sm theme-card rounded-3xl p-6 shadow-sm border border-gray-100 mb-4">
-            <label class="block text-xs font-bold text-gray-400 mb-4 tracking-wide uppercase">Step 1: Identity</label>
-            <p class="text-xs text-gray-500 mb-4 text-left">Enter your registered Lion Pay number.</p>
-            <input type="tel" id="lif-claim-phone" placeholder="Enter Phone Number" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus-accent font-bold theme-card">
-            <button type="button" onclick="verifyLifafaUser()" class="w-full accent-bg text-white font-bold py-3 rounded-xl transition-colors shadow-md">Next ➡️</button>
-            <div class="text-center mt-4"><button type="button" onclick="window.location.href='/'" class="text-gray-400 hover:text-amber-600 text-xs font-bold transition-colors">Go Home 🏠</button></div>
+        <div id="lifafa-step-1" class="hidden w-full max-w-sm theme-card rounded-3xl p-6 shadow-sm border border-gray-100 mb-4">
+            <label class="block text-xs font-bold text-gray-400 mb-4 tracking-wide uppercase">Step 1: Join Channel</label>
+            <p id="lifafa-join-error" class="hidden text-xs text-red-500 font-bold mb-3 bg-red-50 py-2 rounded-lg border border-red-100">First join the channel!</p>
+            <a id="lifafa-channel-btn" href="#" target="_blank" onclick="window.isChannelClicked = true; document.getElementById('lifafa-join-error').classList.add('hidden');" class="block w-full bg-blue-50 text-blue-500 font-black py-4 rounded-xl shadow-sm border border-blue-100 hover:bg-blue-100 transition-colors mb-3"><i class="fab fa-telegram-plane mr-2"></i> JOIN CHANNEL</a>
+            <button type="button" onclick="verifyLifafaJoin()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl transition-colors shadow-md">Verify & Continue</button>
         </div>
 
-        <div id="lif-claim-step-2" class="hidden w-full max-w-sm theme-card rounded-3xl p-6 shadow-sm border border-gray-100 mb-4">
-            <label class="block text-xs font-bold text-gray-400 mb-4 tracking-wide uppercase">Step 2: Join Channels 📢</label>
-            <p id="lifafa-join-error" class="hidden text-xs text-red-500 font-bold mb-3 bg-red-50 py-2 rounded-lg border border-red-100"></p>
-            <div id="lifafa-channels-grid" class="grid grid-cols-2 gap-3 mb-4">
-                </div>
-            <button type="button" onclick="verifyLifafaChannels()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-colors shadow-md"><i class="fas fa-check-double"></i> Verify Status</button>
-        </div>
-
-        <div id="lif-claim-step-3" class="hidden w-full max-w-sm theme-card rounded-3xl p-6 shadow-sm border border-gray-100 mb-4 text-left">
-            <label class="block text-xs font-bold text-gray-400 mb-4 tracking-wide uppercase">Step 3: Final Claim 🎁</label>
-            <div id="lif-pwd-container" class="hidden">
-                <label class="block text-xs font-bold text-gray-400 mb-2">LIFAFA PASSWORD 🔒</label>
-                <input type="password" id="lif-claim-password" placeholder="Enter Password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-5 focus-accent font-bold theme-card text-center">
+        <form id="form-public-lifafa" onsubmit="event.preventDefault(); processPublicLifafaClaim()" class="w-full max-w-sm theme-card rounded-3xl p-6 shadow-sm border border-gray-100 text-left">
+            <input type="hidden" id="public-lif-id">
+            <div id="lifafa-code-box" class="hidden">
+                <label class="block text-xs font-bold text-gray-400 mb-2 tracking-wide">UNIQUE CODE / PASSWORD</label>
+                <input type="text" id="public-lif-code" placeholder="Enter Code" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 text-sm mb-5 focus-accent text-gray-800 font-mono shadow-inner uppercase text-center font-black tracking-widest theme-card">
             </div>
-            <button type="button" onclick="executeAdvancedClaim()" class="btn-animate w-full bg-green-500 text-white font-black py-4 rounded-xl shadow-lg transition-colors text-lg tracking-wide"><i class="fas fa-hand-holding-usd"></i> CLAIM REWARD NOW</button>
-        </div>
-        
-        <div id="lif-claim-step-4" class="hidden w-full max-w-sm theme-card rounded-3xl p-6 shadow-sm border border-gray-100 mb-4">
-            <h1 style="font-size: 60px; margin: 10px;">🎉</h1>
-            <h2 class="text-2xl font-black text-green-500 mb-2">Claim Successful!</h2>
-            <p class="text-sm text-gray-500 mb-6 font-bold" id="lif-success-amt">₹0.00 Added to Wallet</p>
-            <button onclick="window.location.href='/'" class="w-full accent-bg text-white font-bold py-3 rounded-xl transition-colors shadow-md">Open Wallet 🦁</button>
-        </div>
+            <button type="submit" id="btn-public-lifafa" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-xl shadow-lg transition-colors text-lg tracking-wide"><i class="fas fa-gift"></i> CLAIM NOW</button>
+            <div class="text-center mt-4"><button type="button" onclick="window.location.href='/'" class="text-gray-400 hover:text-amber-600 text-xs font-bold transition-colors">Go to Home</button></div>
+        </form>
     </div>
 
     <div id="new-message-popup" class="fixed top-6 left-1/2 transform -translate-x-1/2 w-11/12 max-w-sm bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl p-4 shadow-2xl z-[400] hidden flex-row items-center gap-4 cursor-pointer hover:scale-[1.02] transition-all duration-300 animate-[slideDown_0.5s_ease-out]" onclick="handleMessageNotificationClick()">
@@ -293,47 +325,65 @@
         </div>
     </div>
 
+    <div id="gameModal" class="fixed inset-0 bg-black bg-opacity-70 z-[500] hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div id="gameModalContent" class="theme-card rounded-3xl p-8 text-center transform scale-90 transition-transform duration-300 max-w-sm w-full mx-4 shadow-2xl relative overflow-hidden">
+            <div id="gameModalBg" class="absolute inset-0 opacity-10 pointer-events-none"></div>
+            <div id="gameModalIcon" class="text-7xl mb-4 relative z-10 drop-shadow-md">🎉</div>
+            <h2 id="gameModalTitle" class="text-3xl font-black mb-2 relative z-10 tracking-wide">YOU WON!</h2>
+            <p id="gameModalText" class="text-gray-600 font-bold mb-6 relative z-10">₹0.00</p>
+            <button onclick="closeGameModal()" class="btn-animate w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-xl transition-colors relative z-10 tracking-widest text-sm">CONTINUE</button>
+        </div>
+    </div>
+
     <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-60 z-40 hidden transition-opacity backdrop-blur-sm" onclick="toggleSidebar()"></div>
-    <div id="sidebar" class="fixed top-0 left-0 w-64 h-full theme-card shadow-2xl z-50 transform -translate-x-full transition-transform flex flex-col">
-        <div class="p-6 accent-bg text-white flex justify-between items-center shadow-md">
-            <h2 class="text-2xl font-black tracking-wider flex items-center gap-2"><i class="fas fa-paw"></i> PROFILE</h2><button onclick="toggleSidebar()" class="hover:rotate-90 transition-transform"><i class="fas fa-times text-xl"></i></button>
+    <div id="sidebar" class="fixed top-0 left-0 w-72 h-full theme-card shadow-2xl z-50 transform -translate-x-full transition-transform flex flex-col rounded-r-[2rem] overflow-hidden">
+        <div class="p-8 pt-12 pb-6 accent-bg text-white relative flex flex-col items-center">
+            <button onclick="toggleSidebar()" class="absolute top-6 right-6 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors"><i class="fas fa-times"></i></button>
+            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-3xl mb-4 shadow-lg border-2 border-white overflow-hidden cursor-pointer" onclick="showView('my-profile'); toggleSidebar()">
+                <img id="sidebar-dp-img" src="" class="w-full h-full object-cover hidden" alt="DP">
+                <span id="sidebar-initial" class="font-black accent-text">U</span>
+            </div>
+            <h2 class="text-xl font-black tracking-wide" id="sidebar-name">User Name</h2>
+            <p class="text-xs font-bold opacity-80 tracking-widest mt-1 font-mono" id="sidebar-phone">Phone</p>
         </div>
-        <div class="p-6 text-center border-b border-gray-100 flex flex-col items-center relative sidebar-profile-bg theme-card">
-            <div id="qr-container-wrap" class="theme-card p-2 rounded-xl shadow-sm border border-gray-200 mb-4 transition-all"><img id="sidebar-qr" src="" class="w-32 h-32" alt="My QR Code"></div>
-            <h3 class="font-black text-lg" id="sidebar-name">User Name</h3>
-            <p class="text-xs accent-text font-bold tracking-widest font-mono" id="sidebar-phone">Phone</p>
-            <p class="text-[10px] text-gray-400 mt-2 uppercase tracking-wide">Scan to Pay Me</p>
-        </div>
-        <div class="flex-1 overflow-y-auto py-4 theme-card">
-            <ul class="space-y-1">
-                <li><a href="#" onclick="showView('api'); toggleSidebar()" class="block px-6 py-3 hover:bg-gray-100 transition-colors font-semibold"><i class="fas fa-code w-6"></i> API System</a></li>
-                <li><a href="#" onclick="showAuthView('reset-pin'); document.getElementById('auth-wrapper').classList.remove('hidden'); toggleSidebar()" class="block px-6 py-3 hover:bg-gray-100 transition-colors font-semibold"><i class="fas fa-key w-6"></i> Change Security PIN</a></li>
-                <li><a href="#" onclick="showView('stats'); toggleSidebar()" class="block px-6 py-3 hover:bg-gray-100 transition-colors font-semibold"><i class="fas fa-chart-bar w-6"></i> Account Stats</a></li>
-                <li><div class="h-px bg-gray-100 my-2 mx-4"></div></li>
-                <li><a href="#" onclick="logoutUser()" class="block px-6 py-3 text-red-500 hover:bg-red-50 transition-colors font-semibold"><i class="fas fa-sign-out-alt w-6"></i> Logout</a></li>
+        <div class="flex-1 overflow-y-auto py-6">
+            <div class="px-6 mb-6">
+                <button onclick="showView('my-profile'); toggleSidebar()" class="w-full py-4 rounded-xl accent-bg text-white font-black flex justify-center items-center gap-2 hover:brightness-110 transition-colors shadow-lg btn-animate"><i class="fas fa-user-circle text-lg"></i> My Profile 👤</button>
+            </div>
+            <div class="px-6 text-center border-b border-gray-100 dark:border-gray-800 pb-6 mb-4">
+                <div id="qr-container-wrap" class="theme-card p-2 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 inline-block mb-2"><img id="sidebar-qr" src="" class="w-32 h-32" alt="My QR Code"></div>
+                <p class="text-[10px] text-gray-400 uppercase tracking-wide font-bold">Scan to Pay Me</p>
+            </div>
+            <ul class="space-y-2 px-4">
+                <li><a href="#" onclick="showView('api'); toggleSidebar()" class="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-bold"><div class="w-8 h-8 rounded-full accent-light-bg flex items-center justify-center"><i class="fas fa-code"></i></div> API System</a></li>
+                <li><a href="#" onclick="showAuthView('reset-pin'); document.getElementById('auth-wrapper').classList.remove('hidden'); toggleSidebar()" class="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-bold"><div class="w-8 h-8 rounded-full accent-light-bg flex items-center justify-center"><i class="fas fa-key"></i></div> Change PIN</a></li>
+                <li><a href="#" onclick="showView('game'); toggleSidebar()" class="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-bold"><div class="w-8 h-8 rounded-full accent-light-bg flex items-center justify-center"><i class="fas fa-gamepad"></i></div> Games</a></li>
             </ul>
+            <div class="mt-6 px-8">
+                <button onclick="logoutUser()" class="w-full py-4 rounded-xl bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 font-black flex justify-center items-center gap-2 hover:bg-red-100 transition-colors btn-animate"><i class="fas fa-power-off"></i> LOGOUT</button>
+            </div>
         </div>
     </div>
 
     <input type="file" id="dp-upload" class="hidden" accept="image/*">
 
     <main id="app-container">
+        
         <div id="view-home" class="view-section active">
-            <header class="flex justify-between items-center p-4 theme-card shadow-sm sticky top-0 z-30">
-                <button onclick="toggleSidebar()" class="text-xl hover:text-yellow-500 transition-colors accent-text"><i class="fas fa-bars"></i></button>
+            <header class="flex justify-between items-center p-6 sticky top-0 z-30 bg-transparent">
+                <button onclick="toggleSidebar()" class="text-xl hover:text-yellow-500 transition-colors accent-text w-12 h-12 rounded-full theme-card shadow-sm border border-gray-100 flex items-center justify-center hover:scale-105"><i class="fas fa-bars"></i></button>
                 <h1 class="text-xl font-black tracking-widest accent-text italic">LION PAY</h1>
                 <div class="flex items-center gap-4">
                     <button id="top-tg-btn" class="accent-text text-2xl hover:scale-110 transition-transform cursor-pointer"><i class="fab fa-telegram"></i></button>
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold border-2 accent-border cursor-pointer overflow-hidden shadow-sm hover:scale-105 transition-transform bg-gray-200" id="ui-dp-trigger" onclick="document.getElementById('dp-upload').click();">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold border-2 accent-border cursor-pointer overflow-hidden shadow-sm hover:scale-105 transition-transform bg-gray-100" onclick="showView('my-profile')">
                         <span id="ui-user-initial" class="text-gray-500 w-full h-full flex items-center justify-center bg-gray-100">U</span>
                         <img id="ui-user-dp-img" src="" class="w-full h-full object-cover hidden" alt="DP">
                     </div>
                 </div>
             </header>
 
-            <div class="p-4">
-                <div id="home-main-card" class="rounded-2xl p-6 shadow-lg relative overflow-hidden transform hover:scale-[1.02] transition-all duration-300 accent-bg text-white">
-                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-20 rounded-full blur-2xl"></div>
+            <div class="px-6 relative z-10">
+                <div id="home-main-card" class="glass-credit-card p-6 text-white mb-8">
                     <div class="flex justify-between items-start mb-6 relative z-10">
                         <div>
                             <h2 class="text-lg font-bold" id="ui-user-name">User Name</h2>
@@ -345,47 +395,95 @@
                         <span id="ui-verified-badge" class="bg-white/20 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-full flex items-center gap-1 border border-white/30"><i class="fas fa-shield-alt"></i> Verified</span>
                     </div>
                     <div class="relative z-10">
-                        <p class="text-xs opacity-90 mb-1 uppercase font-semibold">Available Balance</p>
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-2xl font-medium">₹</span>
-                            <h3 class="text-5xl font-black tracking-tight drop-shadow-md flex items-center gap-2">
-                                <span class="global-balance transition-all duration-300">0.00</span>
-                                <i class="fas fa-eye-slash text-xl cursor-pointer opacity-70 hover:opacity-100 hidden transition-all" id="eye-balance" onclick="toggleBalanceVisibility()"></i>
+                        <i class="fas fa-microchip text-2xl text-yellow-300 opacity-80 mb-2"></i>
+                        <p class="text-xs opacity-90 mb-1 uppercase font-semibold">Total Balance</p>
+                        <div class="flex items-baseline gap-1 justify-between">
+                            <h3 class="text-4xl font-black tracking-tight drop-shadow-md flex items-center gap-2">
+                                <span class="text-2xl font-medium">₹</span><span class="global-balance transition-all duration-300">0.00</span>
                             </h3>
+                            <i class="fas fa-eye-slash text-xl cursor-pointer opacity-70 hover:opacity-100 hidden transition-all" id="eye-balance" onclick="toggleBalanceVisibility()"></i>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="theme-card rounded-t-3xl pt-6 px-4 pb-6 shadow-sm mt-2">
-                <div class="grid grid-cols-4 gap-y-6 gap-x-2" id="grid-container-actions">
-                    <button onclick="showView('send')" class="btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-gray-50 theme-card flex items-center justify-center text-xl shadow-sm border border-gray-100 accent-text"><i class="fas fa-paper-plane"></i></div><span class="text-[10px] font-bold text-gray-600">Send</span></button>
-                    <button onclick="showView('bulk')" class="btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-gray-50 theme-card flex items-center justify-center text-xl shadow-sm border border-gray-100 accent-text"><i class="fas fa-users"></i></div><span class="text-[10px] font-bold text-gray-600">Bulk</span></button>
-                    <button onclick="showView('add')" class="btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-gray-50 theme-card flex items-center justify-center text-xl shadow-sm border border-gray-100 accent-text"><i class="fas fa-plus"></i></div><span class="text-[10px] font-bold text-gray-600">Add</span></button>
-                    <button onclick="showView('withdraw')" class="btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-gray-50 theme-card flex items-center justify-center text-xl shadow-sm border border-gray-100 accent-text"><i class="fas fa-arrow-up"></i></div><span class="text-[10px] font-bold text-gray-600">Withdraw</span></button>
+                <h3 class="font-black text-sm tracking-widest uppercase text-gray-400 mb-4 px-1">Quick Actions</h3>
+                <div class="grid grid-cols-4 gap-y-6 gap-x-2 theme-card rounded-[2rem] p-6 shadow-sm border border-gray-100 mb-8" id="grid-container-actions">
+                    <button onclick="showView('send')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle"><i class="fas fa-paper-plane"></i></div><span class="text-[11px] font-bold">Send</span></button>
+                    <button onclick="showView('bulk')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle"><i class="fas fa-users"></i></div><span class="text-[11px] font-bold">Bulk</span></button>
+                    <button onclick="showView('add')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle"><i class="fas fa-plus"></i></div><span class="text-[11px] font-bold">Add</span></button>
+                    <button onclick="showView('withdraw')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle"><i class="fas fa-arrow-up"></i></div><span class="text-[11px] font-bold">Payout</span></button>
                     
-                    <button onclick="showView('lifafa')" class="btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-gray-50 theme-card flex items-center justify-center text-xl shadow-sm border border-gray-100 accent-text"><i class="fas fa-envelope-open-text"></i></div><span class="text-[10px] font-bold text-gray-600">Lifafa</span></button>
-                    <button onclick="showView('gift')" class="btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-gray-50 theme-card flex items-center justify-center text-xl shadow-sm border border-gray-100 accent-text"><i class="fas fa-gift"></i></div><span class="text-[10px] font-bold text-gray-600">Gift Code</span></button>
-                    <button onclick="showView('api')" class="btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-gray-50 theme-card flex items-center justify-center text-xl shadow-sm border border-gray-100 accent-text"><i class="fas fa-code"></i></div><span class="text-[10px] font-bold text-gray-600">API Keys</span></button>
-                    <button onclick="showView('txn')" class="btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-gray-50 theme-card flex items-center justify-center text-xl shadow-sm border border-gray-100 accent-text"><i class="fas fa-search-dollar"></i></div><span class="text-[10px] font-bold text-gray-600">TXN Find</span></button>
+                    <button onclick="showView('lifafa')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle"><i class="fas fa-envelope-open-text"></i></div><span class="text-[11px] font-bold">Lifafa</span></button>
+                    <button onclick="showView('gift')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle"><i class="fas fa-gift"></i></div><span class="text-[11px] font-bold">Gift Code</span></button>
+                    <button onclick="showView('api')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle"><i class="fas fa-code"></i></div><span class="text-[11px] font-bold">API Keys</span></button>
+                    <button onclick="showView('txn')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle"><i class="fas fa-search-dollar"></i></div><span class="text-[11px] font-bold">TXN Find</span></button>
                     
-                    <button id="btn-premium-menu" onclick="showView('premium')" class="btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-gray-50 theme-card flex items-center justify-center text-xl shadow-sm border border-gray-100 text-yellow-500"><i class="fas fa-crown"></i></div><span class="text-[10px] font-bold text-gray-600">Premium</span></button>
-                    <button id="btn-theme-menu" onclick="showView('themes')" class="hidden btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-gray-50 theme-card flex items-center justify-center text-xl shadow-sm border border-gray-100 accent-text"><i class="fas fa-palette"></i></div><span class="text-[10px] font-bold text-gray-600">Settings</span></button>
-                    <button id="btn-tags-menu" onclick="showView('tags')" class="hidden btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-gray-50 theme-card flex items-center justify-center text-xl shadow-sm border border-gray-100 accent-text"><i class="fas fa-tags"></i></div><span class="text-[10px] font-bold text-gray-600">Tags</span></button>
+                    <button id="btn-premium-menu" onclick="showView('premium')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle bg-yellow-50 text-yellow-500 border border-yellow-100"><i class="fas fa-crown"></i></div><span class="text-[11px] font-bold">Premium</span></button>
+                    <button id="btn-theme-menu" onclick="showView('themes')" class="hidden btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle"><i class="fas fa-palette"></i></div><span class="text-[11px] font-bold">Settings</span></button>
+                    <button id="btn-tags-menu" onclick="showView('tags')" class="hidden btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle"><i class="fas fa-tags"></i></div><span class="text-[11px] font-bold">Tags</span></button>
                     
-                    <button onclick="showView('official')" class="btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-gray-50 theme-card flex items-center justify-center text-xl shadow-sm border border-gray-100 accent-text"><i class="fas fa-bullhorn"></i></div><span class="text-[10px] font-bold text-gray-600">Official Post</span></button>
-                    <button onclick="showView('keeper')" class="btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-gray-50 theme-card flex items-center justify-center text-xl shadow-sm border border-gray-100 accent-text"><i class="fas fa-vault"></i></div><span class="text-[10px] font-bold text-gray-600">Keeper</span></button>
-                    <button onclick="showView('stats')" class="btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-gray-50 theme-card flex items-center justify-center text-xl shadow-sm border border-gray-100 accent-text"><i class="fas fa-chart-bar"></i></div><span class="text-[10px] font-bold text-gray-600">Stats</span></button>
-                    <button onclick="showView('help')" class="btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-gray-50 theme-card flex items-center justify-center text-xl shadow-sm border border-gray-100 accent-text"><i class="fas fa-headset"></i></div><span class="text-[10px] font-bold text-gray-600">Help</span></button>
+                    <button onclick="showView('official')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle"><i class="fas fa-bullhorn"></i></div><span class="text-[11px] font-bold">Updates</span></button>
+                    <button onclick="showView('keeper')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle"><i class="fas fa-vault"></i></div><span class="text-[11px] font-bold">Keeper</span></button>
+                    <button onclick="showView('game')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle"><i class="fas fa-gamepad"></i></div><span class="text-[11px] font-bold">Games</span></button>
+                    <button onclick="showView('help')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle bg-gray-50 text-gray-500"><i class="fas fa-headset"></i></div><span class="text-[11px] font-bold">Help</span></button>
                 </div>
-            </div>
 
-            <div class="px-4 mt-6 pb-4">
-                <div class="flex justify-between items-end mb-4">
+                <div class="flex justify-between items-end mb-4 px-1">
                     <h3 class="font-black text-sm tracking-wide">Recent Transactions</h3>
                     <button onclick="showView('txn')" class="text-[10px] font-bold accent-text hover:underline">VIEW ALL</button>
                 </div>
                 <div id="home-txn-list" class="theme-card rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col"></div>
+            </div>
+        </div>
+
+        <div id="view-my-profile" class="view-section min-h-screen theme-card">
+            <header class="flex items-center p-6 sticky top-0 z-30 bg-transparent">
+                <button onclick="showView('home')" class="w-12 h-12 rounded-full flex items-center justify-center hover:bg-gray-100 shadow-sm border border-gray-100 theme-card"><i class="fas fa-arrow-left"></i></button>
+                <h1 class="ml-4 text-lg font-black tracking-wide">MY PROFILE</h1>
+            </header>
+            <div class="px-6 flex flex-col items-center mt-4 pb-20">
+                <div class="relative mb-10 group cursor-pointer" onclick="document.getElementById('dp-upload').click()">
+                    <div class="w-36 h-36 rounded-full border-4 accent-border overflow-hidden shadow-2xl p-1 theme-card">
+                        <img id="profile-view-dp" src="" class="w-full h-full object-cover rounded-full hidden" alt="DP">
+                        <span id="profile-view-initial" class="w-full h-full flex items-center justify-center text-5xl font-black bg-gray-100 text-gray-400 rounded-full">U</span>
+                    </div>
+                    <div class="absolute bottom-1 right-1 w-10 h-10 accent-bg text-white rounded-full flex items-center justify-center shadow-lg border-2 theme-card transform group-hover:scale-110 transition-transform"><i class="fas fa-camera"></i></div>
+                </div>
+
+                <div class="w-full theme-card rounded-[2rem] p-8 shadow-lg border border-gray-100 space-y-6 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i class="fas fa-user accent-text"></i> Full Name</label>
+                        <p class="text-xl font-black" id="profile-view-name">Loading...</p>
+                    </div>
+                    
+                    <div class="relative z-10 border-t border-gray-100 dark:border-gray-700 pt-6">
+                        <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i class="fas fa-phone accent-text"></i> Registered Number</label>
+                        <p class="text-xl font-black font-mono tracking-wider" id="profile-view-phone">Loading...</p>
+                    </div>
+
+                    <div class="relative z-10 border-t border-gray-100 dark:border-gray-700 pt-6">
+                        <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i class="fas fa-id-card accent-text"></i> Custom ID</label>
+                        <p class="text-xl font-black font-mono tracking-wider" id="profile-view-cid">N/A</p>
+                    </div>
+                    
+                    <div class="relative z-10 border-t border-gray-100 dark:border-gray-700 pt-6">
+                        <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i class="fab fa-telegram accent-text"></i> Telegram Chat ID</label>
+                        <p class="text-xl font-black font-mono tracking-wider" id="profile-view-tg">N/A</p>
+                    </div>
+
+                    <div class="relative z-10 border-t border-gray-100 dark:border-gray-700 pt-6">
+                        <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i class="fas fa-tag accent-text"></i> Profile Tag</label>
+                        <p class="text-xl font-black" id="profile-view-tag">Loading...</p>
+                    </div>
+                    
+                    <div class="relative z-10 border-t border-gray-100 dark:border-gray-700 pt-6">
+                        <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2"><i class="fas fa-lock accent-text"></i> Security PIN</label>
+                        <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-2xl px-5 py-4 border border-gray-200 dark:border-gray-700">
+                            <p class="text-2xl font-black tracking-[0.5em] text-gray-600 dark:text-gray-300 translate-y-1" id="profile-view-pin">••••</p>
+                            <button onclick="togglePinVisibility()" class="w-10 h-10 rounded-full theme-card shadow-sm text-gray-400 hover:text-gray-800 transition-colors flex items-center justify-center btn-animate"><i class="fas fa-eye" id="profile-pin-eye"></i></button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -658,12 +756,12 @@
         <div id="view-lifafa" class="view-section">
             <header class="flex items-center p-4 theme-card shadow-sm sticky top-0 z-30">
                 <button onclick="showView('home')" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"><i class="fas fa-arrow-left"></i></button>
-                <h1 class="ml-4 text-[16px] font-black tracking-wide">✉️ ADVANCED LIFAFA</h1>
+                <h1 class="ml-4 text-[16px] font-black tracking-wide">✉️ LIFAFA SYSTEM</h1>
             </header>
             <div class="px-4 mt-4 mb-4">
                 <div class="flex theme-card rounded-xl p-1 gap-1 border border-gray-100 shadow-sm">
-                    <button onclick="switchLifafaTab('lifafa-create')" id="tab-lifafa-create" class="flex-1 py-2.5 text-xs font-bold rounded-lg transition-all tab-btn active accent-bg text-white">CREATE ✍️</button>
-                    <button onclick="switchLifafaTab('lifafa-my')" id="tab-lifafa-my" class="flex-1 py-2.5 text-xs font-bold rounded-lg transition-all tab-btn text-gray-500 hover:bg-gray-50">MY LIFAFA 🕒</button>
+                    <button onclick="switchLifafaTab('lifafa-create')" id="tab-lifafa-create" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all tab-btn active accent-bg text-white">CREATE</button>
+                    <button onclick="switchLifafaTab('lifafa-claim')" id="tab-lifafa-claim" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all tab-btn text-gray-500 hover:bg-gray-50">CLAIM</button>
                 </div>
             </div>
 
@@ -672,42 +770,16 @@
                     <p class="text-[10px] font-bold uppercase opacity-90 mb-1 tracking-wider text-gray-400">AVAILABLE BALANCE</p>
                     <div class="text-4xl font-black tracking-tight accent-text">₹<span class="global-balance blur-none transition-all">0.00</span></div>
                 </div>
-                
-                <div class="bg-blue-50 border border-blue-200 text-blue-700 p-3 rounded-xl mb-4 text-xs font-bold flex items-start gap-2 shadow-sm">
-                    <i class="fas fa-info-circle mt-0.5"></i>
-                    <p>Make <span class="text-blue-900 bg-blue-100 px-1 rounded">@Lion_Pay_Alert_Bot</span> an admin in your Telegram channels to verify users.</p>
-                </div>
-
-                <form onsubmit="event.preventDefault(); processAdvancedLifafaCreate()" class="theme-card rounded-2xl p-5 shadow-sm border border-gray-100">
-                    <label class="block text-xs font-bold text-gray-400 mb-2">TELEGRAM CHANNELS (OPTIONAL) 📢</label>
-                    <div id="lifafa-channels-container">
-                        <div class="mb-3 relative">
-                            <input type="text" class="lif-channel-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus-accent font-bold theme-card" placeholder="e.g. @mychannel">
-                        </div>
-                    </div>
-                    <button type="button" onclick="addLifafaChannel()" class="w-full border border-dashed border-gray-300 text-gray-500 text-xs font-bold py-2 rounded-xl mb-5 hover:bg-gray-50 transition-colors">➕ Add Another Channel</button>
-
-                    <label class="block text-xs font-bold text-gray-400 mb-2">BOT TOKEN 🤖</label>
-                    <input type="text" id="lif-bot-token" placeholder="Your Bot Token (Admin Verify)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-mono theme-card">
-
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1">AMOUNT / USER (₹)</label>
-                            <input type="number" id="lif-amt" required min="1" placeholder="10" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus-accent font-bold theme-card">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1">TOTAL USERS 👥</label>
-                            <input type="number" id="lif-users" required min="1" placeholder="100" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus-accent font-bold theme-card">
-                        </div>
-                    </div>
-
-                    <label class="block text-xs font-bold text-gray-400 mb-2">PASSWORD (OPTIONAL) 🔒</label>
-                    <input type="text" id="lif-password" placeholder="Leave blank if none" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-bold theme-card">
+                <form onsubmit="event.preventDefault(); processLifafaCreate()" class="theme-card rounded-2xl p-5 shadow-sm border border-gray-100">
+                    <label class="block text-xs font-bold text-gray-400 mb-2">NUMBER OF USERS</label>
+                    <input type="number" id="lif-users" required min="1" placeholder="e.g. 5" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-bold theme-card">
+                    <label class="block text-xs font-bold text-gray-400 mb-2">AMOUNT PER USER (₹)</label>
+                    <input type="number" id="lif-amt" required min="1" placeholder="e.g. 10" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-bold theme-card">
                     
-                    <div id="premium-lifafa-box" class="mb-5 theme-card rounded-xl p-3 border border-yellow-200 bg-yellow-50 flex items-center justify-between shadow-sm">
+                    <div id="premium-lifafa-box" class="hidden mb-5 theme-card rounded-xl p-3 border border-yellow-200 bg-yellow-50 flex items-center justify-between">
                         <div>
                             <p class="text-xs font-bold text-yellow-700"><i class="fas fa-crown"></i> Premium Only</p>
-                            <p class="text-[10px] text-yellow-600">Only premium users can claim</p>
+                            <p class="text-[10px] text-yellow-600">Only premium users can claim this lifafa</p>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
                           <input type="checkbox" id="lif-premium-only" class="sr-only peer">
@@ -715,66 +787,19 @@
                         </label>
                     </div>
 
-                    <label class="block text-xs font-bold text-gray-400 mb-2">SECURITY PIN 🔑</label>
+                    <label class="block text-xs font-bold text-gray-400 mb-2">SECURITY PIN</label>
                     <input type="password" id="lif-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-center tracking-widest font-black text-lg mb-6 focus:outline-none focus-accent theme-card">
-                    
-                    <button type="submit" id="btn-create-advanced-lifafa" class="btn-animate w-full accent-bg text-white font-bold py-4 rounded-xl shadow-lg"><i class="fas fa-rocket mr-2"></i>CREATE LIFAFA</button>
-                    
-                    <div id="lifafa-result-box" class="hidden mt-4 p-4 bg-gray-900 rounded-xl border border-gray-700">
-                        <p class="text-green-400 font-bold text-xs mb-2"><i class="fas fa-check-circle"></i> Created Successfully!</p>
-                        <div class="flex gap-2">
-                            <input type="text" id="lifafa-link-generated" readonly class="flex-1 bg-black border border-gray-700 text-white text-[10px] px-2 py-2 rounded font-mono">
-                            <button type="button" onclick="copyText(document.getElementById('lifafa-link-generated').value)" class="bg-gray-700 text-white px-3 rounded text-xs"><i class="fas fa-copy"></i></button>
-                        </div>
-                    </div>
+                    <button type="submit" class="btn-animate w-full accent-bg text-white font-bold py-4 rounded-xl shadow-lg"><i class="fas fa-envelope-open-text mr-2"></i>CREATE LIFAFA</button>
                 </form>
             </div>
 
-            <div id="lifafa-my" class="tab-content px-4 pb-10">
-                <button onclick="loadMyLifafas()" class="w-full border border-gray-200 theme-card py-2 rounded-xl text-xs font-bold text-gray-500 mb-4 hover:bg-gray-50"><i class="fas fa-sync"></i> Refresh List</button>
-                <div id="my-lifafas-container" class="space-y-3">
-                    <p class="text-center text-xs text-gray-400 font-bold mt-10">Click Refresh to load your lifafas</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="view-stats" class="view-section min-h-screen theme-card">
-            <header class="flex items-center p-4 shadow-sm sticky top-0 z-30 theme-card">
-                <button onclick="showView('home')" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full"><i class="fas fa-arrow-left"></i></button>
-                <h1 class="ml-4 text-[16px] font-black tracking-wide accent-text"><i class="fas fa-chart-bar"></i> ACCOUNT STATS</h1>
-            </header>
-            <div class="p-4">
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="stat-card rounded-2xl p-4 shadow-md theme-card border border-gray-100">
-                        <p class="text-[10px] text-gray-400 font-bold tracking-wider mb-1">TOTAL CREDIT 💰</p>
-                        <p class="text-xl font-black text-green-500" id="stat-credit">₹0.00</p>
-                    </div>
-                    <div class="stat-card rounded-2xl p-4 shadow-md theme-card border border-gray-100" style="border-left-color: #ef4444;">
-                        <p class="text-[10px] text-gray-400 font-bold tracking-wider mb-1">TOTAL DEBIT 💸</p>
-                        <p class="text-xl font-black text-red-500" id="stat-debit">₹0.00</p>
-                    </div>
-                    <div class="stat-card rounded-2xl p-4 shadow-md theme-card border border-gray-100" style="border-left-color: #3b82f6;">
-                        <p class="text-[10px] text-gray-400 font-bold tracking-wider mb-1">TRANSACTIONS 📈</p>
-                        <p class="text-xl font-black text-blue-500" id="stat-count">0</p>
-                    </div>
-                    <div class="stat-card rounded-2xl p-4 shadow-md theme-card border border-gray-100" style="border-left-color: #f59e0b;">
-                        <p class="text-[10px] text-gray-400 font-bold tracking-wider mb-1">SUCCESS RATE 🎯</p>
-                        <p class="text-xl font-black text-yellow-500" id="stat-rate">0%</p>
-                    </div>
-                </div>
-
-                <h3 class="font-black text-sm tracking-wide mb-3">Filtered History</h3>
-                <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar mb-4" id="stats-filters">
-                    <div class="filter-chip active" onclick="setStatsFilter('All', this)">All</div>
-                    <div class="filter-chip" onclick="setStatsFilter('Successful', this)">Successful</div>
-                    <div class="filter-chip" onclick="setStatsFilter('Pending', this)">Pending</div>
-                    <div class="filter-chip" onclick="setStatsFilter('Rejected', this)">Reject</div>
-                    <div class="filter-chip" onclick="setStatsFilter('Credit', this)">Credit</div>
-                    <div class="filter-chip" onclick="setStatsFilter('Debit', this)">Debit</div>
-                </div>
-
-                <div id="stats-txn-list" class="theme-card rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col mb-10 min-h-[200px]">
-                    </div>
+            <div id="lifafa-claim" class="tab-content px-4">
+                <form onsubmit="event.preventDefault(); processLifafaClaim()" class="theme-card rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
+                    <div class="w-20 h-20 theme-card accent-text border border-gray-100 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner"><i class="fas fa-envelope"></i></div>
+                    <label class="block text-xs font-bold text-gray-400 mb-3 tracking-widest uppercase">Enter Lifafa Code</label>
+                    <input type="text" id="lif-claim-code" required placeholder="Paste Code Here" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-5 text-center tracking-widest uppercase text-lg font-black mb-8 focus:outline-none focus-accent transition-colors shadow-inner theme-card">
+                    <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-xl shadow-lg text-lg">OPEN LIFAFA</button>
+                </form>
             </div>
         </div>
 
@@ -935,6 +960,42 @@
             </div>
         </div>
 
+        <div id="view-game" class="view-section min-h-screen theme-card">
+            <header class="flex items-center p-4 shadow-sm sticky top-0 z-30 theme-card">
+                <button onclick="showView('home')" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full"><i class="fas fa-arrow-left"></i></button>
+                <h1 class="ml-4 text-[16px] font-black tracking-wide accent-text"><i class="fas fa-gamepad"></i> COLOR BATTLE</h1>
+            </header>
+            <div class="p-4 text-center">
+                <div class="theme-card border border-gray-100 rounded-3xl p-6 mb-8 relative inline-block mx-auto min-w-[220px] shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+                    <p class="text-xs text-gray-400 font-black tracking-[0.2em] mb-1" id="game-timer-label">LIVE TIMER</p>
+                    <div class="text-5xl font-black font-mono accent-text" id="game-time">30</div>
+                </div>
+                <div class="flex gap-4 justify-center mb-6 px-2">
+                    <div onclick="placeGameBet('red')" class="relative flex-1 bg-gradient-to-br from-red-500 to-red-600 rounded-3xl aspect-square shadow-[0_10px_20px_rgba(239,68,68,0.3)] cursor-pointer hover:scale-[1.02] flex flex-col items-center justify-center border-4 border-white active:scale-95">
+                        <i class="fas fa-crown crown-icon" id="crown-red"></i><h2 class="text-3xl font-black mb-2 text-white drop-shadow-md">RED</h2>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/30"><p class="font-mono text-xl font-bold text-white" id="game-tot-red">₹0</p></div>
+                    </div>
+                    <div onclick="placeGameBet('green')" class="relative flex-1 bg-gradient-to-br from-green-500 to-green-600 rounded-3xl aspect-square shadow-[0_10px_20px_rgba(34,197,94,0.3)] cursor-pointer hover:scale-[1.02] flex flex-col items-center justify-center border-4 border-white active:scale-95">
+                        <i class="fas fa-crown crown-icon" id="crown-green"></i><h2 class="text-3xl font-black mb-2 text-white drop-shadow-md">GREEN</h2>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/30"><p class="font-mono text-xl font-bold text-white" id="game-tot-green">₹0</p></div>
+                    </div>
+                </div>
+                
+                <div class="flex overflow-x-auto gap-3 mb-4 pb-2 no-scrollbar px-2" id="coin-container">
+                    <button type="button" onclick="selectGameCoin(1)" class="game-coin selected shrink-0 w-12 h-12 rounded-full theme-card border-2 accent-border accent-text font-black flex items-center justify-center shadow-md">₹1</button>
+                    <button type="button" onclick="selectGameCoin(10)" class="game-coin shrink-0 w-12 h-12 rounded-full theme-card border-2 border-transparent text-gray-500 font-black flex items-center justify-center shadow-sm">₹10</button>
+                    <button type="button" onclick="selectGameCoin(50)" class="game-coin shrink-0 w-12 h-12 rounded-full theme-card border-2 border-transparent text-gray-500 font-black flex items-center justify-center shadow-sm">₹50</button>
+                    <button type="button" onclick="selectGameCoin(100)" class="game-coin shrink-0 w-12 h-12 rounded-full theme-card border-2 border-transparent text-gray-500 font-black flex items-center justify-center shadow-sm">₹100</button>
+                </div>
+                
+                <div class="theme-card rounded-2xl p-5 border border-gray-100 shadow-sm flex justify-between px-6 mb-20">
+                    <div class="text-left"><p class="text-[10px] text-gray-400 font-bold tracking-wider">MY RED BET</p><p class="text-lg font-black text-red-500" id="game-ub-red">₹0</p></div>
+                    <div class="w-px bg-gray-200"></div>
+                    <div class="text-right"><p class="text-[10px] text-gray-400 font-bold tracking-wider">MY GREEN BET</p><p class="text-lg font-black text-green-500" id="game-ub-green">₹0</p></div>
+                </div>
+            </div>
+        </div>
+
         <div id="view-help" class="view-section min-h-screen theme-card">
             <header class="flex items-center p-4 sticky top-0 z-30 border-b border-gray-100 theme-card">
                 <button onclick="showView('home')" class="w-8 h-8 hover:bg-gray-100 rounded-full flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left text-gray-700"></i></button>
@@ -987,16 +1048,14 @@
 
     </main>
 
-    <nav class="fixed bottom-0 left-0 w-full theme-card shadow-[0_-10px_30px_rgba(0,0,0,0.05)] border-t border-gray-100 z-30 pb-safe transition-colors">
-        <div class="flex justify-between items-center px-6 py-2">
-            <a href="#" onclick="showView('home')" class="nav-item flex flex-col items-center gap-1 accent-text pt-2 pb-1"><i class="fas fa-home text-xl btn-animate"></i></a>
-            <a href="#" onclick="showView('send')" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-yellow-500 pt-2 pb-1"><i class="fas fa-paper-plane text-xl btn-animate"></i></a>
-            <a href="#" onclick="showView('scan'); startScanner();" class="relative -top-6 group">
-                <div class="w-16 h-16 accent-bg text-white rounded-2xl flex items-center justify-center shadow-lg border-4 theme-card"><i class="fas fa-qrcode text-3xl"></i></div>
-            </a>
-            <a href="#" onclick="showView('add')" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-yellow-500 pt-2 pb-1"><i class="fas fa-plus-circle text-xl btn-animate"></i></a>
-            <a href="#" onclick="showView('txn')" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-yellow-500 pt-2 pb-1"><i class="fas fa-receipt text-xl btn-animate"></i></a>
-        </div>
+    <nav class="floating-nav flex justify-between items-center z-[80]">
+        <a href="#" onclick="showView('home')" class="nav-item active flex flex-col items-center"><i class="fas fa-home text-xl btn-animate"></i></a>
+        <a href="#" onclick="showView('txn')" class="nav-item flex flex-col items-center text-gray-400 hover:text-gray-800 dark:hover:text-white"><i class="fas fa-receipt text-xl btn-animate"></i></a>
+        <a href="#" onclick="showView('scan'); startScanner();" class="relative -top-6 group">
+            <div class="w-16 h-16 accent-bg text-white rounded-full flex items-center justify-center shadow-lg border-4 border-white dark:border-gray-900 theme-card"><i class="fas fa-qrcode text-3xl"></i></div>
+        </a>
+        <a href="#" onclick="showView('lifafa')" class="nav-item flex flex-col items-center text-gray-400 hover:text-gray-800 dark:hover:text-white"><i class="fas fa-envelope-open-text text-xl btn-animate"></i></a>
+        <a href="#" onclick="showView('my-profile')" class="nav-item flex flex-col items-center text-gray-400 hover:text-gray-800 dark:hover:text-white"><i class="fas fa-user text-xl btn-animate"></i></a>
     </nav>
 
     <script>
@@ -1010,7 +1069,52 @@
         let lastSeenPostTimestamp = localStorage.getItem('lastSeenPost') || 0;
         let isBalanceVisible = false;
         
+        // Game variables preserved
+        let gameTimer = 30, totalRed = 0, totalGreen = 0, userBetRed = 0, userBetGreen = 0, selectedGameCoin = 1, isGameResolving = false, currentGameRoundId = ""; 
+        let gameState = 'BETTING'; 
         let html5QrcodeScanner = null;
+        let isBetting = false; 
+
+        // --- NEW: PROFILE LOGIC ---
+        let isPinVisible = false;
+        function togglePinVisibility() {
+            isPinVisible = !isPinVisible;
+            const pinEl = document.getElementById('profile-view-pin');
+            const eyeEl = document.getElementById('profile-pin-eye');
+            if(isPinVisible) {
+                pinEl.innerText = currentUser.pin;
+                pinEl.classList.remove('tracking-[0.5em]', 'translate-y-1');
+                pinEl.classList.add('tracking-widest');
+                eyeEl.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                pinEl.innerText = '••••';
+                pinEl.classList.add('tracking-[0.5em]', 'translate-y-1');
+                pinEl.classList.remove('tracking-widest');
+                eyeEl.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        document.getElementById('dp-upload').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const base64 = event.target.result;
+                updateDpVisuals(base64);
+                try {
+                    await apiCall('UPDATE_DP', { phone: currentUser.phone, dpBase64: base64 });
+                    currentUser.dp = base64; showToast("Profile Picture Updated!");
+                } catch (err) { showToast("DP Update Failed"); }
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function updateDpVisuals(base64Str) {
+            const dps = ['ui-user-dp-img', 'sidebar-dp-img', 'profile-view-dp'];
+            const initials = ['ui-user-initial', 'sidebar-initial', 'profile-view-initial'];
+            dps.forEach(id => { let el = document.getElementById(id); if(el) { el.src = base64Str; el.classList.remove('hidden'); } });
+            initials.forEach(id => { let el = document.getElementById(id); if(el) el.classList.add('hidden'); });
+        }
 
         const TAGS_LIST = ["Member", "Looter", "Bot Maker", "Admin", "Developer", "Trader", "VIP", "King", "Pro", "Legend"];
         const ACCENT_COLORS = [
@@ -1086,25 +1190,6 @@
         function generateApiKey() { return 'LP-' + Math.random().toString(36).substring(2, 10).toUpperCase(); }
         function generateTxnId() { return 'TXN' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase(); }
         function checkSecurityPin(inputPin) { if(inputPin === currentUser.pin) return true; showToast("Incorrect Security PIN!"); return false; }
-
-        // --- CUSTOM DP LOGIC ---
-        document.getElementById('dp-upload').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = async (event) => {
-                const base64 = event.target.result;
-                document.getElementById('ui-user-dp-img').src = base64;
-                document.getElementById('ui-user-dp-img').classList.remove('hidden');
-                document.getElementById('ui-user-initial').classList.add('hidden');
-                try {
-                    await apiCall('UPDATE_DP', { phone: currentUser.phone, dpBase64: base64 });
-                    currentUser.dp = base64;
-                    showToast("Profile Picture Updated!");
-                } catch (err) { showToast("DP Update Failed"); }
-            };
-            reader.readAsDataURL(file);
-        });
 
         function updateApiKeyUI() {
             let key = currentUser.apiKey || 'LP-PENDING'; 
@@ -1217,7 +1302,7 @@
         async function syncData() {
             if(!currentUser) return;
             try {
-                let data = await apiCall('SYNC', { phone: currentUser.phone });
+                let data = await apiCall('SYNC', { phone: currentUser.phone, gameRoundId: currentGameRoundId });
                 if(data.user) {
                     if(data.user.isBanned) return location.reload();
                     
@@ -1231,7 +1316,7 @@
                     
                     if (currentUser.premium) {
                         if (currentBalance > prevBalance) playSound('credit');
-                        else if (currentBalance < prevBalance && !isActionOnCooldown) playSound('debit');
+                        else if (currentBalance < prevBalance && !isActionOnCooldown && !isBetting) playSound('debit');
                     }
 
                     if(data.user.apiKey && data.user.apiKey !== currentUser.apiKey) { currentUser.apiKey = data.user.apiKey; updateApiKeyUI(); }
@@ -1270,8 +1355,10 @@
                     }
                     if (document.getElementById('view-official').classList.contains('active')) { renderOfficialPosts(); }
                 }
-                updateUI();
-                if(document.getElementById('view-stats').classList.contains('active')) updateStatsView();
+                if(data.gameRound && gameState === 'BETTING') { 
+                    totalRed = data.gameRound.totalRed || 0; totalGreen = data.gameRound.totalGreen || 0; 
+                }
+                updateUI(); updateGameUI();
             } catch(e) {}
         }
 
@@ -1293,23 +1380,28 @@
             
             document.documentElement.style.setProperty('--accent-main', currentAccent);
             document.documentElement.style.setProperty('--accent-glow', hexToRgba(currentAccent, 0.4));
+            document.documentElement.style.setProperty('--accent-light', hexToRgba(currentAccent, 0.15));
             document.documentElement.style.setProperty('--premium-grad-1', hexToRgba(currentAccent, 0.15));
             document.documentElement.style.setProperty('--premium-grad-2', hexToRgba(currentAccent, 0.05));
             localStorage.setItem('lp_color', currentAccent);
+            
+            let tagToShow = currentUser.customUserTag || currentUser.tag || 'Premium';
             
             if (isPrem) {
                 document.getElementById('btn-premium-menu').classList.add('hidden');
                 document.getElementById('btn-theme-menu').classList.remove('hidden');
                 document.getElementById('btn-tags-menu').classList.remove('hidden');
                 document.getElementById('ghost-transfer-box').classList.remove('hidden');
+                document.getElementById('premium-lifafa-box').classList.remove('hidden');
+                document.getElementById('btn-hide-txn').classList.remove('hidden');
                 
                 let qrWrap = document.getElementById('qr-container-wrap');
                 if(qrWrap) qrWrap.className = "theme-card p-2 rounded-2xl mb-4 transition-all premium-border";
                 let qrBadge = document.getElementById('premium-qr-badge');
                 if(qrBadge) qrBadge.classList.remove('hidden');
 
-                let tagToShow = currentUser.customUserTag || currentUser.tag || 'Premium';
                 document.getElementById('ui-verified-badge').innerHTML = `<i class="fas fa-crown text-yellow-400"></i> ${tagToShow}`;
+                document.getElementById('profile-view-tag').innerHTML = `<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-black tracking-widest uppercase"><i class="fas fa-crown"></i> ${tagToShow}</span>`;
                 
                 if (currentUser.advancedUI !== false) {
                     document.documentElement.classList.add('premium-mode');
@@ -1347,6 +1439,8 @@
                 document.getElementById('btn-theme-menu').classList.add('hidden');
                 document.getElementById('btn-tags-menu').classList.add('hidden');
                 document.getElementById('ghost-transfer-box').classList.add('hidden');
+                document.getElementById('premium-lifafa-box').classList.add('hidden');
+                document.getElementById('btn-hide-txn').classList.add('hidden');
                 
                 let qrWrap = document.getElementById('qr-container-wrap');
                 if(qrWrap) qrWrap.className = "theme-card p-2 rounded-xl shadow-sm border border-gray-200 mb-4 transition-all";
@@ -1354,6 +1448,8 @@
                 if(qrBadge) qrBadge.classList.add('hidden');
 
                 document.getElementById('ui-verified-badge').innerHTML = `<i class="fas fa-shield-alt"></i> Verified`;
+                document.getElementById('profile-view-tag').innerHTML = `<span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-black tracking-widest uppercase">Normal User</span>`;
+                
                 document.documentElement.classList.remove('premium-mode');
                 document.documentElement.classList.remove('colorful-mode');
                 localStorage.setItem('lp_premiumUI', 'false');
@@ -1541,26 +1637,41 @@
         function handleMessageNotificationClick() { markPostsAsRead(); showView('official'); }
 
         function initApp() {
+            document.getElementById('ui-user-name-top').innerText = currentUser.name.split(' ')[0]; 
             document.getElementById('ui-user-name').innerText = currentUser.name; 
-            if(currentUser.dp) {
-                document.getElementById('ui-user-dp-img').src = currentUser.dp;
-                document.getElementById('ui-user-dp-img').classList.remove('hidden');
-                document.getElementById('ui-user-initial').classList.add('hidden');
-            } else {
-                document.getElementById('ui-user-initial').innerText = currentUser.name.charAt(0).toUpperCase();
-            }
+            
+            document.getElementById('sidebar-name').innerText = currentUser.name; 
+            document.getElementById('sidebar-phone').innerText = currentUser.customId || currentUser.phone;
             document.getElementById('ui-user-phone').innerText = currentUser.customId || currentUser.phone;
-            document.getElementById('sidebar-name').innerText = currentUser.name; document.getElementById('sidebar-phone').innerText = currentUser.customId || currentUser.phone;
+            
+            // Masked phone formatting for card
+            document.getElementById('ui-user-phone-card').innerText = currentUser.phone.replace(/.(?=.{4})/g, '*');
+            
+            // Profile Init
+            document.getElementById('profile-view-name').innerText = currentUser.name;
+            document.getElementById('profile-view-phone').innerText = currentUser.phone;
+            document.getElementById('profile-view-cid').innerText = currentUser.customId || "N/A";
+            document.getElementById('profile-view-tg').innerText = currentUser.tgUserId || "N/A";
+
+            if(currentUser.dp) updateDpVisuals(currentUser.dp);
+            else { 
+                document.getElementById('ui-user-initial').innerText = currentUser.name.charAt(0).toUpperCase(); 
+                document.getElementById('profile-view-initial').innerText = currentUser.name.charAt(0).toUpperCase(); 
+                document.getElementById('sidebar-initial').innerText = currentUser.name.charAt(0).toUpperCase(); 
+            }
+
             document.getElementById('sidebar-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=LIONPAY:${currentUser.phone}:${encodeURIComponent(currentUser.name)}`;
             updateApiKeyUI();
             
             applyPremiumUI();
+            updateGameSim(); 
             
             syncLoop(); 
+            setInterval(updateGameSim, 1000); 
             
             const urlParams = new URLSearchParams(window.location.search);
             const lifafaCode = urlParams.get('lifafa');
-            if(lifafaCode) { setTimeout(() => startPublicLifafaFlow(lifafaCode), 1000); window.history.replaceState({}, document.title, "/"); }
+            if(lifafaCode) { setTimeout(() => showPublicLifafa(lifafaCode), 1000); window.history.replaceState({}, document.title, "/"); }
         }
         
         async function processSend() {
@@ -1724,6 +1835,130 @@
             keeperBalance -= amt; currentBalance += amt; updateUI(); document.getElementById('kw-amt').value = ''; document.getElementById('kw-pin').value = ''; showToast(`₹${amt} moved to Wallet!`);
         }
 
+        function setCustomGameCoin(val) {
+            let amt = parseInt(val);
+            if(isNaN(amt) || amt <= 0) return;
+            selectedGameCoin = amt;
+            document.querySelectorAll('.game-coin').forEach(b => {
+                b.classList.remove('selected', 'accent-border', 'accent-text');
+                b.classList.add('border-transparent', 'text-gray-500');
+            });
+        }
+
+        function selectGameCoin(amt) { 
+            if(gameState === 'DISTRIBUTING') return;
+            selectedGameCoin=amt; 
+            let customInput = document.getElementById('custom-game-amt');
+            if(customInput) customInput.value = '';
+            document.querySelectorAll('.game-coin').forEach(b => { 
+                b.classList.remove('selected', 'accent-border', 'accent-text'); 
+                b.classList.add('border-transparent', 'text-gray-500'); 
+                if(parseInt(b.innerText.replace('₹',''))===amt) { 
+                    b.classList.add('selected', 'accent-border', 'accent-text'); 
+                    b.classList.remove('border-transparent', 'text-gray-500'); 
+                } 
+            }); 
+        }
+
+        async function placeGameBet(color) {
+            if(!checkCooldown()) return;
+            if(gameState === 'DISTRIBUTING' || gameTimer <= 5) return showToast("Bets are closed! Wait for next round.");
+            let amt = selectedGameCoin; 
+            
+            if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
+            if(amt > currentBalance) return showToast("Insufficient Balance!");
+            if(isBetting) return showToast("Processing..."); 
+            
+            isBetting = true;
+            let txn = createTxnObj('out', `Game Bet (${color.toUpperCase()})`, amt, 'Success', 'fa-gamepad', 'orange', 'Color Game', 'N/A');
+            
+            try {
+                await apiCall('GAME_BET', { phone: currentUser.phone, color, amount: amt, roundId: currentGameRoundId, txn: txn });
+                currentBalance -= amt; 
+                if(color === 'red') { userBetRed += amt; totalRed += amt; } 
+                else { userBetGreen += amt; totalGreen += amt; } 
+                playSound('debit');
+                updateGameUI(); updateUI(); showToast(`₹${amt} bet placed on ${color.toUpperCase()}!`);
+            } catch(e) {
+                showToast(e.message || "Bet failed to save.");
+            } finally {
+                isBetting = false;
+            }
+        }
+
+        function updateGameSim() {
+            let now = Date.now(); 
+            let currentRoundEpoch = Math.floor(now / 40000); 
+            let newRoundId = "R" + currentRoundEpoch; 
+            let elapsedInRound = now % 40000;
+            
+            if (newRoundId !== currentGameRoundId) { 
+                currentGameRoundId = newRoundId; 
+                userBetRed = 0; userBetGreen = 0; 
+                totalRed = 0; totalGreen = 0; 
+                isGameResolving = false;
+                document.querySelectorAll('.crown-icon').forEach(c => c.classList.remove('show')); 
+            }
+            
+            if (elapsedInRound < 30000) {
+                gameState = 'BETTING';
+                gameTimer = 30 - Math.floor(elapsedInRound / 1000);
+            } else {
+                gameState = 'DISTRIBUTING';
+                gameTimer = 10 - Math.floor((elapsedInRound - 30000) / 1000);
+            }
+            
+            updateGameUI();
+            
+            if (gameState === 'DISTRIBUTING' && !isGameResolving) { 
+                isGameResolving = true; 
+                resolveGame(userBetRed, userBetGreen, totalRed, totalGreen); 
+            }
+        }
+
+        async function resolveGame(uRed, uGreen, tRed, tGreen) {
+            setTimeout(async () => {
+                let title = "ROUND OVER", text = "Nobody won.", isWin = false; 
+                let didPlay = (uRed > 0 || uGreen > 0);
+                
+                try {
+                    let winColor = 'tie'; if(tRed < tGreen) winColor = 'red'; else if(tGreen < tRed) winColor = 'green';
+                    
+                    document.querySelectorAll('.crown-icon').forEach(c => c.classList.remove('show')); 
+                    if(winColor === 'red') document.getElementById('crown-red').classList.add('show'); 
+                    if(winColor === 'green') document.getElementById('crown-green').classList.add('show');
+                    
+                    if(winColor === 'tie' && didPlay) {
+                        title = "IT'S A TIE!"; text = "Bets refunded."; let amt = uRed + uGreen;
+                        let txn = createTxnObj('in', 'Game Refund', amt, 'Success', 'fa-gamepad', 'gray', 'Game System', 'N/A'); 
+                        await apiCall('EXECUTE_TXN', { mode: 'GAME_REFUND', sender: currentUser.phone, amount: Number(amt), txn }); 
+                        currentBalance += amt;
+                    } else if (didPlay) {
+                        if(winColor === 'red' && uRed > 0) {
+                            let winAmt = uRed * 1.5; isWin = true; title = "YOU WON!"; text = `Won ₹${winAmt}`;
+                            let txn = createTxnObj('in', 'Game Won (Red)', winAmt, 'Success', 'fa-trophy', 'green', 'Game System', 'N/A'); 
+                            await apiCall('EXECUTE_TXN', { mode: 'GAME_WIN', sender: currentUser.phone, amount: Number(winAmt), txn }); 
+                            currentBalance += winAmt;
+                        } else if(winColor === 'green' && uGreen > 0) {
+                            let winAmt = uGreen * 1.5; isWin = true; title = "YOU WON!"; text = `Won ₹${winAmt}`;
+                            let txn = createTxnObj('in', 'Game Won (Green)', winAmt, 'Success', 'fa-trophy', 'green', 'Game System', 'N/A'); 
+                            await apiCall('EXECUTE_TXN', { mode: 'GAME_WIN', sender: currentUser.phone, amount: Number(winAmt), txn }); 
+                            currentBalance += winAmt;
+                        } else { title = "YOU LOSE!"; text = `Better luck next time.`; }
+                    } else if (!didPlay) { text = `${winColor.toUpperCase()} wins!`; }
+                    
+                    if(didPlay) { 
+                        if (isWin) playSound('credit');
+                        updateUI(); 
+                        showGameModal(title, text, isWin); 
+                    }
+                } catch (e) {
+                    console.error("Resolve Error:", e);
+                    if(didPlay) { showGameModal(title, text, isWin); }
+                }
+            }, 2000); 
+        }
+
         async function toggleTxnVisibility() {
             if (!currentModalTxnId) return;
             try {
@@ -1783,8 +2018,40 @@
                     listEl.innerHTML += `<div onclick="openTxnModal('${txn.id}')" class="flex justify-between items-center p-4 border-b border-gray-100 hover:bg-gray-50 theme-card cursor-pointer transition-colors"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl theme-card accent-text flex items-center justify-center text-lg border border-gray-200"><i class="fas ${txn.icon}"></i></div><div><p class="text-sm font-bold ${titleClass}">${txn.title}</p><p class="text-[10px] ${statusColor} font-bold mt-0.5">${txn.status} • ${txn.date.split(',')[0]}</p></div></div><p class="font-black ${amountClass}">${sign}₹${parseFloat(txn.amount).toFixed(2)}</p></div>`;
                 });
             }
+        }
+        
+        function updateGameUI() {
+            let gt = document.getElementById('game-time');
+            let gl = document.getElementById('game-timer-label');
+            if(!gt || !gl) return;
+            gt.innerText = gameTimer < 10 ? '0'+gameTimer : gameTimer;
+            let customInput = document.getElementById('custom-game-amt');
 
-            if(document.getElementById('view-stats').classList.contains('active')) updateStatsView();
+            gt.classList.remove('accent-text', 'text-red-600', 'text-blue-500');
+            
+            if (gameState === 'DISTRIBUTING') { 
+                gt.classList.add('text-blue-500'); 
+                gl.innerText = "DISTRIBUTING PRIZE"; 
+                document.querySelectorAll('.game-coin').forEach(c => c.classList.add('disabled')); 
+                if(customInput) customInput.disabled = true;
+            } 
+            else if (gameTimer <= 5 && gameTimer > 0) { 
+                gt.classList.add('text-red-600'); 
+                gl.innerText = "BETS CLOSED"; 
+                document.querySelectorAll('.game-coin').forEach(c => c.classList.add('disabled')); 
+                if(customInput) customInput.disabled = true;
+            } 
+            else { 
+                gt.classList.add('accent-text'); 
+                gl.innerText = "LIVE TIMER"; 
+                document.querySelectorAll('.game-coin').forEach(c => c.classList.remove('disabled')); 
+                if(customInput) customInput.disabled = false;
+            }
+            
+            document.getElementById('game-tot-red').innerText = '₹' + totalRed; 
+            document.getElementById('game-tot-green').innerText = '₹' + totalGreen; 
+            document.getElementById('game-ub-red').innerText = '₹' + userBetRed; 
+            document.getElementById('game-ub-green').innerText = '₹' + userBetGreen;
         }
 
         let currentModalTxnId = '';
@@ -1841,7 +2108,6 @@
             }
 
             if (viewId === 'official') markPostsAsRead();
-            if (viewId === 'stats') updateStatsView();
             
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); 
             document.getElementById('view-' + viewId).classList.add('active'); 
@@ -1849,7 +2115,7 @@
             document.querySelectorAll('.nav-item').forEach(el => { 
                 el.classList.remove('accent-text'); 
                 el.classList.add('text-gray-400'); 
-                if(el.innerHTML.includes(viewId) || (viewId === 'stats' && false)) { // Stats isn't on bottom bar
+                if(el.getAttribute('onclick').includes(viewId)) { 
                     el.classList.remove('text-gray-400'); 
                     el.classList.add('accent-text'); 
                 } 
@@ -1860,8 +2126,26 @@
 
         function toggleSidebar() { const sidebar = document.getElementById('sidebar'); const overlay = document.getElementById('sidebarOverlay'); if(sidebar.classList.contains('-translate-x-full')) { sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); setTimeout(()=>overlay.classList.add('opacity-100'),10); } else { sidebar.classList.add('-translate-x-full'); overlay.classList.remove('opacity-100'); setTimeout(()=>overlay.classList.add('hidden'),300); } }
         function switchTab(tabId) { document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'accent-bg', 'text-white')); document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('text-[#6b7280]')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); let activeBtn = document.getElementById('tab-'+tabId); activeBtn.classList.remove('text-[#6b7280]'); activeBtn.classList.add('active', 'accent-bg', 'text-white'); document.getElementById(tabId).classList.add('active'); }
-        function switchLifafaTab(tabId) { document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'accent-bg', 'text-white')); document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('text-[#6b7280]')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); let activeBtn = document.getElementById('tab-'+tabId); activeBtn.classList.remove('text-[#6b7280]'); activeBtn.classList.add('active', 'accent-bg', 'text-white'); document.getElementById(tabId).classList.add('active'); if(tabId === 'lifafa-my') loadMyLifafas(); }
+        function switchLifafaTab(tabId) { document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'accent-bg', 'text-white')); document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('text-[#6b7280]')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); let activeBtn = document.getElementById('tab-'+tabId); activeBtn.classList.remove('text-[#6b7280]'); activeBtn.classList.add('active', 'accent-bg', 'text-white'); document.getElementById(tabId).classList.add('active'); }
         function switchKeeperTab(tabId) { document.querySelectorAll('.keeper-tab-btn').forEach(btn => btn.classList.remove('active')); document.querySelectorAll('.keeper-tab-content').forEach(c => c.classList.remove('active')); document.getElementById('btn-'+tabId).classList.add('active'); document.getElementById(tabId).classList.add('active'); }
+        
+        function showGameModal(title, text, isWin) { 
+            document.getElementById('gameModalIcon').innerText = isWin ? '🎉' : '💀'; 
+            document.getElementById('gameModalTitle').innerText = title; 
+            document.getElementById('gameModalTitle').className = `text-4xl font-black mb-2 relative z-10 tracking-wide ${isWin ? 'text-green-500' : 'text-red-500'}`; 
+            document.getElementById('gameModalText').innerText = text; 
+            document.getElementById('gameModalBg').className = isWin ? 'absolute inset-0 opacity-20 pointer-events-none bg-gradient-to-br from-green-400 to-yellow-400' : 'absolute inset-0 opacity-10 pointer-events-none bg-gray-500'; 
+            document.getElementById('gameModal').classList.remove('hidden'); 
+            setTimeout(()=> {
+                document.getElementById('gameModal').classList.remove('opacity-0');
+                document.getElementById('gameModalContent').classList.remove('scale-90');
+            }, 10); 
+        }
+        function closeGameModal() { 
+            document.getElementById('gameModal').classList.add('opacity-0'); 
+            document.getElementById('gameModalContent').classList.add('scale-90');
+            setTimeout(()=>document.getElementById('gameModal').classList.add('hidden'),300); 
+        }
         
         function setKLAmt(val) { document.getElementById('kl-amt').value = val === 'all' ? currentBalance : val; }
         function setKWAmt(val) { document.getElementById('kw-amt').value = val === 'all' ? keeperBalance : val; }
@@ -1919,277 +2203,47 @@
             } catch(e) {}
         }
 
-        // ==========================================
-        // STATS LOGIC
-        // ==========================================
-        let currentStatsFilter = 'All';
-        function setStatsFilter(filter, el) {
-            currentStatsFilter = filter;
-            document.querySelectorAll('#stats-filters .filter-chip').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            updateStatsView();
-        }
-
-        function updateStatsView() {
-            if(!transactions) return;
-            let credit = 0, debit = 0, successCount = 0, failCount = 0, pendingCount = 0;
-            
-            transactions.forEach(t => {
-                if (t.status === 'Success') {
-                    successCount++;
-                    if (t.type === 'in') credit += parseFloat(t.amount);
-                    if (t.type === 'out') debit += parseFloat(t.amount);
-                } else if (t.status === 'Pending') {
-                    pendingCount++;
-                } else {
-                    failCount++;
-                }
-            });
-            
-            let totalTxn = transactions.length;
-            let successRate = totalTxn > 0 ? Math.round((successCount / totalTxn) * 100) : 0;
-
-            document.getElementById('stat-credit').innerText = '₹' + credit.toFixed(2);
-            document.getElementById('stat-debit').innerText = '₹' + debit.toFixed(2);
-            document.getElementById('stat-count').innerText = totalTxn;
-            document.getElementById('stat-rate').innerText = successRate + '%';
-
-            const listEl = document.getElementById('stats-txn-list');
-            listEl.innerHTML = '';
-            
-            let filtered = transactions.filter(t => {
-                if (currentStatsFilter === 'All') return true;
-                if (currentStatsFilter === 'Successful' && t.status === 'Success') return true;
-                if (currentStatsFilter === 'Pending' && t.status === 'Pending') return true;
-                if (currentStatsFilter === 'Rejected' && t.status === 'Rejected') return true;
-                if (currentStatsFilter === 'Credit' && t.type === 'in' && t.status === 'Success') return true;
-                if (currentStatsFilter === 'Debit' && t.type === 'out' && t.status === 'Success') return true;
-                return false;
-            });
-
-            if(filtered.length === 0) {
-                listEl.innerHTML = '<p class="text-center text-gray-400 p-6 text-xs font-bold">No transactions found</p>';
-                return;
-            }
-
-            filtered.forEach(txn => {
-                let amountClass = '', titleClass = 'text-gray-800', sign = '', statusColor = 'text-gray-400';
-                if(currentUser && currentUser.theme === 'dark' && !document.documentElement.classList.contains('premium-mode')) titleClass = 'text-gray-200';
-
-                if (txn.status === 'Pending') {
-                    statusColor = 'text-yellow-500'; amountClass = 'text-yellow-500'; titleClass = 'text-yellow-500';
-                } else if (txn.status === 'Rejected') {
-                    statusColor = 'text-red-500'; amountClass = 'text-red-500'; titleClass = 'text-red-500';
-                } else {
-                    if (txn.type === 'in') { statusColor = 'text-green-500'; amountClass = 'text-green-500'; titleClass = 'text-green-500'; sign = '+'; } 
-                    else { statusColor = 'text-green-500'; amountClass = 'text-red-500'; sign = '-'; }
-                }
-                
-                listEl.innerHTML += `<div onclick="openTxnModal('${txn.id}')" class="flex justify-between items-center p-4 border-b border-gray-100 hover:bg-gray-50 theme-card cursor-pointer"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl theme-card accent-text flex items-center justify-center text-lg border border-gray-200"><i class="fas ${txn.icon}"></i></div><div><p class="text-sm font-bold ${titleClass}">${txn.title}</p><p class="text-[10px] ${statusColor} font-bold mt-0.5">${txn.status} • ${txn.date.split(',')[0]}</p></div></div><p class="font-black ${amountClass}">${sign}₹${parseFloat(txn.amount).toFixed(2)}</p></div>`;
-            });
-        }
-
-        // ==========================================
-        // ADVANCED LIFAFA CREATION
-        // ==========================================
-        function addLifafaChannel() {
-            const container = document.getElementById('lifafa-channels-container');
-            const div = document.createElement('div');
-            div.className = 'mb-3 relative';
-            div.innerHTML = `
-                <input type="text" class="lif-channel-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus-accent font-bold theme-card" placeholder="e.g. @channel2">
-                <button type="button" onclick="this.parentElement.remove()" class="absolute right-4 top-3.5 text-red-500 text-lg hover:scale-110"><i class="fas fa-times-circle"></i></button>
-            `;
-            container.appendChild(div);
-        }
-
-        async function processAdvancedLifafaCreate() {
+        async function processLifafaCreate() {
             if(!checkCooldown()) return;
             let pin = document.getElementById('lif-pin').value; if(!checkSecurityPin(pin)) return;
-            
             let amt = parseFloat(document.getElementById('lif-amt').value); 
             let users = parseInt(document.getElementById('lif-users').value); 
-            let pwd = document.getElementById('lif-password').value.trim();
-            let botToken = document.getElementById('lif-bot-token').value.trim();
             let isPremOnly = document.getElementById('lif-premium-only') && document.getElementById('lif-premium-only').checked;
             
-            let channelInputs = document.querySelectorAll('.lif-channel-input');
-            let channels = Array.from(channelInputs).map(inp => inp.value.trim()).filter(v => v !== "");
-
-            if(channels.length > 0 && !botToken) return showToast("Bot Token is required to verify channels!");
             if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
-            
             let total = amt * users;
             if(total > currentBalance) return alert(`Need ₹${total}`);
 
-            let btn = document.getElementById('btn-create-advanced-lifafa');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> PROCESSING...';
-            btn.disabled = true;
-
             let txn = createTxnObj('out', `Lifafa Created ${isPremOnly ? '(Premium)' : ''}`, total, `Success`, 'fa-envelope-open-text', 'yellow', 'Lifafa System', 'N/A');
-            
             try {
-                let payload = { phone: currentUser.phone, amount: amt, totalUsers: users, isPremiumOnly: isPremOnly, isAdvanced: true, channels: channels, botToken: botToken, password: pwd, txn };
-                let lifafaId = await apiCall('CREATE_LIFAFA', payload);
+                let lifafaId = await apiCall('CREATE_LIFAFA', { phone: currentUser.phone, amount: amt, totalUsers: users, isPremiumOnly: isPremOnly, txn });
                 playSound('debit');
-                
-                let link = `https://${window.location.host}/?lifafa=${lifafaId}`;
-                document.getElementById('lifafa-link-generated').value = link;
-                document.getElementById('lifafa-result-box').classList.remove('hidden');
-                
+                alert(`Lifafa Created Successfully!\nShare this Link: https://${window.location.host}/?lifafa=${lifafaId}`);
                 currentBalance -= total; updateUI(); 
-                document.getElementById('lif-amt').value=''; document.getElementById('lif-users').value=''; document.getElementById('lif-pin').value=''; document.getElementById('lif-password').value='';
-                
-                showToast("Lifafa created successfully!");
-            } catch(e) {
-                alert(e.message);
-            } finally {
-                btn.innerHTML = '<i class="fas fa-rocket mr-2"></i>CREATE LIFAFA';
-                btn.disabled = false;
-            }
+                document.getElementById('lif-amt').value=''; document.getElementById('lif-users').value=''; document.getElementById('lif-pin').value=''; 
+                showView('home');
+            } catch(e) {}
         }
 
-        // ==========================================
-        // MY LIFAFA VIEW
-        // ==========================================
-        async function loadMyLifafas() {
-            let container = document.getElementById('my-lifafas-container');
-            container.innerHTML = '<p class="text-center text-xs text-gray-500"><i class="fas fa-spinner fa-spin"></i> Loading...</p>';
-            
+        async function processLifafaClaim() {
+            let code = document.getElementById('lif-claim-code').value.trim();
+            if(!code) return showToast("Enter Lifafa Code");
             try {
-                // Since there is no native getMyLifafas in backend without rewriting much, we reconstruct from transactions
-                let myLifafasTxns = transactions.filter(t => t.type === 'out' && t.title.includes('Lifafa Created'));
-                
-                if (myLifafasTxns.length === 0) {
-                    container.innerHTML = '<p class="text-center text-xs text-gray-400 mt-10 font-bold">No lifafas created yet.</p>';
-                    return;
+                let lifData = await apiCall('GET_LIFAFA_INFO', { code });
+                if(lifData.isPremiumOnly && !currentUser.premium) {
+                    return alert("This is a Premium-Only Lifafa! Subscribe to Premium to claim this.");
                 }
-
-                container.innerHTML = '';
-                myLifafasTxns.forEach(t => {
-                    container.innerHTML += `
-                    <div class="theme-card rounded-xl border border-gray-200 p-4 shadow-sm flex justify-between items-center">
-                        <div>
-                            <p class="text-xs font-black text-gray-800">${t.date.split(',')[0]}</p>
-                            <p class="text-[10px] text-gray-500 font-bold mt-1">Total: ₹${t.amount}</p>
-                        </div>
-                        <div class="text-right">
-                            <span class="bg-green-100 text-green-600 text-[10px] px-2 py-1 rounded font-bold uppercase">Active</span>
-                        </div>
-                    </div>`;
-                });
-            } catch(e) { container.innerHTML = 'Error loading.'; }
+                showToast("Claim logic pending implementation...");
+            } catch(e) {}
         }
 
-        // ==========================================
-        // ADVANCED LIFAFA CLAIM FLOW
-        // ==========================================
-        let activeClaimLifafaId = '';
-        let activeClaimData = null;
-        let claimingTgUserId = null;
-        let claimingPhoneNum = null;
-
-        async function startPublicLifafaFlow(code) {
-            activeClaimLifafaId = code;
-            document.getElementById('public-lifafa-wrapper').classList.remove('hidden'); 
-            document.getElementById('public-lifafa-wrapper').style.display = 'flex';
+        function showPublicLifafa(code) { document.getElementById('public-lifafa-wrapper').classList.remove('hidden'); document.getElementById('public-lifafa-wrapper').style.display = 'flex'; }
+        async function verifyLifafaJoin() {
+            if(!window.isChannelClicked) return document.getElementById('lifafa-join-error').classList.remove('hidden');
+            document.getElementById('lifafa-step-1').classList.add('hidden');
+            document.getElementById('form-public-lifafa').classList.remove('hidden');
         }
-
-        async function verifyLifafaUser() {
-            let phone = document.getElementById('lif-claim-phone').value.trim();
-            if(!phone) return showToast("Enter your number");
-            
-            try {
-                let user = await apiCall('CHECK_USER', { phone });
-                if (!user) return alert("Number not registered. Please create account on Lion Pay first.");
-                
-                claimingPhoneNum = user.resolvedPhone || user.phone;
-                claimingTgUserId = user.tgUserId;
-
-                // Fetch Lifafa Details
-                let btn = event.currentTarget; btn.innerText = "Loading..."; btn.disabled = true;
-                activeClaimData = await apiCall('GET_LIFAFA_INFO', { code: activeClaimLifafaId });
-                btn.innerText = "Next ➡️"; btn.disabled = false;
-
-                if (activeClaimData.isPremiumOnly && !user.premium) {
-                    return alert("This Lifafa is for Premium Users Only!");
-                }
-
-                if (activeClaimData.isAdvanced && activeClaimData.channels && activeClaimData.channels.length > 0) {
-                    // Show channels
-                    document.getElementById('lif-claim-step-1').classList.add('hidden');
-                    let grid = document.getElementById('lifafa-channels-grid');
-                    grid.innerHTML = '';
-                    activeClaimData.channels.forEach((ch, idx) => {
-                        let link = ch.startsWith('@') ? `https://t.me/${ch.substring(1)}` : ch;
-                        grid.innerHTML += `
-                            <div class="theme-card border border-blue-200 rounded-xl p-3 text-center shadow-sm">
-                                <p class="text-[10px] font-bold text-gray-600 truncate mb-2">${ch}</p>
-                                <a href="${link}" target="_blank" class="bg-blue-50 text-blue-500 text-xs px-3 py-1.5 rounded-lg font-bold block hover:bg-blue-100 transition-colors">JOIN</a>
-                            </div>
-                        `;
-                    });
-                    document.getElementById('lif-claim-step-2').classList.remove('hidden');
-                } else {
-                    // Go direct to pwd or claim
-                    moveToStep3();
-                }
-
-            } catch (e) {
-                alert(e.message);
-                let btn = document.querySelector('#lif-claim-step-1 button'); btn.innerText = "Next ➡️"; btn.disabled = false;
-            }
-        }
-
-        async function verifyLifafaChannels() {
-            let errEl = document.getElementById('lifafa-join-error');
-            errEl.classList.add('hidden');
-            let btn = event.currentTarget; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...'; btn.disabled = true;
-
-            try {
-                let res = await apiCall('VERIFY_CHANNEL_JOIN', { code: activeClaimLifafaId, tgUserId: claimingTgUserId });
-                if (res.verified) {
-                    document.getElementById('lif-claim-step-2').classList.add('hidden');
-                    moveToStep3();
-                } else {
-                    errEl.innerText = `You have not joined: ${res.channel}`;
-                    errEl.classList.remove('hidden');
-                }
-            } catch(e) {
-                errEl.innerText = e.message; errEl.classList.remove('hidden');
-            } finally {
-                btn.innerHTML = '<i class="fas fa-check-double"></i> Verify Status'; btn.disabled = false;
-            }
-        }
-
-        function moveToStep3() {
-            document.getElementById('lif-claim-step-1').classList.add('hidden');
-            document.getElementById('lif-claim-step-2').classList.add('hidden');
-            
-            if (activeClaimData.hasPassword) {
-                document.getElementById('lif-pwd-container').classList.remove('hidden');
-            }
-            document.getElementById('lif-claim-step-3').classList.remove('hidden');
-        }
-
-        async function executeAdvancedClaim() {
-            let pwd = document.getElementById('lif-claim-password').value.trim();
-            if (activeClaimData.hasPassword && !pwd) return showToast("Enter Lifafa Password");
-
-            let btn = event.currentTarget; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> CLAIMING...'; btn.disabled = true;
-
-            try {
-                let reward = await apiCall('CLAIM_LIFAFA_NEW', { phone: claimingPhoneNum, code: activeClaimLifafaId, password: pwd });
-                document.getElementById('lif-claim-step-3').classList.add('hidden');
-                document.getElementById('lif-success-amt').innerText = `₹${reward} Added to Wallet`;
-                document.getElementById('lif-claim-step-4').classList.remove('hidden');
-                playSound('credit');
-            } catch(e) {
-                alert(e.message);
-            } finally {
-                btn.innerHTML = '<i class="fas fa-hand-holding-usd"></i> CLAIM REWARD NOW'; btn.disabled = false;
-            }
-        }
+        async function processPublicLifafaClaim() { alert("Login required to claim lifafa!"); window.location.href='/'; }
 
         window.onload = checkAuth;
     </script>
