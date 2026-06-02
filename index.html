@@ -35,7 +35,13 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-        :root { --theme-bg: #f3f4f6; --theme-text: #1f2937; --theme-card: #ffffff; }
+        :root { 
+            --theme-bg: #f3f4f6; 
+            --theme-text: #1f2937; 
+            --theme-card: #ffffff; 
+        }
+        
+        /* Modern Dark Mode - Deep Slate/Navy instead of pure black */
         html.dark-mode body { --theme-bg: #0b0f19; --theme-text: #f8fafc; --theme-card: #151b2b; background-color: var(--theme-bg); color: var(--theme-text); }
         html.dark-mode .theme-card { background-color: var(--theme-card) !important; border-color: rgba(255,255,255,0.05) !important; }
         
@@ -53,6 +59,7 @@
         ::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
+        /* Smooth View Transitions */
         .view-section { display: none; opacity: 0; padding-bottom: 100px; }
         .view-section.active { display: block; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -72,34 +79,68 @@
         .keeper-tab-content { display: none; }
         .keeper-tab-content.active { display: block; animation: slideUpFade 0.3s ease forwards; }
 
-        .floating-nav { position: fixed; bottom: 20px; left: 5%; width: 90%; border-radius: 100px; padding: 8px 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 80; background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(255, 255, 255, 0.3); }
+        /* Floating Nav Styling */
+        .floating-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 5%;
+            width: 90%;
+            border-radius: 100px;
+            padding: 8px 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 80;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
         html.dark-mode .floating-nav { box-shadow: 0 10px 40px rgba(0,0,0,0.5); background: rgba(21, 27, 43, 0.85); border: 1px solid rgba(255,255,255,0.05); }
 
         .nav-item { position: relative; padding: 10px; transition: 0.3s; }
         .nav-item.active { color: var(--accent-main); transform: translateY(-5px); }
         .nav-item.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 6px; height: 6px; background: var(--accent-main); border-radius: 50%; }
 
-        .glass-credit-card { background: var(--accent-main); box-shadow: 0 10px 25px var(--accent-glow); position: relative; overflow: hidden; border-radius: 24px; }
-        .glass-credit-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%); transform: rotate(30deg); pointer-events: none; }
-
-        .action-circle { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: 0.3s; background-color: var(--accent-light); color: var(--accent-main); }
+        .action-circle {
+            width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 24px; transition: 0.3s; background-color: var(--accent-light); color: var(--accent-main);
+        }
         html.premium-mode .action-circle { border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 0 15px var(--accent-glow); }
 
-        html.premium-mode body { background: linear-gradient(135deg, var(--premium-grad-1), var(--premium-grad-2), var(--theme-bg)); background-size: 400% 400%; animation: premiumBg 15s ease infinite; will-change: background-position; }
-        html.dark-mode.premium-mode body { background: linear-gradient(135deg, #020617, #0f172a, var(--premium-grad-1)); background-size: 300% 300%; animation: premiumBg 15s ease infinite; will-change: background-position; }
+        html.premium-mode body {
+            background: linear-gradient(135deg, var(--premium-grad-1), var(--premium-grad-2), var(--theme-bg));
+            background-size: 400% 400%;
+            animation: premiumBg 15s ease infinite;
+            will-change: background-position;
+        }
+        
+        html.dark-mode.premium-mode body {
+            background: linear-gradient(135deg, #020617, #0f172a, var(--premium-grad-1));
+            background-size: 300% 300%;
+            animation: premiumBg 15s ease infinite;
+            will-change: background-position;
+        }
+        
         @keyframes premiumBg { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
         
-        html.premium-mode .theme-card { background: rgba(var(--theme-card), 0.7) !important; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 var(--premium-grad-2); }
+        html.premium-mode .theme-card {
+            background: rgba(var(--theme-card), 0.7) !important;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 var(--premium-grad-2);
+        }
+        
         .premium-border { border: 2px solid var(--accent-main) !important; box-shadow: 0 0 20px var(--accent-glow) !important; animation: borderGlow 2s infinite alternate; }
         @keyframes borderGlow { from { box-shadow: 0 0 5px var(--accent-glow); } to { box-shadow: 0 0 25px var(--accent-glow); } }
 
         .sidebar-profile-bg { background: linear-gradient(180deg, var(--accent-glow) 0%, transparent 100%); }
+        
         #reader video { object-fit: cover !important; width: 100% !important; height: 100% !important; border-radius: 2rem; }
         @keyframes scanline { 0% { top: 5%; opacity: 0; } 10% { opacity: 1; } 50% { top: 95%; } 90% { opacity: 1; } 100% { top: 5%; opacity: 0; } }
         .animate-scanline { animation: scanline 2.5s ease-in-out infinite; background: var(--accent-main); box-shadow: 0 0 15px 3px var(--accent-glow); }
         .premium-scanner { border-color: var(--accent-main) !important; box-shadow: 0 0 30px var(--accent-glow); }
-        .privacy-blur { filter: blur(8px); user-select: none; transition: filter 0.3s ease; }
 
+        /* COLORFUL MODE CSS */
         html.colorful-mode #grid-container-actions button:nth-child(1) div { background-color: #ef4444; color: white; border: none; box-shadow: 0 4px 15px rgba(239,68,68,0.4); }
         html.colorful-mode #grid-container-actions button:nth-child(2) div { background-color: #3b82f6; color: white; border: none; box-shadow: 0 4px 15px rgba(59,130,246,0.4); }
         html.colorful-mode #grid-container-actions button:nth-child(3) div { background-color: #10b981; color: white; border: none; box-shadow: 0 4px 15px rgba(16,185,129,0.4); }
@@ -109,6 +150,11 @@
         html.colorful-mode #grid-container-actions button:nth-child(7) div { background-color: #06b6d4; color: white; border: none; box-shadow: 0 4px 15px rgba(6,182,212,0.4); }
         html.colorful-mode #grid-container-actions button:nth-child(8) div { background-color: #f97316; color: white; border: none; box-shadow: 0 4px 15px rgba(249,115,22,0.4); }
         html.colorful-mode #grid-container-actions button:nth-child(12) div { background-color: #6366f1; color: white; border: none; box-shadow: 0 4px 15px rgba(99,102,241,0.4); }
+        html.colorful-mode #grid-container-actions button:nth-child(13) div { background-color: #14b8a6; color: white; border: none; box-shadow: 0 4px 15px rgba(20,184,166,0.4); }
+        html.colorful-mode #grid-container-actions button:nth-child(14) div { background-color: #eab308; color: white; border: none; box-shadow: 0 4px 15px rgba(234,179,8,0.4); }
+        html.colorful-mode #grid-container-actions button:nth-child(15) div { background-color: #64748b; color: white; border: none; box-shadow: 0 4px 15px rgba(100,116,139,0.4); }
+
+        .privacy-blur { filter: blur(8px); user-select: none; transition: filter 0.3s ease; }
     </style>
 </head>
 <body class="font-sans pb-20 text-gray-800 transition-all duration-500">
@@ -183,8 +229,8 @@
         </div>
     </div>
 
-    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl z-[9999] hidden opacity-0 transition-opacity duration-300 flex items-center gap-3 border border-gray-700">
-        <i class="fas fa-bell accent-text"></i> <span id="toastMsg" class="font-bold text-sm tracking-wide">Message</span>
+    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl z-[300] hidden opacity-0 transition-opacity duration-300 flex items-center gap-2 border accent-border">
+        <i class="fas fa-info-circle accent-text"></i> <span id="toastMsg" class="font-medium">Message</span>
     </div>
 
     <div id="txnModal" class="fixed inset-0 bg-black/60 z-[250] hidden flex items-center justify-center backdrop-blur-md transition-opacity duration-300 opacity-0">
@@ -211,7 +257,7 @@
         <div id="auth-login" class="min-h-screen flex flex-col p-6 items-center justify-center relative">
             <div class="w-24 h-24 accent-light-bg rounded-full flex items-center justify-center text-5xl mb-6 shadow-inner"><i class="fas fa-fingerprint accent-text"></i></div>
             <h1 class="text-4xl font-black tracking-tight mb-2">LION <span class="accent-text">PAY</span></h1>
-            <p class="text-sm font-bold text-gray-400 tracking-widest mb-10 uppercase">Secure Wallet</p>
+            <p class="text-sm font-bold text-gray-400 tracking-widest mb-10 uppercase">Next-Gen Wallet</p>
             <form onsubmit="event.preventDefault(); processLogin()" class="w-full max-w-sm">
                 <div class="bg-gray-50 dark:bg-gray-800 rounded-3xl p-2 mb-6 border border-gray-100 dark:border-gray-700 shadow-sm">
                     <input type="tel" id="login-phone" required placeholder="Phone Number" class="w-full bg-transparent px-4 py-4 text-sm font-bold outline-none border-b border-gray-200 dark:border-gray-700">
@@ -226,8 +272,8 @@
         <div id="auth-reset-pin" class="min-h-screen flex flex-col p-6 items-center justify-center relative hidden"><h2 class="text-2xl font-black mb-8">RESET ACCESS</h2><form onsubmit="event.preventDefault(); processResetPinStep1()" class="w-full max-w-sm" id="form-reset-1"><input type="tel" id="reset-phone" required placeholder="Registered Phone" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-4 font-bold text-sm outline-none mb-6"><button type="submit" class="btn-animate w-full bg-gray-900 dark:bg-white dark:text-gray-900 text-white font-black py-4 rounded-2xl shadow-xl mb-6">SEND OTP</button><div class="text-center"><button type="button" onclick="showAuthView('login')" class="text-gray-400 font-bold text-sm">Back</button></div></form><form onsubmit="event.preventDefault(); processResetPinStep2()" class="w-full max-w-sm hidden" id="form-reset-2"><input type="password" id="reset-new-pass" required placeholder="New Password" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-4 font-bold text-sm outline-none mb-4"><input type="password" id="reset-new-pin" required maxlength="4" pattern="\d{4}" placeholder="New 4-Digit PIN" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-4 font-black tracking-widest text-center text-lg outline-none mb-8"><button type="submit" class="btn-animate w-full bg-green-500 text-white font-black py-4 rounded-2xl shadow-xl">SAVE</button></form></div>
     </div>
 
-    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-60 z-40 hidden transition-opacity backdrop-blur-sm" onclick="toggleSidebar()"></div>
-    <div id="sidebar" class="fixed top-0 left-0 w-72 h-full theme-card shadow-2xl z-50 transform -translate-x-full transition-transform flex flex-col rounded-r-[2rem] overflow-hidden">
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-[60] hidden transition-opacity backdrop-blur-sm" onclick="toggleSidebar()"></div>
+    <div id="sidebar" class="fixed top-0 left-0 w-72 h-full theme-card shadow-2xl z-[70] transform -translate-x-full transition-transform flex flex-col rounded-r-[2rem] overflow-hidden">
         <div class="p-8 pt-12 pb-6 accent-bg text-white relative flex flex-col items-center">
             <button onclick="toggleSidebar()" class="absolute top-6 right-6 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors"><i class="fas fa-times"></i></button>
             <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-3xl mb-4 shadow-lg border-2 border-white overflow-hidden cursor-pointer" onclick="showView('my-profile'); toggleSidebar()">
@@ -251,7 +297,7 @@
                 <li><a href="#" onclick="showView('stats'); toggleSidebar()" class="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-bold text-gray-700 dark:text-gray-200"><div class="w-8 h-8 rounded-full accent-light-bg flex items-center justify-center"><i class="fas fa-chart-pie"></i></div> Analytics / Stats</a></li>
             </ul>
             <div class="mt-8 px-8">
-                <button onclick="logoutUser()" class="w-full py-4 rounded-xl bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 font-black flex justify-center items-center gap-2 hover:bg-red-100 transition-colors btn-animate"><i class="fas fa-power-off"></i> LOGOUT</button>
+                <button onclick="logoutUser()" class="w-full py-4 rounded-xl bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 font-black flex justify-center items-center gap-2 hover:bg-red-100 transition-colors"><i class="fas fa-power-off"></i> LOGOUT</button>
             </div>
         </div>
     </div>
@@ -274,7 +320,8 @@
             </header>
 
             <div class="px-6 relative z-10">
-                <div id="home-main-card" class="glass-credit-card p-6 text-white mb-8">
+                <div id="home-main-card" class="rounded-[2rem] p-6 text-white mb-8 accent-bg shadow-[0_10px_25px_var(--accent-glow)] relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl"></div>
                     <div class="flex justify-between items-start mb-6 relative z-10">
                         <div>
                             <h2 class="text-lg font-bold" id="ui-user-name">User Name</h2>
@@ -314,17 +361,15 @@
                     
                     <button onclick="showView('official')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle"><i class="fas fa-bullhorn"></i></div><span class="text-[11px] font-bold">Updates</span></button>
                     <button onclick="showView('keeper')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle"><i class="fas fa-vault"></i></div><span class="text-[11px] font-bold">Keeper</span></button>
-                    
                     <button onclick="showView('stats')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle"><i class="fas fa-chart-pie"></i></div><span class="text-[11px] font-bold">Stats</span></button>
-                    
-                    <button onclick="showView('help')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle bg-gray-50 text-gray-500 dark:bg-gray-800"><i class="fas fa-headset"></i></div><span class="text-[11px] font-bold">Help</span></button>
+                    <button onclick="showView('help')" class="btn-animate icon-hover-bounce flex flex-col items-center gap-2"><div class="action-circle bg-blue-50 text-blue-500 border border-blue-100 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700"><i class="fas fa-headset"></i></div><span class="text-[11px] font-bold">Help</span></button>
                 </div>
 
                 <div class="flex justify-between items-end mb-4 px-1">
                     <h3 class="font-black text-sm tracking-wide">Recent Transactions</h3>
                     <button onclick="showView('stats')" class="text-[10px] font-bold accent-text hover:underline bg-transparent px-3 py-1 rounded-full border accent-border transition-colors hover:bg-gray-50 dark:hover:bg-gray-800">VIEW ALL</button>
                 </div>
-                <div id="home-txn-list" class="theme-card rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col mb-10"></div>
+                <div id="home-txn-list" class="theme-card rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col mb-10 min-h-[100px]"></div>
             </div>
         </div>
 
@@ -347,22 +392,27 @@
                         <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i class="fas fa-user accent-text"></i> Full Name</label>
                         <p class="text-xl font-black" id="profile-view-name">Loading...</p>
                     </div>
+                    
                     <div class="relative z-10 border-t border-gray-100 dark:border-gray-700 pt-6">
                         <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i class="fas fa-phone accent-text"></i> Registered Number</label>
                         <p class="text-xl font-black font-mono tracking-wider" id="profile-view-phone">Loading...</p>
                     </div>
+
                     <div class="relative z-10 border-t border-gray-100 dark:border-gray-700 pt-6">
                         <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i class="fas fa-id-card accent-text"></i> Custom ID</label>
                         <p class="text-xl font-black font-mono tracking-wider" id="profile-view-cid">N/A</p>
                     </div>
+                    
                     <div class="relative z-10 border-t border-gray-100 dark:border-gray-700 pt-6">
                         <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i class="fab fa-telegram accent-text"></i> Telegram Chat ID</label>
                         <p class="text-xl font-black font-mono tracking-wider" id="profile-view-tg">N/A</p>
                     </div>
+
                     <div class="relative z-10 border-t border-gray-100 dark:border-gray-700 pt-6">
                         <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i class="fas fa-tag accent-text"></i> Profile Tag</label>
                         <p class="text-xl font-black" id="profile-view-tag">Loading...</p>
                     </div>
+                    
                     <div class="relative z-10 border-t border-gray-100 dark:border-gray-700 pt-6">
                         <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2"><i class="fas fa-lock accent-text"></i> Security PIN</label>
                         <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-2xl px-5 py-4 border border-gray-200 dark:border-gray-700">
@@ -481,34 +531,34 @@
             </header>
             <div class="px-6">
                 <div class="flex gap-4 mb-6">
-                    <div class="flex-1 theme-card rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col items-center justify-center">
-                        <div class="w-10 h-10 accent-light-bg rounded-lg flex items-center justify-center mb-2"><i class="fas fa-wallet accent-text"></i></div>
+                    <div class="flex-1 theme-card rounded-[2rem] p-5 shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+                        <div class="w-12 h-12 accent-light-bg rounded-full flex items-center justify-center mb-3"><i class="fas fa-wallet accent-text text-lg"></i></div>
                         <p class="text-[10px] text-gray-400 font-bold tracking-wider mb-1">WALLET</p>
                         <p class="text-xl font-black">₹<span class="global-balance blur-none transition-all">0.00</span></p>
                     </div>
-                    <div class="flex-1 theme-card rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col items-center justify-center">
-                        <div class="w-10 h-10 accent-light-bg rounded-lg flex items-center justify-center mb-2"><i class="fas fa-vault accent-text"></i></div>
+                    <div class="flex-1 theme-card rounded-[2rem] p-5 shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+                        <div class="w-12 h-12 accent-light-bg rounded-full flex items-center justify-center mb-3"><i class="fas fa-vault accent-text text-lg"></i></div>
                         <p class="text-[10px] text-gray-400 font-bold tracking-wider mb-1">KEEPER</p>
                         <p class="text-xl font-black">₹<span class="global-keeper-balance">0.00</span></p>
                     </div>
                 </div>
                 <div class="theme-card rounded-[2rem] p-6 shadow-sm border border-gray-100 mb-6">
-                    <div class="flex theme-card rounded-xl p-1 gap-1 mb-4 border border-gray-200 dark:border-gray-700">
-                        <button onclick="switchKeeperTab('keeper-lock')" id="btn-keeper-lock" class="flex-1 py-3 text-xs text-gray-500 rounded-lg keeper-tab-btn active"><i class="fas fa-lock mr-1"></i> LOCK</button>
-                        <button onclick="switchKeeperTab('keeper-with')" id="btn-keeper-with" class="flex-1 py-3 text-xs text-gray-500 rounded-lg keeper-tab-btn"><i class="fas fa-unlock mr-1"></i> WITHDRAW</button>
+                    <div class="flex theme-card rounded-2xl p-1 gap-1 mb-6 border border-gray-200 dark:border-gray-700">
+                        <button onclick="switchKeeperTab('keeper-lock')" id="btn-keeper-lock" class="flex-1 py-3 text-xs text-gray-500 rounded-xl keeper-tab-btn active"><i class="fas fa-lock mr-1"></i> LOCK</button>
+                        <button onclick="switchKeeperTab('keeper-with')" id="btn-keeper-with" class="flex-1 py-3 text-xs text-gray-500 rounded-xl keeper-tab-btn"><i class="fas fa-unlock mr-1"></i> WITHDRAW</button>
                     </div>
                     <div id="keeper-lock" class="keeper-tab-content active">
                         <form onsubmit="event.preventDefault(); processKeeperLock()">
-                            <input type="number" id="kl-amt" required placeholder="Amount to Lock" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-4 font-bold outline-none focus-accent mb-4 text-center">
-                            <input type="password" id="kl-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-4 text-center tracking-widest font-black text-lg mb-6 focus-accent outline-none theme-card">
-                            <button type="submit" class="btn-animate w-full accent-bg text-white font-bold py-4 rounded-xl shadow-lg">LOCK BALANCE</button>
+                            <input type="number" id="kl-amt" required placeholder="Amount to Lock" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-4 font-bold outline-none focus-accent mb-4 text-center">
+                            <input type="password" id="kl-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-4 text-center tracking-widest font-black text-xl mb-6 focus-accent outline-none">
+                            <button type="submit" class="btn-animate w-full accent-bg text-white font-bold py-4 rounded-2xl shadow-lg">LOCK BALANCE</button>
                         </form>
                     </div>
                     <div id="keeper-with" class="keeper-tab-content">
                         <form onsubmit="event.preventDefault(); processKeeperWithdraw()">
-                            <input type="number" id="kw-amt" required placeholder="Amount to Withdraw" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-4 font-bold outline-none focus-accent mb-4 text-center">
-                            <input type="password" id="kw-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-4 text-center tracking-widest font-black text-lg mb-6 focus-accent outline-none theme-card">
-                            <button type="submit" class="btn-animate w-full bg-gray-800 text-white font-bold py-4 rounded-xl shadow-md">WITHDRAW BALANCE</button>
+                            <input type="number" id="kw-amt" required placeholder="Amount to Withdraw" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-4 font-bold outline-none focus-accent mb-4 text-center">
+                            <input type="password" id="kw-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-4 text-center tracking-widest font-black text-xl mb-6 focus-accent outline-none">
+                            <button type="submit" class="btn-animate w-full bg-gray-800 text-white font-bold py-4 rounded-2xl shadow-md">WITHDRAW BALANCE</button>
                         </form>
                     </div>
                 </div>
@@ -521,9 +571,9 @@
                 <h1 class="ml-4 text-lg font-black tracking-wide">🎁 GIFT CODE</h1>
             </header>
             <div class="px-6 mt-2 mb-4">
-                <div class="flex theme-card rounded-xl p-1 gap-1 border border-gray-100 shadow-sm">
-                    <button onclick="switchTab('gift-create')" id="tab-gift-create" class="flex-1 py-3 text-sm font-bold rounded-lg transition-all tab-btn active accent-bg text-white">CREATE</button>
-                    <button onclick="switchTab('gift-claim')" id="tab-gift-claim" class="flex-1 py-3 text-sm font-bold rounded-lg transition-all tab-btn text-gray-500 hover:bg-gray-50">CLAIM</button>
+                <div class="flex theme-card rounded-2xl p-1 gap-1 border border-gray-100 shadow-sm">
+                    <button onclick="switchTab('gift-create')" id="tab-gift-create" class="flex-1 py-3 text-sm font-bold rounded-xl transition-all tab-btn active accent-bg text-white">CREATE</button>
+                    <button onclick="switchTab('gift-claim')" id="tab-gift-claim" class="flex-1 py-3 text-sm font-bold rounded-xl transition-all tab-btn text-gray-500 hover:bg-gray-50">CLAIM</button>
                 </div>
             </div>
 
@@ -531,14 +581,14 @@
                 <form onsubmit="event.preventDefault(); processGiftCreate()" class="theme-card rounded-[2rem] p-6 shadow-sm border border-gray-100">
                     <input type="number" id="gift-users" required min="1" placeholder="Number of Users (e.g. 5)" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-4 text-sm mb-4 font-bold outline-none focus-accent text-center">
                     <input type="number" id="gift-amt" required min="1" placeholder="Amount Per User (₹)" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-4 text-sm mb-4 font-bold outline-none focus-accent text-center">
-                    <input type="password" id="gift-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-4 text-center tracking-widest font-black text-lg mb-6 outline-none focus-accent">
+                    <input type="password" id="gift-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-4 text-center tracking-widest font-black text-xl mb-6 outline-none focus-accent">
                     <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-2xl shadow-lg"><i class="fas fa-magic mr-2"></i> GENERATE CODE</button>
                 </form>
             </div>
 
             <div id="gift-claim" class="tab-content px-6">
                 <form onsubmit="event.preventDefault(); processGiftClaim()" class="theme-card rounded-[2rem] p-6 shadow-sm border border-gray-100 text-center">
-                    <div class="w-20 h-20 theme-card accent-text border border-gray-100 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner"><i class="fas fa-gift"></i></div>
+                    <div class="w-24 h-24 theme-card accent-text border border-gray-100 rounded-[2rem] flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner"><i class="fas fa-gift"></i></div>
                     <label class="block text-xs font-bold text-gray-400 mb-3 tracking-widest uppercase">Enter 5-Digit Code</label>
                     <input type="text" id="claim-code" required maxlength="5" placeholder="E.G. X8K9M" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-5 text-center tracking-[0.3em] uppercase text-2xl font-black mb-8 outline-none focus-accent transition-colors shadow-inner">
                     <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-2xl shadow-lg text-lg">CLAIM REWARD</button>
@@ -552,9 +602,9 @@
                 <h1 class="ml-4 text-lg font-black tracking-wide">✉️ LIFAFA</h1>
             </header>
             <div class="px-6 mt-2 mb-4">
-                <div class="flex theme-card rounded-xl p-1 gap-1 border border-gray-100 shadow-sm">
-                    <button onclick="switchLifafaTab('lifafa-create')" id="tab-lifafa-create" class="flex-1 py-3 text-sm font-bold rounded-lg transition-all tab-btn active accent-bg text-white">CREATE</button>
-                    <button onclick="switchLifafaTab('lifafa-claim')" id="tab-lifafa-claim" class="flex-1 py-3 text-sm font-bold rounded-lg transition-all tab-btn text-gray-500 hover:bg-gray-50">CLAIM</button>
+                <div class="flex theme-card rounded-2xl p-1 gap-1 border border-gray-100 shadow-sm">
+                    <button onclick="switchLifafaTab('lifafa-create')" id="tab-lifafa-create" class="flex-1 py-3 text-sm font-bold rounded-xl transition-all tab-btn active accent-bg text-white">CREATE</button>
+                    <button onclick="switchLifafaTab('lifafa-claim')" id="tab-lifafa-claim" class="flex-1 py-3 text-sm font-bold rounded-xl transition-all tab-btn text-gray-500 hover:bg-gray-50">CLAIM</button>
                 </div>
             </div>
 
@@ -574,14 +624,14 @@
                         </label>
                     </div>
 
-                    <input type="password" id="lif-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-4 text-center tracking-widest font-black text-lg mb-6 outline-none focus-accent">
+                    <input type="password" id="lif-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-4 text-center tracking-widest font-black text-xl mb-6 outline-none focus-accent">
                     <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-2xl shadow-lg text-lg"><i class="fas fa-envelope-open-text mr-2"></i>CREATE LIFAFA</button>
                 </form>
             </div>
 
             <div id="lifafa-claim" class="tab-content px-6">
                 <form onsubmit="event.preventDefault(); processLifafaClaim()" class="theme-card rounded-[2rem] p-6 shadow-sm border border-gray-100 text-center">
-                    <div class="w-20 h-20 theme-card accent-text border border-gray-100 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner"><i class="fas fa-envelope"></i></div>
+                    <div class="w-24 h-24 theme-card accent-text border border-gray-100 rounded-[2rem] flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner"><i class="fas fa-envelope"></i></div>
                     <label class="block text-xs font-bold text-gray-400 mb-3 tracking-widest uppercase">Enter Lifafa Code</label>
                     <input type="text" id="lif-claim-code" required placeholder="Paste Code Here" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-5 text-center tracking-widest uppercase text-lg font-black mb-8 outline-none focus-accent shadow-inner">
                     <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-2xl shadow-lg text-lg">OPEN LIFAFA</button>
@@ -640,103 +690,6 @@
             </div>
         </div>
 
-        <div id="view-premium" class="view-section bg-gradient-to-br from-[#3b82f6] via-[#8b5cf6] to-[#d946ef] min-h-screen text-white relative pb-32">
-            <header class="flex items-center p-6 sticky top-0 z-30 bg-transparent">
-                <button onclick="showView('home')" class="w-12 h-12 flex items-center justify-center text-white hover:bg-white/20 rounded-full transition-colors backdrop-blur-sm"><i class="fas fa-arrow-left"></i></button>
-            </header>
-
-            <div class="px-6 flex flex-col items-center text-center">
-                <i class="fas fa-star text-[80px] text-white drop-shadow-[0_0_25px_rgba(255,255,255,0.7)] mb-4 animate-pulse transform -rotate-12"></i>
-                <h1 class="text-3xl font-black mb-2 tracking-wide">Lion Premium</h1>
-                <p class="text-[13px] opacity-90 mb-6 max-w-xs font-medium leading-relaxed">Go beyond the limits and unlock dozens of exclusive features by subscribing to Lion Premium.</p>
-            </div>
-
-            <div class="bg-white text-gray-800 rounded-3xl mx-4 mb-4 overflow-hidden shadow-2xl theme-card">
-                <div id="plan-row-1year" class="plan-row p-5 border-b border-gray-100 flex items-center gap-4 cursor-pointer transition-colors" style="background:var(--accent-glow)" onclick="selectPremiumPlan('1year')">
-                    <div class="w-6 h-6 rounded-full accent-bg text-white flex items-center justify-center text-xs check-icon shrink-0 shadow-inner"><i class="fas fa-check"></i></div>
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2 mb-0.5">
-                            <span class="font-black text-[15px]">Annual</span>
-                            <span class="accent-bg text-white text-[10px] px-2 py-0.5 rounded-full font-black">-16%</span>
-                        </div>
-                        <div class="text-xs text-gray-400 font-medium"><strike>₹360.00</strike> <span class="text-gray-800 font-bold ml-1">₹300.00 / year</span></div>
-                    </div>
-                </div>
-                <div id="plan-row-1month" class="plan-row p-5 flex items-center gap-4 cursor-pointer hover:bg-gray-50 transition-colors" onclick="selectPremiumPlan('1month')">
-                    <div class="w-6 h-6 rounded-full border-2 border-gray-300 check-icon shrink-0"></div>
-                    <div class="flex-1"><span class="font-black text-[15px]">Monthly</span></div>
-                    <div class="text-right text-xs font-bold text-gray-500">₹30.00/month</div>
-                </div>
-            </div>
-
-            <div class="fixed bottom-0 left-0 w-full p-6 bg-white/90 backdrop-blur-lg border-t border-gray-100 z-50 pb-safe shadow-[0_-10px_25px_rgba(0,0,0,0.1)]">
-                <button id="btn-subscribe-prem" class="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-black py-4 rounded-2xl shadow-[0_10px_25px_rgba(168,85,247,0.4)] transition-all active:scale-95 text-[15px] tracking-wide" onclick="executePremiumPurchase()">
-                    Subscribe for ₹300.00 per year
-                </button>
-            </div>
-        </div>
-
-        <div id="view-themes" class="view-section min-h-screen theme-card">
-            <header class="flex items-center p-6 theme-card shadow-sm sticky top-0 z-30">
-                <button onclick="showView('home')" class="w-12 h-12 rounded-full flex items-center justify-center hover:bg-gray-100 border border-gray-100"><i class="fas fa-arrow-left"></i></button>
-                <h1 class="ml-4 text-lg font-black tracking-wide">SETTINGS</h1>
-            </header>
-
-            <h3 class="font-black text-sm accent-text mb-3 px-6 mt-4"><i class="fas fa-lock"></i> Privacy Controls</h3>
-            <div class="px-6">
-                <div class="p-5 theme-card rounded-2xl flex items-center justify-between shadow-sm border border-gray-100">
-                    <div>
-                        <h3 class="font-black text-sm text-gray-800 dark:text-gray-200">Hide Balance</h3>
-                        <p class="text-[10px] text-gray-500 mt-0.5">Blur balance on home screen</p>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" id="toggle-privacy-ui" class="sr-only peer" onchange="togglePrivacyMode()">
-                      <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                </div>
-            </div>
-            
-            <h3 class="font-black text-sm accent-text mb-3 px-6 mt-6">Mode Select</h3>
-            <div class="px-6 flex gap-4">
-                <button onclick="setGlobalTheme('light')" class="flex-1 bg-white border border-gray-200 p-4 rounded-xl font-bold shadow-sm text-gray-800">Light Mode</button>
-                <button onclick="setGlobalTheme('dark')" class="flex-1 bg-gray-900 border border-gray-700 text-white p-4 rounded-xl font-bold shadow-sm">Dark Mode</button>
-            </div>
-            
-            <h3 class="font-black text-sm accent-text mb-3 px-6 mt-6">Accent Color (Premium)</h3>
-            <div class="px-6 grid grid-cols-5 gap-4 mb-6" id="color-palette"></div>
-            
-            <div class="px-6 mt-2 space-y-4">
-                <div class="p-5 theme-card rounded-2xl flex items-center justify-between shadow-sm border border-gray-100">
-                    <div>
-                        <h3 class="font-black text-sm text-gray-800 dark:text-gray-200">Premium Visuals</h3>
-                        <p class="text-[10px] text-gray-500 mt-0.5">Toggle 3D glowing effects</p>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" id="toggle-premium-ui" class="sr-only peer" onchange="togglePremiumVisuals()">
-                      <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                </div>
-                <div class="p-5 theme-card rounded-2xl flex items-center justify-between shadow-sm border border-gray-100">
-                    <div>
-                        <h3 class="font-black text-sm text-gray-800 dark:text-gray-200">Colorful Mode</h3>
-                        <p class="text-[10px] text-gray-500 mt-0.5">Make app highly colorful</p>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" id="toggle-colorful-ui" class="sr-only peer" onchange="toggleColorfulTheme()">
-                      <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <div id="view-tags" class="view-section min-h-screen theme-card">
-            <header class="flex items-center p-6 theme-card shadow-sm sticky top-0 z-30">
-                <button onclick="showView('home')" class="w-12 h-12 rounded-full flex items-center justify-center hover:bg-gray-100 border border-gray-100"><i class="fas fa-arrow-left"></i></button>
-                <h1 class="ml-4 text-lg font-black tracking-wide">PROFILE TAG</h1>
-            </header>
-            <div class="px-6 mt-6" id="tags-container"></div>
-        </div>
-
         <div id="view-official" class="view-section min-h-screen theme-card">
             <header class="flex items-center p-6 theme-card shadow-sm sticky top-0 z-30 border-b border-gray-100">
                 <button onclick="showView('home')" class="w-12 h-12 flex items-center justify-center hover:bg-gray-100 rounded-full border border-gray-100"><i class="fas fa-arrow-left text-gray-700"></i></button>
@@ -771,7 +724,7 @@
 
     </main>
 
-    <nav class="floating-nav flex justify-between items-center">
+    <nav class="floating-nav flex justify-between items-center z-[80]">
         <a href="#" onclick="showView('home')" class="nav-item active flex flex-col items-center"><i class="fas fa-home text-xl btn-animate"></i></a>
         <a href="#" onclick="showView('stats')" class="nav-item flex flex-col items-center text-gray-400 hover:text-gray-800 dark:hover:text-white"><i class="fas fa-chart-pie text-xl btn-animate"></i></a>
         <a href="#" onclick="showView('scan'); startScanner();" class="relative -top-6 group">
@@ -909,6 +862,42 @@
         function generateTxnId() { return 'TXN' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase(); }
         function checkSecurityPin(inputPin) { if(inputPin === currentUser.pin) return true; showToast("Incorrect Security PIN!"); return false; }
 
+        function updateApiKeyUI() {
+            let key = currentUser.apiKey || 'LP-PENDING'; 
+            let domain = window.location.host;
+            
+            let elUrlFull = document.getElementById('ui-api-url-full'); 
+            if(elUrlFull) elUrlFull.innerHTML = `https://${domain}/api?key=<span class="accent-text">${key}</span>&paytm=<span class="text-green-400">{number}</span>&amount=<span class="text-green-400">{amount}</span>&comment=<span class="text-green-400">{comment}</span>`;
+            
+            let elUrlUpi = document.getElementById('ui-api-url-upi'); 
+            if(elUrlUpi) elUrlUpi.innerHTML = `https://Lion-pay.vercel.app/Api/upi.php?token=<span class="accent-text">${key}</span>&upi_id=<span class="text-green-400">{upi_id}</span>&amount=<span class="text-green-400">{amount}</span>&comment=<span class="text-green-400">{comment}</span>`;
+
+            let elDisp = document.getElementById('ui-api-key-display'); if(elDisp) elDisp.innerText = key;
+            
+            let premiumApiSec = document.getElementById('premium-api-edit');
+            if(premiumApiSec) {
+                if (currentUser.premium) premiumApiSec.classList.remove('hidden');
+                else premiumApiSec.classList.add('hidden');
+            }
+        }
+
+        async function saveCustomApiKey() {
+            let newKey = document.getElementById('custom-api-input').value.trim();
+            if(!newKey) return showToast("Enter an API Key");
+            if(/\s/.test(newKey) || !/^[a-zA-Z0-9_-]+$/.test(newKey)) return showToast("Spaces not allowed. Use letters, numbers, -, _");
+            try {
+                await apiCall('SET_CUSTOM_API', { phone: currentUser.phone, newKey: newKey });
+                currentUser.apiKey = newKey; updateApiKeyUI(); showToast("Custom API Key Saved!");
+                document.getElementById('custom-api-input').value = '';
+            } catch(e) {}
+        }
+
+        async function regenerateApiKey() {
+            if(!confirm("Are you sure? Old API key will stop working immediately.")) return;
+            let newKey = generateApiKey(); await apiCall('GENERATE_API', { phone: currentUser.phone, newKey });
+            currentUser.apiKey = newKey; updateApiKeyUI(); showToast("API Key Regenerated!");
+        }
+
         function showAuthView(view) { ['login', 'signup', 'otp', 'reset-pin'].forEach(v => document.getElementById('auth-' + v).classList.add('hidden')); document.getElementById('auth-' + view).classList.remove('hidden'); }
         function logoutUser() { localStorage.removeItem('lionSession'); currentUser = null; location.reload(); }
 
@@ -920,6 +909,7 @@
                     if (user) {
                         currentUser = user; currentUser.phone = sessionPhone;
                         if(currentUser.isBanned) { document.getElementById('banned-wrapper').classList.remove('hidden'); document.getElementById('banned-wrapper').style.display = 'flex'; return; }
+                        if (!currentUser.apiKey) { currentUser.apiKey = generateApiKey(); await apiCall('GENERATE_API', { phone: currentUser.phone, newKey: currentUser.apiKey }); }
                         document.getElementById('auth-wrapper').classList.add('hidden'); initApp();
                     } else { logoutUser(); }
                 } catch(e) { 
@@ -934,6 +924,7 @@
             try { 
                 let user = await apiCall('LOGIN', { phone, password: pass }); 
                 localStorage.setItem('lionSession', phone); currentUser = user; currentUser.phone = phone; 
+                if (!currentUser.apiKey) { currentUser.apiKey = generateApiKey(); await apiCall('GENERATE_API', { phone: currentUser.phone, newKey: currentUser.apiKey }); } 
                 document.getElementById('auth-wrapper').classList.add('hidden'); initApp(); 
             } catch(e) { showToast(e.message); }
         }
@@ -1020,7 +1011,6 @@
             try {
                 let data = await apiCall('SYNC', { phone: currentUser.phone });
                 if(data.user) {
-                    if(data.user.isBanned) return location.reload();
                     let savedPhone = currentUser.phone;
                     let prevBalance = currentBalance;
                     
@@ -1457,6 +1447,7 @@
             let pin = document.getElementById('bulk-pin').value; if(!checkSecurityPin(pin)) return;
             let numsText = document.getElementById('bulk-nums').value.trim(); 
             let amt = parseFloat(document.getElementById('bulk-amt').value); 
+            let comment = document.getElementById('bulk-comment').value.trim();
             if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
             if(!numsText) return;
             
@@ -1472,7 +1463,8 @@
                 await apiCall('BULK_PAY', { sender: currentUser.phone, receivers: resolvedReceivers, amount: amt, comment: "", date: formatDateTime() });
                 playSound('debit');
                 sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'out', `Bulk Sent to ${resolvedReceivers.length} users`, totalAmt, `Done!`)); 
-                showToast(`Sent to ${resolvedReceivers.length} users!`); currentBalance -= totalAmt; updateUI(); document.getElementById('bulk-nums').value = ''; document.getElementById('bulk-amt').value = ''; document.getElementById('bulk-pin').value = ''; setTimeout(() => showView('home'), 1200);
+                showToast(`Sent to ${resolvedReceivers.length} users!`); currentBalance -= totalAmt; updateUI();
+                document.getElementById('bulk-nums').value = ''; document.getElementById('bulk-amt').value = ''; document.getElementById('bulk-pin').value = ''; setTimeout(() => showView('home'), 1200);
             } catch(e) { showToast(e.message); }
         }
 
@@ -1488,7 +1480,7 @@
             try {
                 await apiCall('EXECUTE_TXN', { mode: 'WITHDRAW', sender: currentUser.phone, amount: amt, txn });
                 let adminChatId = globalSettings.adminChatId || null; 
-                let withdrawMsg = `📤 𝗪𝗜𝗧𝗛𝗗𝗥𝗔𝗪𝗔𝗟 𝗥𝗘𝗤𝗨𝗘𝗦𝗧 💼✨\n\n👤 𝗨𝘀𝗲𝗿: ${currentUser.name}\n💰 𝗔𝗺𝗼𝘂𝗻𝘁: ₹${amt}\n🏦 𝗨𝗣𝗜 𝗜𝗗: ${upi}\n🧾 𝗧𝗫𝗡: ${txn.id}`;
+                let withdrawMsg = `📤 𝗪𝗜𝗧𝗛𝗗𝗥𝗔𝗪𝗔𝗟 𝗥𝗘𝗤𝗨𝗘𝗦𝗧 💼✨\n\n👤 𝗨𝘀𝗲𝗿: ${currentUser.name}\n💰 𝗔𝗺𝗼𝘂𝗻𝘁: ₹${amt}\n🏦 𝗨𝗣𝗜 𝗜𝗗: ${upi}\n🧾 𝗧𝗿𝗮𝗻𝘀𝗮𝗰𝘁𝗶𝗼𝗻 𝗜𝗗 (𝗧𝗫𝗡): ${txn.id}\n\n🔹 Kindly process this withdrawal request at the earliest.\n🔹 All details have been provided accurately.\n\n🙏 Thank you for your service.`;
                 if (adminChatId) sendTelegramMsg(adminChatId, withdrawMsg);
                 else sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'out', 'Withdraw Pending', amt, `UPI: ${upi}`));
                 playSound('debit'); currentBalance -= amt; updateUI(); document.getElementById('with-upi').value = ''; document.getElementById('with-amt').value = ''; document.getElementById('with-pin').value = ''; showToast("Withdraw request sent!"); setTimeout(() => showView('home'), 500);
