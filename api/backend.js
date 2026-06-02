@@ -1,5 +1,5 @@
-const { initializeApp } = require("firebase/app");
-const { getDatabase, ref, get, set, update, runTransaction } = require("firebase/database");
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, get, set, update, runTransaction } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCVf5lRQ6t1gFbZeS9j2bf842NhoNrBX8M",
@@ -14,7 +14,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
+    // CORS configuration for local & vercel testing
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
