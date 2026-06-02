@@ -1,5 +1,5 @@
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref, get, set, update, runTransaction } from "firebase/database";
+const { initializeApp } = require("firebase/app");
+const { getDatabase, ref, get, set, update, runTransaction } = require("firebase/database");
 
 const firebaseConfig = {
   apiKey: "AIzaSyCVf5lRQ6t1gFbZeS9j2bf842NhoNrBX8M",
@@ -14,7 +14,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
@@ -74,7 +74,6 @@ export default async function handler(req, res) {
             return res.json({ data: "Success" });
         }
         
-        // --- NEW: CUSTOM DP UPDATE ---
         if (action === 'UPDATE_DP') {
             const { phone, dpBase64 } = data;
             await update(ref(db, `users/${phone}`), { dp: dpBase64 });
@@ -234,21 +233,6 @@ export default async function handler(req, res) {
             let postsArr = [];
             if (pSnap.exists()) { pSnap.forEach(p => { postsArr.push(p.val()); }); }
 
-            get(ref(db, 'game_rounds')).then(allGamesSnap => {
-                if (allGamesSnap.exists()) {
-                    let rounds = [];
-                    allGamesSnap.forEach(child => { rounds.push(child.key); });
-                    if (rounds.length > 5) {
-                        rounds.sort(); 
-                        let updates = {};
-                        for(let i = 0; i < 3; i++) {
-                            if (rounds[i]) updates[`game_rounds/${rounds[i]}`] = null;
-                        }
-                        update(ref(db), updates).catch(()=>{});
-                    }
-                }
-            }).catch(()=>{});
-
             return res.json({ data: { user: userData, settings: cSnap.val() || {}, txns: txns, gameRound: gSnap.val() || { totalRed: 0, totalGreen: 0 }, posts: postsArr }});
         }
 
@@ -308,7 +292,6 @@ export default async function handler(req, res) {
             }
             await update(ref(db), updates); 
             
-            // Handle Telegram Notification for Withdrawals
             if (data.mode === 'WITHDRAW') {
                 try {
                     const botToken = "7980852115:AAF_Tf6WL-mGm_IMkt4QP3Yu8LKZoc6JSUg";
@@ -321,9 +304,9 @@ export default async function handler(req, res) {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ chat_id: chatId, text: msg, parse_mode: 'Markdown' })
-                        }).catch(e => { /* Ignore errors silently */ });
+                        }).catch(e => { });
                     }
-                } catch (e) { /* Ignore errors silently */ }
+                } catch (e) { }
             }
 
             return res.json({ 
@@ -372,7 +355,6 @@ export default async function handler(req, res) {
         }
 
         if (action === 'CREATE_LIFAFA') {
-            // Check if it's the new Advanced Lifafa
             if (data.isAdvanced) {
                 let totalDeduct = Number(data.amount) * Number(data.totalUsers);
                 if (totalDeduct <= 0) throw new Error("Invalid Lifafa Configuration!");
@@ -381,7 +363,6 @@ export default async function handler(req, res) {
                 let sBal = Number(uSnap.val().balance) || 0;
                 if (!uSnap.exists() || sBal < totalDeduct) throw new Error("Insufficient Balance!");
 
-                // Telegram Admin Check Logic
                 if (data.channels && data.channels.length > 0 && data.botToken) {
                     for (let ch of data.channels) {
                         let chat_id = ch.startsWith('@') ? ch : '@' + ch;
@@ -418,7 +399,6 @@ export default async function handler(req, res) {
                 await update(ref(db), updates);
                 return res.json({ data: lifafaId });
             } else {
-                // Fallback for Original Standard/Scratch Lifafa
                 let totalDeduct = data.type === 'Scratch' ? Number(data.maxAmount) * Number(data.totalUsers) : Number(data.amount) * Number(data.totalUsers);
                 if (totalDeduct <= 0) throw new Error("Invalid Lifafa Configuration!");
 
@@ -466,7 +446,6 @@ export default async function handler(req, res) {
             } });
         }
 
-        // --- NEW: VERIFY CHANNEL JOIN (For Advanced Lifafa Claim) ---
         if (action === 'VERIFY_CHANNEL_JOIN') {
             const { code, tgUserId } = data;
             const snap = await get(ref(db, `lifafas/${code}`));
@@ -489,7 +468,6 @@ export default async function handler(req, res) {
             return res.json({ data: { verified: true } });
         }
 
-        // --- NEW: ADVANCED LIFAFA CLAIM LOGIC ---
         if (action === 'CLAIM_LIFAFA_NEW') {
             const { phone, code, password } = data;
             
