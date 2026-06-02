@@ -1,0 +1,10 @@
+{
+  "name": "lion-pay-backend",
+  "version": "1.0.0",
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+    "firebase": "^10.8.0"
+  }
+}
