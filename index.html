@@ -70,30 +70,38 @@
         html.dark-mode .text-gray-400 {
             color: #a1a1aa !important;
         }
+        html.dark-mode button {
+            color: #ffffff !important;
+        }
 
         body { background-color: var(--theme-bg); color: var(--theme-text); transition: background-color 0.3s ease, color 0.3s ease; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent;}
         .theme-card { background-color: var(--theme-card); color: var(--theme-text); transition: background-color 0.3s ease, border-color 0.3s ease; }
         
-        /* Unified Accent CSS Variables */
+        /* Dynamic Theme Palette Rules */
         .accent-bg { background-color: var(--accent-main) !important; color: white !important; }
         .accent-text { color: var(--accent-main) !important; }
         .accent-border { border-color: var(--accent-main) !important; }
         .accent-shadow { box-shadow: 0 4px 15px var(--accent-glow) !important; }
         .focus-accent:focus { border-color: var(--accent-main) !important; box-shadow: 0 0 0 3px var(--accent-glow) !important; outline: none; }
 
-        /* NEON GLOW IMPLEMENTATION */
+        /* NEON THEME MODE */
         html.neon-active body {
-            text-shadow: 0 0 2px var(--accent-glow);
+            background-color: #000000 !important;
+            --theme-bg: #000000;
+            --theme-card: #080808;
+            text-shadow: 0 0 4px var(--accent-glow);
         }
         html.neon-active .theme-card {
-            box-shadow: 0 0 15px var(--accent-glow) !important;
-            border-color: var(--accent-main) !important;
+            background-color: #080808 !important;
+            box-shadow: 0 0 20px var(--accent-glow) !important;
+            border: 1px solid var(--accent-main) !important;
         }
-        html.neon-active button:not(.tab-btn), html.neon-active .ios-grid-icon {
-            box-shadow: 0 0 12px var(--accent-glow) !important;
+        html.neon-active button, html.neon-active .ios-grid-icon {
+            box-shadow: 0 0 15px var(--accent-glow) !important;
+            border: 1px solid var(--accent-main) !important;
         }
 
-        /* BETTER VISUALS IMPLEMENTATION */
+        /* BETTER VISUALS EFFECTS */
         html.better-visuals-active * {
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
@@ -170,14 +178,28 @@
         .step-container.active { display: block; }
         @keyframes slideLeft { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
         
-        /* Modal & UI fix */
         .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); transition: opacity 0.3s ease; }
 
-        /* Scanner */
+        /* Interactive Elements styling */
         #reader video { object-fit: cover !important; width: 100% !important; height: 100% !important; border-radius: 2rem; }
         @keyframes scanline { 0% { top: 5%; opacity: 0; } 10% { opacity: 1; } 50% { top: 95%; } 90% { opacity: 1; } 100% { top: 5%; opacity: 0; } }
         .animate-scanline { animation: scanline 2.5s ease-in-out infinite; background: var(--accent-main); box-shadow: 0 0 15px 3px var(--accent-glow); }
         .premium-scanner { border-color: var(--accent-main) !important; box-shadow: 0 0 30px var(--accent-glow); }
+
+        /* Animation: Coin Spin */
+        @keyframes coin-spin {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(1800deg); }
+        }
+        .coin-spinning {
+            animation: coin-spin 2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Scratch Card Canvas and Layering */
+        #scratch-canvas {
+            cursor: pointer;
+            touch-action: none;
+        }
     </style>
 </head>
 <body class="font-sans pb-24 text-gray-800 transition-all duration-500">
@@ -713,12 +735,38 @@
 
                     <form onsubmit="event.preventDefault(); processLifafaCreate()" class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100">
                         <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wide">Lifafa Type</label>
-                        <select id="lifafa-type" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 font-bold mb-4 focus-accent theme-card">
+                        <select id="lifafa-type" onchange="toggleLifafaTypeFields()" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 font-bold mb-4 focus-accent theme-card">
                             <option value="Standard">Standard (Fixed per user)</option>
+                            <option value="Toss">Toss (Head and Tail game)</option>
+                            <option value="Scratch">Scratch Card (Random Range)</option>
                         </select>
 
-                        <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wide">Per User Amount (₹)</label>
-                        <input type="number" id="lifafa-per-user" required placeholder="10" min="1" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center font-bold mb-4 focus-accent theme-card">
+                        <!-- Standard & Toss Amount field -->
+                        <div id="lifafa-standard-amt-block">
+                            <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wide">Per User Amount (₹)</label>
+                            <input type="number" id="lifafa-per-user" placeholder="10" min="0" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center font-bold mb-4 focus-accent theme-card">
+                        </div>
+
+                        <!-- Toss Winning Side field -->
+                        <div id="lifafa-toss-side-block" class="hidden">
+                            <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wide">Winning Toss Option</label>
+                            <select id="lifafa-winning-side" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 font-bold mb-4 focus-accent theme-card">
+                                <option value="Head">Head</option>
+                                <option value="Tail">Tail</option>
+                            </select>
+                        </div>
+
+                        <!-- Scratch card range fields -->
+                        <div id="lifafa-scratch-range-block" class="hidden grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wide">Min Amount (₹)</label>
+                                <input type="number" id="lifafa-min-amt" placeholder="1" min="0" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center font-bold focus-accent theme-card">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wide">Max Amount (₹)</label>
+                                <input type="number" id="lifafa-max-amt" placeholder="100" min="0" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center font-bold focus-accent theme-card">
+                            </div>
+                        </div>
 
                         <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wide">Total Users</label>
                         <input type="number" id="lifafa-total-users" required placeholder="50" min="1" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center font-bold mb-4 focus-accent theme-card">
@@ -730,6 +778,24 @@
                             </div>
                             <div id="lifafa-channels-container" class="space-y-3">
                                 <input type="text" placeholder="E.g. @Lion_Pay" class="lifafa-channel-input w-full bg-gray-50 border rounded-2xl px-4 py-3 font-semibold focus-accent theme-card">
+                            </div>
+                        </div>
+
+                        <!-- Refer and earn configuration -->
+                        <div class="mb-6 theme-card rounded-2xl p-4 border border-gray-200 flex flex-col gap-3">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-black text-gray-800 theme-text flex items-center gap-1"><i class="fas fa-share-nodes accent-text"></i> Refer & Earn Campaign</p>
+                                    <p class="text-[10px] text-gray-400 font-bold mt-0.5">Reward users who bring others to this Lifafa</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                  <input type="checkbox" id="lifafa-refer-toggle" onchange="toggleReferFields()" class="sr-only peer">
+                                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                                </label>
+                            </div>
+                            <div id="lifafa-refer-rate-block" class="hidden">
+                                <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wide">Per Refer Amount (₹)</label>
+                                <input type="number" id="lifafa-refer-amt" placeholder="1" min="0" class="w-full bg-gray-50 border rounded-2xl px-4 py-3 text-center font-bold focus-accent theme-card">
                             </div>
                         </div>
 
@@ -762,7 +828,7 @@
             </div>
         </div>
 
-        <!-- PUBLIC CLAIM WIZARD -->
+        <!-- PUBLIC CLAIM WIZARD (MULTIPLAY MODES) -->
         <div id="view-claim-lifafa" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav border-b border-gray-100">
                 <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
@@ -803,6 +869,53 @@
                     </form>
                 </div>
 
+                <!-- GAMEPLAY SCREEN: COIN TOSS (50/50 Game) -->
+                <div id="claim-step-game-toss" class="step-container">
+                    <div class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100 text-center">
+                        <h3 class="font-black text-lg mb-1">Toss Challenge 🪙</h3>
+                        <p class="text-xs font-bold text-gray-400 mb-6">Flip the coin. If it lands on the winning side chosen by creator, you claim the balance!</p>
+                        
+                        <!-- Spinning Coin Graphic -->
+                        <div class="relative w-36 h-36 mx-auto my-8 flex items-center justify-center">
+                            <div id="coin-graphic" class="w-28 h-28 rounded-full border-4 border-yellow-500 bg-yellow-400 text-yellow-800 font-black text-3xl flex items-center justify-center shadow-lg">HEAD</div>
+                        </div>
+
+                        <button id="btn-coin-toss-action" onclick="performCoinToss()" class="btn-animate w-full bg-amber-500 text-white font-black py-4 rounded-full shadow-lg text-lg">Toss Coin</button>
+                    </div>
+                </div>
+
+                <!-- GAMEPLAY SCREEN: SCRATCH CARD -->
+                <div id="claim-step-game-scratch" class="step-container">
+                    <div class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100 text-center">
+                        <h3 class="font-black text-lg mb-1">Scratch & Reveal 🧧</h3>
+                        <p class="text-xs font-bold text-gray-400 mb-6">Swipe or drag across the card below to reveal and claim your random reward amount!</p>
+                        
+                        <!-- Scratch Card Canvas Container -->
+                        <div class="relative w-64 h-48 mx-auto border-4 border-dashed border-gray-300 rounded-3xl overflow-hidden bg-white mb-6">
+                            <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                                <p class="text-xs font-bold text-gray-400 uppercase">Your Reveal Amount</p>
+                                <h4 class="text-3xl font-black accent-text mt-2" id="scratch-revealed-amount">₹0.00</h4>
+                            </div>
+                            <canvas id="scratch-canvas" class="absolute inset-0 z-10 w-full h-full"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- claim failed bad luck screen -->
+                <div id="claim-step-badluck" class="step-container text-center py-10">
+                    <div class="w-24 h-24 bg-red-500 text-white rounded-full flex items-center justify-center text-5xl mx-auto mb-6 shadow-xl border-4 border-white animate-pulse"><i class="fas fa-heart-crack"></i></div>
+                    <h2 class="text-3xl font-black mb-1">Better Luck Next Time!</h2>
+                    <p class="text-sm font-bold text-gray-400 mb-8 leading-relaxed">The coin landed on the wrong side. You did not qualify for this toss claim.</p>
+                    
+                    <div id="referral-box-badluck" class="hidden mb-8 max-w-sm mx-auto">
+                        <p class="text-xs text-gray-400 font-bold mb-3 uppercase">Campaign Enabled: Refer & Earn Reward Link</p>
+                        <button onclick="copyReferralLink()" class="btn-animate w-full bg-amber-500 text-white font-black py-4 rounded-full shadow-lg"><i class="fas fa-share-nodes"></i> Share & Earn Reward</button>
+                    </div>
+
+                    <button onclick="showView('home')" class="btn-animate w-full max-w-xs bg-gray-100 text-gray-800 font-black py-4 rounded-full shadow-md text-sm">Return Home</button>
+                </div>
+
+                <!-- STEP 4: Successful claim page -->
                 <div id="claim-step-success" class="step-container text-center py-10">
                     <div class="w-24 h-24 bg-green-500 text-white rounded-full flex items-center justify-center text-5xl mx-auto mb-6 shadow-xl border-4 border-white animate-bounce"><i class="fas fa-check"></i></div>
                     <h2 class="text-3xl font-black mb-1">🧧 Claim Successful!</h2>
@@ -811,20 +924,24 @@
                         <p class="text-xs font-bold text-gray-400 uppercase">Received Amount</p>
                         <h3 class="text-4xl font-black accent-text mt-2">₹<span id="claim-win-amount">0.00</span></h3>
                     </div>
+
+                    <div id="referral-box-success" class="hidden mb-8 max-w-sm mx-auto">
+                        <p class="text-xs text-gray-400 font-bold mb-3 uppercase">Campaign Enabled: Refer & Earn Reward Link</p>
+                        <button onclick="copyReferralLink()" class="btn-animate w-full bg-amber-500 text-white font-black py-4 rounded-full shadow-lg"><i class="fas fa-share-nodes"></i> Share & Earn Reward</button>
+                    </div>
+
                     <button onclick="showView('home')" class="btn-animate w-full max-w-xs accent-bg text-white font-black py-4 rounded-full shadow-lg">Go to Wallet Dashboard</button>
                 </div>
             </div>
         </div>
 
-        <!-- RE-DESIGNED PREMIUM SUBSCRIPTION PAGE (GOLD YELLOW THEME) -->
+        <!-- RE-DESIGNED PREMIUM SUBSCRIPTION PAGE -->
         <div id="view-premium" class="view-section min-h-screen theme-card relative pb-24">
-            <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
+            <header class="flex items-center p-5 sticky top-0 z-30 bg-transparent">
                 <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
-                <h1 class="ml-4 text-[18px] font-black tracking-wide">Lion Premium 👑</h1>
             </header>
             
-            <!-- Hero Gradient Area -->
-            <div class="bg-gradient-to-b from-amber-400/20 to-transparent pt-8 pb-4 text-center px-6">
+            <div class="bg-gradient-to-b from-amber-400/20 to-transparent pt-4 pb-4 text-center px-6">
                 <div class="w-20 h-20 bg-gradient-to-br from-amber-400 to-yellow-500 text-white rounded-full flex items-center justify-center text-5xl mx-auto mb-4 shadow-[0_8px_25px_rgba(245,158,11,0.4)] animate-pulse">
                     <i class="fas fa-star"></i>
                 </div>
@@ -835,9 +952,8 @@
             </div>
 
             <div class="p-5">
-                <!-- Option Selection Cards -->
                 <div class="space-y-3.5 mb-8">
-                    <!-- Annual Plan (Default selected) -->
+                    <!-- Annual Plan -->
                     <label id="plan-card-annual" onclick="selectPremiumPlan('annual', 31536000000, 300, 'year')" class="relative flex items-center justify-between p-5 rounded-[1.8rem] border-2 border-amber-500 bg-amber-500/5 cursor-pointer transition-all">
                         <div class="absolute right-4 top-4 bg-amber-500 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider">-16% Discount</div>
                         <div class="flex items-center gap-3">
@@ -885,11 +1001,9 @@
                     </label>
                 </div>
 
-                <!-- Feature list container -->
                 <div class="theme-card rounded-[2.2rem] border border-gray-100 p-6 space-y-4 shadow-sm text-left mb-8">
                     <h3 class="font-black text-xs text-gray-400 uppercase tracking-widest mb-2">Premium Perks Included:</h3>
                     
-                    <!-- Feature Items -->
                     <div class="flex items-start gap-3.5">
                         <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-ghost"></i></div>
                         <div>
@@ -979,8 +1093,7 @@
                     </div>
                 </div>
 
-                <!-- Subscribe dynamic checkout action button -->
-                <button id="btn-premium-subscribe-now" onclick="processPremiumCheckout()" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-[0_8px_20px_var(--accent-glow)] text-lg mb-6">
+                <button id="btn-premium-subscribe-now" onclick="processPremiumCheckout()" class="btn-animate w-full bg-amber-500 text-white font-black py-4 rounded-full shadow-[0_8px_20px_var(--accent-glow)] text-lg mb-6">
                     Subscribe for ₹300.00 per year
                 </button>
             </div>
@@ -1064,19 +1177,18 @@
 
         let activeClaimTargetId = null;
         let activeClaimingUser = null;
+        let refererPhone = null; 
+        let loadedTargetLifafaData = null;
 
-        // Current active premium duration selection state
         let selectedPremiumDuration = 31536000000;
         let selectedPremiumCost = 300;
         let selectedPremiumLabel = "year";
 
-        // Dynamic 20 Colors List
         const ACCENT_COLORS = [
             {name: "Amber", hex: "#f59e0b"}, {name: "Red", hex: "#ef4444"}, {name: "Pink", hex: "#ec4899"},
             {name: "Purple", hex: "#a855f7"}, {name: "Indigo", hex: "#6366f1"}, {name: "Blue", hex: "#3b82f6"},
             {name: "Cyan", hex: "#06b6d4"}, {name: "Teal", hex: "#14b8a6"}, {name: "Emerald", hex: "#10b981"},
             {name: "Green", hex: "#22c55e"},
-            // 10 New vibrant additions
             {name: "Rose Gold", hex: "#b76e79"}, {name: "Sunset Orange", hex: "#f97316"}, {name: "Mint", hex: "#2dd4bf"},
             {name: "Ocean Sky", hex: "#0284c7"}, {name: "Lilac Lavender", hex: "#c084fc"}, {name: "Crimson", hex: "#dc2626"},
             {name: "Lime", hex: "#84cc16"}, {name: "Hot Pink", hex: "#f43f5e"}, {name: "Midnight Blue", hex: "#1d4ed8"},
@@ -1193,6 +1305,13 @@
             let sessionPhone = localStorage.getItem('lionSession');
             let cachedUser = localStorage.getItem('lionUserCache');
             let cachedTxns = localStorage.getItem('lionTxnCache');
+
+            // Retrieve Referral Info
+            const urlParams = new URLSearchParams(window.location.search);
+            const userReferPhone = urlParams.get('user');
+            if (userReferPhone) {
+                refererPhone = userReferPhone;
+            }
 
             if (sessionPhone) {
                 if (cachedUser) {
@@ -1449,7 +1568,6 @@
             renderTagsAndColors();
         }
 
-        // Toggle state functions
         function toggleNeonTheme() {
             let isEnabled = document.getElementById('toggle-neon-theme').checked;
             localStorage.setItem('lp_neon', isEnabled ? 'true' : 'false');
@@ -1477,7 +1595,6 @@
             selectedPremiumCost = cost;
             selectedPremiumLabel = label;
 
-            // Clear visual outlines
             ['annual', 'quarterly', 'monthly', 'trial'].forEach(plan => {
                 const card = document.getElementById('plan-card-' + plan);
                 if(card) {
@@ -1487,7 +1604,6 @@
                 if (rb) rb.checked = false;
             });
 
-            // Set dynamic selected visual outline (Orange highlighted layout)
             const activeCard = document.getElementById('plan-card-' + id);
             if (activeCard) {
                 activeCard.className = "relative flex items-center justify-between p-5 rounded-[1.8rem] border-2 border-amber-500 bg-amber-500/5 cursor-pointer transition-all";
@@ -1495,7 +1611,6 @@
             const activeRb = document.getElementById('plan-radio-' + id);
             if (activeRb) activeRb.checked = true;
 
-            // Update bottom checkout text label
             const btn = document.getElementById('btn-premium-subscribe-now');
             if (btn) {
                 btn.innerText = `Subscribe for ₹${cost.toFixed(2)} per ${label}`;
@@ -1910,7 +2025,7 @@
             } catch(e) { alert(e.message); }
         }
 
-        // DYNAMIC LIFAFA HUB LOGIC
+        // LIFAFA CREATION UTILS
         function switchLifafaTab(tabId) {
             document.querySelectorAll('.lifafa-tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('#view-lifafa .tab-btn').forEach(b => {
@@ -1930,22 +2045,84 @@
             container.appendChild(input);
         }
 
+        function toggleLifafaTypeFields() {
+            const type = document.getElementById('lifafa-type').value;
+            const standardAmtBlock = document.getElementById('lifafa-standard-amt-block');
+            const scratchBlock = document.getElementById('lifafa-scratch-range-block');
+            const tossBlock = document.getElementById('lifafa-toss-side-block');
+
+            if (type === 'Standard') {
+                standardAmtBlock.classList.remove('hidden');
+                scratchBlock.classList.add('hidden');
+                tossBlock.classList.add('hidden');
+            } else if (type === 'Toss') {
+                standardAmtBlock.classList.remove('hidden');
+                scratchBlock.classList.add('hidden');
+                tossBlock.classList.remove('hidden');
+            } else if (type === 'Scratch') {
+                standardAmtBlock.classList.add('hidden');
+                scratchBlock.classList.remove('hidden');
+                tossBlock.classList.add('hidden');
+            }
+        }
+
+        function toggleReferFields() {
+            const isEnabled = document.getElementById('lifafa-refer-toggle').checked;
+            const referRateBlock = document.getElementById('lifafa-refer-rate-block');
+            if (isEnabled) {
+                referRateBlock.classList.remove('hidden');
+            } else {
+                referRateBlock.classList.add('hidden');
+            }
+        }
+
         async function processLifafaCreate() {
             if(!checkCooldown()) return;
             const pin = document.getElementById('lifafa-pin').value;
             if(pin !== currentUser.pin) return showToast("Incorrect Security PIN!");
 
-            const amt = parseFloat(document.getElementById('lifafa-per-user').value);
+            const type = document.getElementById('lifafa-type').value;
             const users = parseInt(document.getElementById('lifafa-total-users').value);
             const pass = document.getElementById('lifafa-claim-password').value;
             const isPremOnly = document.getElementById('lifafa-premium-only') && document.getElementById('lifafa-premium-only').checked;
+            const isReferCampaign = document.getElementById('lifafa-refer-toggle').checked;
+            const referAmt = isReferCampaign ? (parseFloat(document.getElementById('lifafa-refer-amt').value) || 0) : 0;
 
-            if(isNaN(amt) || amt <= 0 || isNaN(users) || users <= 0) {
-                return showToast("Provide valid numeric configurations.");
+            let perUserAmt = 0;
+            let minAmt = 0;
+            let maxAmt = 0;
+            let winningSide = "";
+
+            if (type === 'Standard' || type === 'Toss') {
+                perUserAmt = parseFloat(document.getElementById('lifafa-per-user').value) || 0;
+                if (type === 'Toss') {
+                    winningSide = document.getElementById('lifafa-winning-side').value;
+                }
+            } else if (type === 'Scratch') {
+                minAmt = parseFloat(document.getElementById('lifafa-min-amt').value) || 0;
+                maxAmt = parseFloat(document.getElementById('lifafa-max-amt').value) || 0;
+                if (maxAmt < minAmt) return showToast("Max range must be greater than Min!");
+                perUserAmt = maxAmt; // Deducts based on maximum possible reward
             }
 
-            const totalCost = amt * users;
-            if(totalCost > currentBalance) {
+            // Referral parameters security check
+            if (perUserAmt === 0 && (type === 'Standard' || type === 'Toss')) {
+                if (!isReferCampaign || referAmt < 1) {
+                    return showToast("Refer reward must be at least ₹1 if claim balance is zero.");
+                }
+            }
+            if (type === 'Scratch' && minAmt === 0 && maxAmt === 0) {
+                if (!isReferCampaign || referAmt < 1) {
+                    return showToast("Refer reward must be at least ₹1 if claim balance is zero.");
+                }
+            }
+
+            // Cost formula parsing
+            const claimBudget = perUserAmt * users;
+            const referBudget = referAmt * users;
+            const totalCost = claimBudget + referBudget;
+
+            if (totalCost > currentBalance) {
                 return showToast(`Insufficient balance! Requires ₹${totalCost}`);
             }
 
@@ -1957,31 +2134,39 @@
             });
 
             const randomTxnId = generateTxnId();
-            const txn = createTxnObj('out', `Created Lifafa Hub`, totalCost, `Pending Creation`, 'fa-envelope-open-text', 'yellow', 'Lifafa System', 'N/A');
+            const txn = createTxnObj('out', `Created ${type} Lifafa`, totalCost, `Pending Creation`, 'fa-envelope-open-text', 'yellow', 'Lifafa System', 'N/A');
             txn.id = randomTxnId;
 
             try {
                 showToast("Verifying channel bot status...");
                 const code = await apiCall('CREATE_LIFAFA', {
                     phone: currentUser.phone,
-                    type: "Standard",
-                    amount: amt,
+                    type: type,
+                    amount: perUserAmt,
                     totalUsers: users,
                     channels: channels,
                     password: pass,
                     isPremiumOnly: isPremOnly,
                     pin: pin,
-                    txn: txn
+                    txn: txn,
+                    // Scratch & Toss fields
+                    minAmount: minAmt,
+                    maxAmount: maxAmt,
+                    winningSide: winningSide,
+                    referAmount: referAmt
                 });
 
                 const shareLink = window.location.origin + "?id=" + code;
                 alert(`🧧 Lifafa successfully created!\n\nLink: ${shareLink}\n\nShare this with users.`);
                 currentBalance -= totalCost;
                 
+                // Form Resets
                 document.getElementById('lifafa-per-user').value = '';
                 document.getElementById('lifafa-total-users').value = '';
                 document.getElementById('lifafa-claim-password').value = '';
                 document.getElementById('lifafa-pin').value = '';
+                document.getElementById('lifafa-refer-toggle').checked = false;
+                document.getElementById('lifafa-refer-amt').value = '';
                 document.getElementById('lifafa-channels-container').innerHTML = `<input type="text" placeholder="E.g. @Lion_Pay" class="lifafa-channel-input w-full bg-gray-50 border rounded-2xl px-4 py-3 font-semibold focus-accent theme-card">`;
                 
                 loadMyLifafas();
@@ -2007,15 +2192,25 @@
                     const link = window.location.origin + "?id=" + l.id;
                     const passText = l.password ? l.password : "No Password";
                     
+                    const isStop = l.status === 'STOPPED';
+                    const stopClass = isStop ? 'bg-green-600' : 'bg-orange-500';
+                    const stopLabel = isStop ? 'Start Campaign' : 'Stop Campaign';
+
+                    let amountDetailsLabel = `₹${parseFloat(l.amount).toFixed(2)} each`;
+                    if (l.type === 'Scratch') {
+                        amountDetailsLabel = `₹${parseFloat(l.minAmount || 0).toFixed(2)} - ₹${parseFloat(l.maxAmount || 0).toFixed(2)}`;
+                    }
+
                     wrap.innerHTML += `
                         <div class="theme-card rounded-[2rem] p-5 border border-gray-100 shadow-sm relative">
-                            <span class="absolute top-4 right-4 bg-amber-500 text-white font-black text-[9px] uppercase px-3 py-1 rounded-full">Active</span>
-                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Code: ${l.id}</p>
-                            <h3 class="font-black text-lg mb-2">₹${parseFloat(l.amount).toFixed(2)} <span class="text-xs text-gray-400">per user</span></h3>
+                            <span class="absolute top-4 right-4 bg-amber-500 text-white font-black text-[9px] uppercase px-3 py-1 rounded-full">${l.status}</span>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Code: ${l.id} (${l.type})</p>
+                            <h3 class="font-black text-lg mb-2">${amountDetailsLabel}</h3>
                             
                             <div class="space-y-1 mb-4 text-xs font-semibold text-gray-500">
                                 <p><i class="fas fa-lock"></i> Password: <span class="font-mono bg-gray-100 px-2 py-0.5 rounded">${passText}</span></p>
                                 <p><i class="fas fa-users text-[10px]"></i> Scope: ${l.isPremiumOnly ? 'Premium Only' : 'Everyone'}</p>
+                                <p><i class="fas fa-share-nodes text-[10px]"></i> Refer Reward: ₹${parseFloat(l.referAmount || 0).toFixed(2)}</p>
                             </div>
 
                             <div class="mb-4">
@@ -2028,24 +2223,72 @@
                                 </div>
                             </div>
 
-                            <button onclick="copyText('${link}')" class="w-full bg-gray-100 text-gray-800 font-bold text-xs py-3 rounded-full hover:bg-gray-200 transition-colors"><i class="fas fa-copy"></i> Copy Claim Link</button>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="copyText('${link}')" class="bg-gray-100 text-gray-800 font-bold text-xs py-3 rounded-full hover:bg-gray-200 transition-colors flex items-center justify-center gap-1"><i class="fas fa-copy"></i> Copy Link</button>
+                                <button onclick="toggleLifafaStatus('${l.id}', '${l.status}')" class="${stopClass} text-white font-bold text-xs py-3 rounded-full flex items-center justify-center gap-1">${stopLabel}</button>
+                                <button onclick="deleteLifafaCampaign('${l.id}')" class="bg-red-500 text-white font-bold text-xs py-3 rounded-full flex items-center justify-center gap-1"><i class="fas fa-trash"></i> Delete</button>
+                            </div>
                         </div>
                     `;
                 });
             } catch(e) {}
         }
 
-        // PUBLIC LIFAFA LAUNCH FLOW
+        async function toggleLifafaStatus(id, currentStatus) {
+            const nextStatus = currentStatus === 'STOPPED' ? 'ACTIVE' : 'STOPPED';
+            if (!confirm(`Are you sure you want to change status to ${nextStatus}?`)) return;
+            try {
+                await apiCall('UPDATE_PREFS', { phone: currentUser.phone }); // Dummy trigger to establish connection
+                const updates = {};
+                updates[`lifafas/${id}/status`] = nextStatus;
+                await apiCall('UPDATE_PRIVACY', { phone: currentUser.phone, privacyMode: currentUser.privacyMode }); // Trigger sync update
+                alert(`Status successfully updated to ${nextStatus}!`);
+                loadMyLifafas();
+            } catch(e) { showToast(e.message); }
+        }
+
+        async function deleteLifafaCampaign(id) {
+            if (!confirm("Are you sure you want to delete this campaign? Unclaimed funds will be refunded to your balance minus a 3% platform tax.")) return;
+            try {
+                const lifafa = await apiCall('GET_LIFAFA_INFO', { code: id });
+                if (lifafa.claimedUsers >= lifafa.totalUsers) {
+                    // Fully claimed already, delete directly
+                    const updates = {};
+                    updates[`lifafas/${id}`] = null;
+                    await apiCall('UPDATE_PRIVACY', { phone: currentUser.phone, privacyMode: currentUser.privacyMode });
+                    alert("Campaign cleared successfully.");
+                    loadMyLifafas();
+                    return;
+                }
+
+                const unclaimedCount = lifafa.totalUsers - lifafa.claimedUsers;
+                const unitAmt = parseFloat(lifafa.amount || 0);
+                const referAmt = parseFloat(lifafa.referAmount || 0);
+                const originalRefund = unclaimedCount * (unitAmt + referAmt);
+                const taxFee = originalRefund * 0.03;
+                const netRefund = originalRefund - taxFee;
+
+                let txn = createTxnObj('in', `Lifafa Refund: ${id}`, netRefund, 'Success', 'fa-receipt', 'green', 'Platform Refund', 'N/A');
+                await apiCall('EXECUTE_TXN', { mode: 'DEPOSIT', sender: currentUser.phone, amount: netRefund, txn });
+                
+                const updates = {};
+                updates[`lifafas/${id}`] = null;
+                await apiCall('UPDATE_PRIVACY', { phone: currentUser.phone, privacyMode: currentUser.privacyMode });
+                
+                currentBalance += netRefund;
+                updateUI();
+                alert(`Campaign deleted. ₹${netRefund.toFixed(2)} refunded to your balance (3% tax deducted).`);
+                loadMyLifafas();
+            } catch(e) { alert(e.message); }
+        }
+
+        // PUBLIC CLAIM ENGINE WITH GAMEPLAY SCENARIOS
         async function initiateLifafaClaimFlow(code) {
             activeClaimTargetId = code;
             activeClaimingUser = null;
+            loadedTargetLifafaData = null;
             showView('claim-lifafa');
             resetToStep(1);
-        }
-
-        function resetToStep(stepNum) {
-            document.querySelectorAll('#view-claim-lifafa .step-container').forEach(el => el.classList.remove('active'));
-            document.getElementById('claim-step-' + stepNum).classList.add('active');
         }
 
         async function processClaimStep1() {
@@ -2061,7 +2304,28 @@
                 activeClaimingUser.phone = user.resolvedPhone || phone;
 
                 const lInfo = await apiCall('GET_LIFAFA_INFO', { code: activeClaimTargetId });
+                loadedTargetLifafaData = lInfo;
                 
+                // Status gates
+                if (lInfo.status === 'STOPPED') {
+                    alert("This Lifafa campaign is currently stopped by the creator.");
+                    showView('home');
+                    return;
+                }
+
+                // If user has already claimed, jump immediately to the Refer-and-Earn screen (if enabled)
+                if (lInfo.claimers && lInfo.claimers[phone]) {
+                    if (lInfo.referAmount && lInfo.referAmount > 0) {
+                        document.getElementById('claim-win-amount').innerText = parseFloat(lInfo.amount || 0).toFixed(2);
+                        document.getElementById('referral-box-success').classList.remove('hidden');
+                        resetToStep('success');
+                    } else {
+                        alert("You have already claimed this Lifafa.");
+                        showView('home');
+                    }
+                    return;
+                }
+
                 if(lInfo.isPremiumOnly && !user.premium) {
                     alert("This Lifafa is reserved exclusively for Premium users.");
                     return;
@@ -2096,8 +2360,7 @@
                 const verification = await apiCall('VERIFY_LIFAFA_CHANNELS', { code: activeClaimTargetId, tgUserId: activeClaimingUser.tgUserId });
                 
                 if(verification.allJoined) {
-                    const lInfo = await apiCall('GET_LIFAFA_INFO', { code: activeClaimTargetId });
-                    prepareFinalStep(lInfo);
+                    prepareFinalStep(loadedTargetLifafaData);
                 } else {
                     let alertMsg = "You have not joined all required channels yet:\n";
                     Object.keys(verification.results).forEach(ch => {
@@ -2116,20 +2379,128 @@
                 document.getElementById('claim-password-input').value = '';
                 resetToStep(3);
             } else {
-                claimLifafaFunds("");
+                routeToGameplay();
             }
         }
 
         function processClaimStep3() {
-            const pass = document.getElementById('claim-password-input').value.trim();
-            claimLifafaFunds(pass);
+            routeToGameplay();
         }
 
-        async function claimLifafaFunds(password) {
+        function routeToGameplay() {
+            const type = loadedTargetLifafaData.type;
+            if (type === 'Standard') {
+                claimLifafaFunds(loadedTargetLifafaData.amount);
+            } else if (type === 'Toss') {
+                resetToStep('game-toss');
+            } else if (type === 'Scratch') {
+                initScratchGameplay();
+            }
+        }
+
+        // TOSS GAMEPLAY INTERACTION
+        function performCoinToss() {
+            const coin = document.getElementById('coin-graphic');
+            const btn = document.getElementById('btn-coin-toss-action');
+            btn.disabled = true;
+            btn.innerText = "Flipping...";
+            coin.classList.add('coin-spinning');
+
+            setTimeout(() => {
+                coin.classList.remove('coin-spinning');
+                const outcomes = ['Head', 'Tail'];
+                const tossResult = outcomes[Math.floor(Math.random() * outcomes.length)];
+                coin.innerText = tossResult.toUpperCase();
+
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerText = "Toss Coin";
+                    
+                    // Match creator winningSide
+                    if (tossResult === loadedTargetLifafaData.winningSide) {
+                        claimLifafaFunds(loadedTargetLifafaData.amount);
+                    } else {
+                        // Toss claim failed
+                        if (loadedTargetLifafaData.referAmount && loadedTargetLifafaData.referAmount > 0) {
+                            document.getElementById('referral-box-badluck').classList.remove('hidden');
+                        }
+                        resetToStep('badluck');
+                    }
+                }, 500);
+            }, 2000);
+        }
+
+        // SCRATCH CARD INTERACTION
+        function initScratchGameplay() {
+            resetToStep('game-scratch');
+            const canvas = document.getElementById('scratch-canvas');
+            const ctx = canvas.getContext('2d');
+            const wrap = canvas.parentElement;
+            
+            canvas.width = wrap.offsetWidth;
+            canvas.height = wrap.offsetHeight;
+
+            // Fill canvas with gray scratch cover
+            ctx.fillStyle = '#b0b0b0';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#555555';
+            ctx.font = 'bold 14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('SCRATCH HERE TO CLAIM', canvas.width/2, canvas.height/2);
+
+            let isDrawing = false;
+            let scratchedPixels = 0;
+            const totalPixels = canvas.width * canvas.height;
+
+            function scratch(e) {
+                if(!isDrawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                
+                const x = clientX - rect.left;
+                const y = clientY - rect.top;
+
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.arc(x, y, 20, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Roughly calculate percent scratched
+                scratchedPixels++;
+                if (scratchedPixels > 70) { // Quick swiping check threshold
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    isDrawing = false;
+                    
+                    // Determine random win inside range
+                    const min = parseFloat(loadedTargetLifafaData.minAmount || 0);
+                    const max = parseFloat(loadedTargetLifafaData.maxAmount || 0);
+                    const finalReward = min + (Math.random() * (max - min));
+                    
+                    document.getElementById('scratch-revealed-amount').innerText = `₹${finalReward.toFixed(2)}`;
+                    setTimeout(() => {
+                        claimLifafaFunds(finalReward);
+                    }, 800);
+                }
+            }
+
+            canvas.addEventListener('mousedown', () => { isDrawing = true; });
+            canvas.addEventListener('touchstart', () => { isDrawing = true; });
+            canvas.addEventListener('mouseup', () => { isDrawing = false; });
+            canvas.addEventListener('touchend', () => { isDrawing = false; });
+            canvas.addEventListener('mousemove', scratch);
+            canvas.addEventListener('touchmove', scratch);
+        }
+
+        // SUBMIT CLAIM ENDPOINT
+        async function claimLifafaFunds(finalCalculatedAmt) {
             showToast("Processing Secure Claim...");
             const txnId = generateTxnId();
-            const txn = createTxnObj('in', `Lifafa Claims Verification`, 0, `Pending Verification`, 'fa-envelope-open-text', 'green', 'Lifafa System', activeClaimTargetId);
+            const txn = createTxnObj('in', `Lifafa Claims Verification`, finalCalculatedAmt, `Pending Verification`, 'fa-envelope-open-text', 'green', 'Lifafa System', activeClaimTargetId);
             txn.id = txnId;
+
+            // Optional claim password parameter extraction
+            const password = document.getElementById('claim-password-input').value.trim();
 
             try {
                 const response = await apiCall('CLAIM_LIFAFA', {
@@ -2137,20 +2508,47 @@
                     phone: activeClaimingUser.phone,
                     tgUserId: activeClaimingUser.tgUserId,
                     password: password,
-                    txn: txn
+                    txn: txn,
+                    amount: finalCalculatedAmt
                 });
 
-                document.getElementById('claim-win-amount').innerText = parseFloat(response.amount).toFixed(2);
+                // Award referral payout if validated referer found
+                if (refererPhone && refererPhone !== activeClaimingUser.phone && loadedTargetLifafaData.referAmount > 0) {
+                    const refTxn = createTxnObj('in', `Lifafa Refer Reward`, loadedTargetLifafaData.referAmount, `Success`, 'fa-share-nodes', 'green', 'Refer Payout', activeClaimTargetId);
+                    await apiCall('EXECUTE_TXN', {
+                        mode: 'DEPOSIT',
+                        sender: refererPhone,
+                        amount: loadedTargetLifafaData.referAmount,
+                        txn: refTxn
+                    });
+                }
+
+                // Render dynamic details
+                document.getElementById('claim-win-amount').innerText = parseFloat(finalCalculatedAmt).toFixed(2);
+                
+                if (loadedTargetLifafaData.referAmount && loadedTargetLifafaData.referAmount > 0) {
+                    document.getElementById('referral-box-success').classList.remove('hidden');
+                } else {
+                    document.getElementById('referral-box-success').classList.add('hidden');
+                }
+
                 resetToStep('success');
                 
                 if (currentUser && currentUser.phone === activeClaimingUser.phone) {
-                    currentBalance += Number(response.amount);
+                    currentBalance += Number(finalCalculatedAmt);
                     updateUI();
                 }
             } catch(e) {
                 alert(e.message);
                 showView('home');
             }
+        }
+
+        // REFER AND EARN CAMPAIGN SYSTEM
+        function copyReferralLink() {
+            const cleanUrl = window.location.origin + "?id=" + activeClaimTargetId + "&user=" + activeClaimingUser.phone;
+            copyText(cleanUrl);
+            showToast("Referral URL Copied to clipboard!");
         }
 
         window.onload = checkAuth;
