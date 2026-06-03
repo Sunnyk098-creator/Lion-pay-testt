@@ -14,10 +14,14 @@
             let savedColor = localStorage.getItem('lp_color') || '#f59e0b'; 
             let savedPremium = localStorage.getItem('lp_premiumUI') === 'true';
             let savedColorful = localStorage.getItem('lp_colorful') === 'true';
+            let savedNeon = localStorage.getItem('lp_neon') === 'true';
+            let savedVisuals = localStorage.getItem('lp_visuals') === 'true';
 
             if(savedTheme === 'dark') document.documentElement.classList.add('dark-mode');
             if(savedPremium) document.documentElement.classList.add('premium-mode');
             if(savedColorful) document.documentElement.classList.add('colorful-mode');
+            if(savedNeon) document.documentElement.classList.add('neon-active');
+            if(savedVisuals) document.documentElement.classList.add('better-visuals-active');
 
             function hexToRgba(hex, alpha) {
                 let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
@@ -38,18 +42,72 @@
             --theme-card: #ffffff; 
         }
         
-        html.dark-mode body { --theme-bg: #000000; --theme-text: #f2f2f7; --theme-card: #1c1c1e; background-color: var(--theme-bg); color: var(--theme-text); }
+        html.dark-mode body { 
+            --theme-bg: #000000; 
+            --theme-text: #f2f2f7; 
+            --theme-card: #1c1c1e; 
+            background-color: var(--theme-bg); 
+            color: var(--theme-text); 
+        }
         html.dark-mode .theme-card { background-color: var(--theme-card) !important; border-color: rgba(255,255,255,0.08) !important; }
         html.dark-mode input, html.dark-mode textarea, html.dark-mode select { background-color: #2c2c2e !important; color: white !important; border-color: #3a3a3c !important; }
+
+        /* Dark Mode Text Visibility Fixes */
+        html.dark-mode .theme-text, 
+        html.dark-mode h1, html.dark-mode h2, html.dark-mode h3, html.dark-mode h4, html.dark-mode h5, html.dark-mode h6,
+        html.dark-mode p:not(.text-gray-400):not(.text-gray-500) {
+            color: #f3f4f6 !important;
+        }
+        html.dark-mode .text-gray-800, 
+        html.dark-mode .text-gray-700, 
+        html.dark-mode .text-gray-900 {
+            color: #e5e7eb !important;
+        }
+        html.dark-mode .text-gray-600, 
+        html.dark-mode .text-gray-500 {
+            color: #9ca3af !important;
+        }
+        html.dark-mode .text-gray-400 {
+            color: #a1a1aa !important;
+        }
 
         body { background-color: var(--theme-bg); color: var(--theme-text); transition: background-color 0.3s ease, color 0.3s ease; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent;}
         .theme-card { background-color: var(--theme-card); color: var(--theme-text); transition: background-color 0.3s ease, border-color 0.3s ease; }
         
+        /* Unified Accent CSS Variables */
         .accent-bg { background-color: var(--accent-main) !important; color: white !important; }
         .accent-text { color: var(--accent-main) !important; }
         .accent-border { border-color: var(--accent-main) !important; }
         .accent-shadow { box-shadow: 0 4px 15px var(--accent-glow) !important; }
         .focus-accent:focus { border-color: var(--accent-main) !important; box-shadow: 0 0 0 3px var(--accent-glow) !important; outline: none; }
+
+        /* NEON GLOW IMPLEMENTATION */
+        html.neon-active body {
+            text-shadow: 0 0 2px var(--accent-glow);
+        }
+        html.neon-active .theme-card {
+            box-shadow: 0 0 15px var(--accent-glow) !important;
+            border-color: var(--accent-main) !important;
+        }
+        html.neon-active button:not(.tab-btn), html.neon-active .ios-grid-icon {
+            box-shadow: 0 0 12px var(--accent-glow) !important;
+        }
+
+        /* BETTER VISUALS IMPLEMENTATION */
+        html.better-visuals-active * {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        html.better-visuals-active .btn-animate:active {
+            transform: scale(0.9) translateY(-2px);
+            filter: brightness(1.1);
+        }
+        html.better-visuals-active .view-section.active {
+            animation: scaleUpFadeVisuals 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes scaleUpFadeVisuals {
+            0% { opacity: 0; transform: scale(0.94) translateY(15px); filter: blur(5px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+        }
 
         .transition-transform { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         ::-webkit-scrollbar { display: none; }
@@ -198,7 +256,6 @@
                                 </h3>
                             </div>
                         </div>
-                        <!-- Balanced state visibility gate -->
                         <button id="btn-balance-privacy" onclick="toggleBalanceVisibility()" class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-colors border border-white/20 shadow-sm hidden"><i class="fas fa-eye" id="eye-balance"></i></button>
                     </div>
 
@@ -548,6 +605,7 @@
             </div>
         </div>
 
+        <!-- THEME & VISUAL PREFS SETTINGS -->
         <div id="view-themes" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
                 <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
@@ -567,6 +625,14 @@
                     <label id="privacy-setting-row" class="theme-card rounded-2xl p-4 flex items-center justify-between border border-gray-200 shadow-sm hidden">
                         <span class="font-bold">Privacy UI (Hide Balance)</span>
                         <input type="checkbox" id="toggle-privacy-ui" onchange="togglePrivacyMode()" class="w-6 h-6 rounded focus-accent">
+                    </label>
+                    <label class="theme-card rounded-2xl p-4 flex items-center justify-between border border-gray-200 shadow-sm">
+                        <span class="font-bold">Neon Aesthetics Glow</span>
+                        <input type="checkbox" id="toggle-neon-theme" onchange="toggleNeonTheme()" class="w-6 h-6 rounded focus-accent">
+                    </label>
+                    <label class="theme-card rounded-2xl p-4 flex items-center justify-between border border-gray-200 shadow-sm">
+                        <span class="font-bold">Enhanced Visual Effects</span>
+                        <input type="checkbox" id="toggle-better-visuals" onchange="toggleBetterVisuals()" class="w-6 h-6 rounded focus-accent">
                     </label>
                 </div>
             </div>
@@ -624,7 +690,7 @@
             </div>
         </div>
 
-        <!-- NEW LIFAFA MODULE VIEW -->
+        <!-- LIFAFA MANAGEMENT -->
         <div id="view-lifafa" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
                 <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
@@ -636,7 +702,6 @@
                     <button onclick="switchLifafaTab('lifafa-my')" id="tab-lifafa-my-btn" class="flex-1 py-3 text-sm font-bold rounded-full transition-all tab-btn text-gray-500">My Lifafa</button>
                 </div>
 
-                <!-- Create Lifafa Panel -->
                 <div id="lifafa-create-panel" class="lifafa-tab-content block">
                     <div class="mb-5 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start gap-3">
                         <i class="fas fa-info-circle text-amber-600 mt-1"></i>
@@ -658,7 +723,6 @@
                         <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wide">Total Users</label>
                         <input type="number" id="lifafa-total-users" required placeholder="50" min="1" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center font-bold mb-4 focus-accent theme-card">
 
-                        <!-- Dynamic Channel Verification Lists -->
                         <div class="mb-5">
                             <div class="flex justify-between items-center mb-2">
                                 <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wide">Verification Channels</label>
@@ -672,7 +736,6 @@
                         <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wide">Claim Password (Optional)</label>
                         <input type="text" id="lifafa-claim-password" placeholder="Leave blank if none" class="w-full bg-gray-50 border rounded-2xl px-4 py-3 font-bold mb-4 focus-accent theme-card text-center">
 
-                        <!-- Premium toggles -->
                         <div id="premium-lifafa-box" class="hidden mb-6 theme-card rounded-2xl p-4 border border-amber-200 bg-amber-50/50 flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-black text-amber-700 flex items-center gap-1"><i class="fas fa-crown"></i> Premium Exclusive</p>
@@ -691,7 +754,6 @@
                     </form>
                 </div>
 
-                <!-- My Created Lifafas Panel -->
                 <div id="lifafa-my-panel" class="lifafa-tab-content hidden space-y-4">
                     <div id="my-lifafas-container" class="space-y-4">
                         <p class="text-center text-gray-400 text-sm font-bold py-10">You have not created any Lifafas yet.</p>
@@ -700,21 +762,19 @@
             </div>
         </div>
 
-        <!-- NEW SINGLE-PAGE PUBLIC CLAIM LIFAFA VIEW -->
+        <!-- PUBLIC CLAIM WIZARD -->
         <div id="view-claim-lifafa" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav border-b border-gray-100">
                 <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
                 <h1 class="ml-4 text-[18px] font-black tracking-wide">Claim Lifafa 🧧</h1>
             </header>
             <div class="p-5">
-                <!-- Target Lifafa Card State -->
                 <div class="theme-card rounded-[2rem] p-6 shadow-sm border border-gray-100 mb-6 text-center">
                     <span class="text-amber-500 text-5xl mb-3 block"><i class="fas fa-envelope-open-text"></i></span>
                     <h2 class="text-2xl font-black mb-1">Incoming Wallet Lifafa</h2>
                     <p class="text-sm font-bold text-gray-400">Join required channels to claim free rewards instantly.</p>
                 </div>
 
-                <!-- STEP 1: Identification Step -->
                 <div id="claim-step-1" class="step-container active">
                     <form onsubmit="event.preventDefault(); processClaimStep1()" class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100">
                         <h3 class="font-black text-lg text-center mb-4">Step 1: Verify Identity</h3>
@@ -724,21 +784,16 @@
                     </form>
                 </div>
 
-                <!-- STEP 2: Channel Verifications step -->
                 <div id="claim-step-2" class="step-container">
                     <div class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100">
                         <h3 class="font-black text-lg text-center mb-1">Step 2: Join Channels</h3>
                         <p class="text-xs font-bold text-gray-400 text-center mb-6">Verify that you have joined all mandatory channels below.</p>
-                        
-                        <!-- 2x2 Grid of Channels -->
                         <div id="claim-channels-grid" class="grid grid-cols-2 gap-4 mb-6"></div>
-
                         <button onclick="processClaimStep2()" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg mb-4">Verify Channels Joined</button>
                         <button onclick="resetToStep(1)" class="w-full text-center text-xs font-bold text-gray-400">Back</button>
                     </div>
                 </div>
 
-                <!-- STEP 3: Password Verified Step -->
                 <div id="claim-step-3" class="step-container">
                     <form onsubmit="event.preventDefault(); processClaimStep3()" class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100 text-center">
                         <h3 class="font-black text-lg mb-1">Step 3: Password Protected</h3>
@@ -748,7 +803,6 @@
                     </form>
                 </div>
 
-                <!-- STEP 4: Beautiful animated successful step -->
                 <div id="claim-step-success" class="step-container text-center py-10">
                     <div class="w-24 h-24 bg-green-500 text-white rounded-full flex items-center justify-center text-5xl mx-auto mb-6 shadow-xl border-4 border-white animate-bounce"><i class="fas fa-check"></i></div>
                     <h2 class="text-3xl font-black mb-1">🧧 Claim Successful!</h2>
@@ -762,49 +816,173 @@
             </div>
         </div>
 
-        <!-- NEW PREMIUM VIEW -->
+        <!-- RE-DESIGNED PREMIUM SUBSCRIPTION PAGE (GOLD YELLOW THEME) -->
         <div id="view-premium" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
                 <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
-                <h1 class="ml-4 text-[18px] font-black tracking-wide">Lion Pay Premium 👑</h1>
+                <h1 class="ml-4 text-[18px] font-black tracking-wide">Lion Premium 👑</h1>
             </header>
-            <div class="p-5 text-center">
-                <div class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-amber-500 text-white rounded-full flex items-center justify-center text-4xl mx-auto mb-4 shadow-xl"><i class="fas fa-crown"></i></div>
-                <h2 class="text-2xl font-black mb-2">Unlock Luxury Features</h2>
-                <p class="text-sm text-gray-500 max-w-xs mx-auto mb-8">Upgrade to elite user class and get full access to exclusive platform privileges.</p>
+            
+            <!-- Hero Gradient Area -->
+            <div class="bg-gradient-to-b from-amber-400/20 to-transparent pt-8 pb-4 text-center px-6">
+                <div class="w-20 h-20 bg-gradient-to-br from-amber-400 to-yellow-500 text-white rounded-full flex items-center justify-center text-5xl mx-auto mb-4 shadow-[0_8px_25px_rgba(245,158,11,0.4)] animate-pulse">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h2 class="text-3xl font-black tracking-tight mb-2 theme-text">Lion Premium</h2>
+                <p class="text-xs text-gray-500 font-bold max-w-xs mx-auto leading-relaxed">
+                    Go beyond the limits and unlock dozens of exclusive features by subscribing to Lion Premium.
+                </p>
+            </div>
 
-                <div class="grid grid-cols-1 gap-4 mb-8">
-                    <div class="theme-card p-5 rounded-[2rem] border border-gray-100 flex items-center justify-between text-left">
-                        <div>
-                            <p class="text-[10px] text-amber-500 font-bold uppercase tracking-widest">Basic Premium</p>
-                            <h3 class="font-black text-lg">30 Days Elite Privilege</h3>
+            <div class="p-5">
+                <!-- Option Selection Cards -->
+                <div class="space-y-3.5 mb-8">
+                    <!-- Annual Plan (Default selected) -->
+                    <label id="plan-card-annual" onclick="selectPremiumPlan('annual', 31536000000, 300, 'year')" class="relative flex items-center justify-between p-5 rounded-[1.8rem] border-2 border-amber-500 bg-amber-500/5 cursor-pointer transition-all">
+                        <div class="absolute right-4 top-4 bg-amber-500 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider">-16% Discount</div>
+                        <div class="flex items-center gap-3">
+                            <input type="radio" id="plan-radio-annual" name="premium_plan" value="annual" checked class="w-5 h-5 accent-amber-500">
+                            <div>
+                                <span class="font-black text-sm block theme-text">Annual</span>
+                                <span class="text-xs text-gray-400 line-through">₹360.00</span>
+                                <span class="text-xs font-bold theme-text ml-1">₹300.00 / year</span>
+                            </div>
                         </div>
-                        <button onclick="buyPremiumSubscription(2592000000, 20)" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 py-3 rounded-full text-sm">₹20</button>
+                        <span class="text-xs font-black text-amber-600">₹25.00/month</span>
+                    </label>
+
+                    <!-- Quarterly Plan -->
+                    <label id="plan-card-quarterly" onclick="selectPremiumPlan('quarterly', 7776000000, 90, '3 months')" class="flex items-center justify-between p-5 rounded-[1.8rem] border border-gray-200 cursor-pointer transition-all hover:bg-gray-50">
+                        <div class="flex items-center gap-3">
+                            <input type="radio" id="plan-radio-quarterly" name="premium_plan" value="quarterly" class="w-5 h-5 accent-amber-500">
+                            <div>
+                                <span class="font-black text-sm block theme-text">Quarterly</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-black theme-text">₹90.00/3 months</span>
+                    </label>
+
+                    <!-- Monthly Plan -->
+                    <label id="plan-card-monthly" onclick="selectPremiumPlan('monthly', 2592000000, 30, 'month')" class="flex items-center justify-between p-5 rounded-[1.8rem] border border-gray-200 cursor-pointer transition-all hover:bg-gray-50">
+                        <div class="flex items-center gap-3">
+                            <input type="radio" id="plan-radio-monthly" name="premium_plan" value="monthly" class="w-5 h-5 accent-amber-500">
+                            <div>
+                                <span class="font-black text-sm block theme-text">Monthly</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-black theme-text">₹30.00/month</span>
+                    </label>
+
+                    <!-- Trial Plan -->
+                    <label id="plan-card-trial" onclick="selectPremiumPlan('trial', 259200000, 10, '3 days')" class="flex items-center justify-between p-5 rounded-[1.8rem] border border-gray-200 cursor-pointer transition-all hover:bg-gray-50">
+                        <div class="flex items-center gap-3">
+                            <input type="radio" id="plan-radio-trial" name="premium_plan" value="trial" class="w-5 h-5 accent-amber-500">
+                            <div>
+                                <span class="font-black text-sm block theme-text">Trial (3 Days)</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-black theme-text">₹10.00/3 days</span>
+                    </label>
+                </div>
+
+                <!-- Feature list container -->
+                <div class="theme-card rounded-[2.2rem] border border-gray-100 p-6 space-y-4 shadow-sm text-left mb-8">
+                    <h3 class="font-black text-xs text-gray-400 uppercase tracking-widest mb-2">Premium Perks Included:</h3>
+                    
+                    <!-- Feature Items -->
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-ghost"></i></div>
+                        <div>
+                            <h4 class="font-black text-xs text-gray-800 theme-text">Ghost Transfer</h4>
+                            <p class="text-[10px] text-gray-400 font-bold">Send money without showing in receiver's history.</p>
+                        </div>
                     </div>
-                    <div class="theme-card p-5 rounded-[2rem] border-2 border-amber-500 flex items-center justify-between text-left relative overflow-hidden bg-amber-50/10">
-                        <div class="absolute right-0 top-0 bg-amber-500 text-white text-[8px] font-black uppercase px-3 py-1 rounded-bl-xl tracking-widest">Most Popular</div>
+
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-eye-slash"></i></div>
                         <div>
-                            <p class="text-[10px] text-amber-500 font-bold uppercase tracking-widest">Pro Elite</p>
-                            <h3 class="font-black text-lg">90 Days Elite Privilege</h3>
+                            <h4 class="font-black text-xs text-gray-800 theme-text">Privacy Mode</h4>
+                            <p class="text-[10px] text-gray-400 font-bold">Hide balance & hide specific transactions from home.</p>
                         </div>
-                        <button onclick="buyPremiumSubscription(7776000000, 50)" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 py-3 rounded-full text-sm">₹50</button>
                     </div>
-                    <div class="theme-card p-5 rounded-[2rem] border border-gray-100 flex items-center justify-between text-left">
+
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-envelope-open-text"></i></div>
                         <div>
-                            <p class="text-[10px] text-amber-500 font-bold uppercase tracking-widest">VIP Sovereign</p>
-                            <h3 class="font-black text-lg">365 Days Elite Privilege</h3>
+                            <h4 class="font-black text-xs text-gray-800 theme-text">Premium Only Lifafa</h4>
+                            <p class="text-[10px] text-gray-400 font-bold">Create Lifafa that only Premium users can claim.</p>
                         </div>
-                        <button onclick="buyPremiumSubscription(31536000000, 150)" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 py-3 rounded-full text-sm">₹150</button>
+                    </div>
+
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-palette"></i></div>
+                        <div>
+                            <h4 class="font-black text-xs text-gray-800 theme-text">Colorful App Theme</h4>
+                            <p class="text-[10px] text-gray-400 font-bold">Unlock the special colorful gradient theme mode.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-key"></i></div>
+                        <div>
+                            <h4 class="font-black text-xs text-gray-800 theme-text">Custom API Key</h4>
+                            <p class="text-[10px] text-gray-400 font-bold">Set a personalized custom API key for your gateway.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-crown"></i></div>
+                        <div>
+                            <h4 class="font-black text-xs text-gray-800 theme-text">Premium Verified Badge</h4>
+                            <p class="text-[10px] text-gray-400 font-bold">Get a verified crown badge next to your profile.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-id-card"></i></div>
+                        <div>
+                            <h4 class="font-black text-xs text-gray-800 theme-text">Custom ID & Tag Discount</h4>
+                            <p class="text-[10px] text-gray-400 font-bold">Huge discounts on Custom IDs & unique name tags.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-wand-magic-sparkles"></i></div>
+                        <div>
+                            <h4 class="font-black text-xs text-gray-800 theme-text">Advanced Visual UI</h4>
+                            <p class="text-[10px] text-gray-400 font-bold">Animations, 3D glow effects, and a premium feel.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-headset"></i></div>
+                        <div>
+                            <h4 class="font-black text-xs text-gray-800 theme-text">Priority Customer Support</h4>
+                            <p class="text-[10px] text-gray-400 font-bold">Faster help and priority ticket routing by admins.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-ban"></i></div>
+                        <div>
+                            <h4 class="font-black text-xs text-gray-800 theme-text">No Service Fees</h4>
+                            <p class="text-[10px] text-gray-400 font-bold">Zero charges on server maintenance and deposits.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-lightbulb"></i></div>
+                        <div>
+                            <h4 class="font-black text-xs text-gray-800 theme-text">Neon Theme</h4>
+                            <p class="text-[10px] text-gray-400 font-bold">Toggle neon glow aesthetics on custom app layouts.</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="text-left space-y-3 px-2">
-                    <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-2">Premium Perks Included:</p>
-                    <div class="flex items-center gap-3 text-sm font-semibold"><i class="fas fa-ghost text-purple-500 text-base"></i> Ghost Send Transfer Modes</div>
-                    <div class="flex items-center gap-3 text-sm font-semibold"><i class="fas fa-eye-slash text-blue-500 text-base"></i> Balance Hide & Blur Controls</div>
-                    <div class="flex items-center gap-3 text-sm font-semibold"><i class="fas fa-envelope-open text-amber-500 text-base"></i> Create Premium-Only Lifafas</div>
-                    <div class="flex items-center gap-3 text-sm font-semibold"><i class="fas fa-palette text-pink-500 text-base"></i> Custom Accent Colors & Glow UI</div>
-                </div>
+                <!-- Subscribe dynamic checkout action button -->
+                <button id="btn-premium-subscribe-now" onclick="processPremiumCheckout()" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-[0_8px_20px_var(--accent-glow)] text-lg mb-6">
+                    Subscribe for ₹300.00 per year
+                </button>
             </div>
         </div>
 
@@ -887,11 +1065,22 @@
         let activeClaimTargetId = null;
         let activeClaimingUser = null;
 
+        // Current active premium duration selection state
+        let selectedPremiumDuration = 31536000000;
+        let selectedPremiumCost = 300;
+        let selectedPremiumLabel = "year";
+
+        // Dynamic 20 Colors List
         const ACCENT_COLORS = [
             {name: "Amber", hex: "#f59e0b"}, {name: "Red", hex: "#ef4444"}, {name: "Pink", hex: "#ec4899"},
             {name: "Purple", hex: "#a855f7"}, {name: "Indigo", hex: "#6366f1"}, {name: "Blue", hex: "#3b82f6"},
             {name: "Cyan", hex: "#06b6d4"}, {name: "Teal", hex: "#14b8a6"}, {name: "Emerald", hex: "#10b981"},
-            {name: "Green", hex: "#22c55e"}
+            {name: "Green", hex: "#22c55e"},
+            // 10 New vibrant additions
+            {name: "Rose Gold", hex: "#b76e79"}, {name: "Sunset Orange", hex: "#f97316"}, {name: "Mint", hex: "#2dd4bf"},
+            {name: "Ocean Sky", hex: "#0284c7"}, {name: "Lilac Lavender", hex: "#c084fc"}, {name: "Crimson", hex: "#dc2626"},
+            {name: "Lime", hex: "#84cc16"}, {name: "Hot Pink", hex: "#f43f5e"}, {name: "Midnight Blue", hex: "#1d4ed8"},
+            {name: "Yellow Gold", hex: "#d97706"}
         ];
 
         let isActionOnCooldown = false;
@@ -1042,8 +1231,6 @@
                     }
                 }
             } else { 
-                // Check if we are landing directly on a Claim Lifafa link parameter
-                const urlParams = new URLSearchParams(window.location.search);
                 const rawParamCode = getQueryStringValue();
                 if (rawParamCode) {
                     initiateLifafaClaimFlow(rawParamCode);
@@ -1251,8 +1438,72 @@
                 localStorage.setItem('lp_theme', 'light');
             }
             
+            // Sync toggles settings UI state
+            let tglNeon = document.getElementById('toggle-neon-theme');
+            if (tglNeon) tglNeon.checked = localStorage.getItem('lp_neon') === 'true';
+            
+            let tglVisuals = document.getElementById('toggle-better-visuals');
+            if (tglVisuals) tglVisuals.checked = localStorage.getItem('lp_visuals') === 'true';
+
             updateApiKeyUI();
             renderTagsAndColors();
+        }
+
+        // Toggle state functions
+        function toggleNeonTheme() {
+            let isEnabled = document.getElementById('toggle-neon-theme').checked;
+            localStorage.setItem('lp_neon', isEnabled ? 'true' : 'false');
+            if(isEnabled) {
+                document.documentElement.classList.add('neon-active');
+            } else {
+                document.documentElement.classList.remove('neon-active');
+            }
+            showToast("Neon Settings Applied");
+        }
+
+        function toggleBetterVisuals() {
+            let isEnabled = document.getElementById('toggle-better-visuals').checked;
+            localStorage.setItem('lp_visuals', isEnabled ? 'true' : 'false');
+            if(isEnabled) {
+                document.documentElement.classList.add('better-visuals-active');
+            } else {
+                document.documentElement.classList.remove('better-visuals-active');
+            }
+            showToast("Visual enhancements configured");
+        }
+
+        function selectPremiumPlan(id, duration, cost, label) {
+            selectedPremiumDuration = duration;
+            selectedPremiumCost = cost;
+            selectedPremiumLabel = label;
+
+            // Clear visual outlines
+            ['annual', 'quarterly', 'monthly', 'trial'].forEach(plan => {
+                const card = document.getElementById('plan-card-' + plan);
+                if(card) {
+                    card.className = "flex items-center justify-between p-5 rounded-[1.8rem] border border-gray-200 cursor-pointer transition-all hover:bg-gray-50";
+                }
+                const rb = document.getElementById('plan-radio-' + plan);
+                if (rb) rb.checked = false;
+            });
+
+            // Set dynamic selected visual outline (Orange highlighted layout)
+            const activeCard = document.getElementById('plan-card-' + id);
+            if (activeCard) {
+                activeCard.className = "relative flex items-center justify-between p-5 rounded-[1.8rem] border-2 border-amber-500 bg-amber-500/5 cursor-pointer transition-all";
+            }
+            const activeRb = document.getElementById('plan-radio-' + id);
+            if (activeRb) activeRb.checked = true;
+
+            // Update bottom checkout text label
+            const btn = document.getElementById('btn-premium-subscribe-now');
+            if (btn) {
+                btn.innerText = `Subscribe for ₹${cost.toFixed(2)} per ${label}`;
+            }
+        }
+
+        function processPremiumCheckout() {
+            buyPremiumSubscription(selectedPremiumDuration, selectedPremiumCost);
         }
 
         function toggleBalanceVisibility() {
@@ -1329,7 +1580,6 @@
         }
 
         function getQueryStringValue() {
-            // Parses link layouts: ?id=CODE, ?lifafa=CODE or ?=CODE format
             const urlParams = new URLSearchParams(window.location.search);
             let code = urlParams.get('id') || urlParams.get('lifafa');
             if (!code) {
@@ -1699,7 +1949,6 @@
                 return showToast(`Insufficient balance! Requires ₹${totalCost}`);
             }
 
-            // Map configured channels
             const channelInputs = document.querySelectorAll('.lifafa-channel-input');
             const channels = [];
             channelInputs.forEach(input => {
@@ -1729,7 +1978,6 @@
                 alert(`🧧 Lifafa successfully created!\n\nLink: ${shareLink}\n\nShare this with users.`);
                 currentBalance -= totalCost;
                 
-                // Reset Forms
                 document.getElementById('lifafa-per-user').value = '';
                 document.getElementById('lifafa-total-users').value = '';
                 document.getElementById('lifafa-claim-password').value = '';
@@ -1812,22 +2060,18 @@
                 activeClaimingUser = user;
                 activeClaimingUser.phone = user.resolvedPhone || phone;
 
-                // Load Info metadata
                 const lInfo = await apiCall('GET_LIFAFA_INFO', { code: activeClaimTargetId });
                 
-                // Gate Premium Checks
                 if(lInfo.isPremiumOnly && !user.premium) {
                     alert("This Lifafa is reserved exclusively for Premium users.");
                     return;
                 }
 
-                // Render dynamic joined components
                 const grid = document.getElementById('claim-channels-grid');
                 grid.innerHTML = '';
                 
                 const channels = lInfo.channels || [];
                 if(channels.length === 0) {
-                    // Bypass Step 2 if no channel joint verification required
                     prepareFinalStep(lInfo);
                 } else {
                     channels.forEach(ch => {
@@ -1896,7 +2140,6 @@
                     txn: txn
                 });
 
-                // Set win updates
                 document.getElementById('claim-win-amount').innerText = parseFloat(response.amount).toFixed(2);
                 resetToStep('success');
                 
