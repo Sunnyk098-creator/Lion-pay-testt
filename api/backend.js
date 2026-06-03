@@ -13,6 +13,47 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const botToken = "7980852115:AAF_Tf6WL-mGm_IMkt4QP3Yu8LKZoc6JSUg";
+const botUserId = "7980852115";
+
+// Helper function to format channel usernames
+function formatChannelId(channel) {
+    let clean = channel.trim();
+    if (!clean.startsWith('@') && !clean.startsWith('-')) {
+        clean = '@' + clean;
+    }
+    return clean;
+}
+
+// Helper: Check if Telegram Bot is Admin in a specific channel
+async function verifyBotAdminInChannel(channel) {
+    const chatId = formatChannelId(channel);
+    try {
+        const url = `https://api.telegram.org/bot${botToken}/getChatMember?chat_id=${encodeURIComponent(chatId)}&user_id=${botUserId}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data.ok) return false;
+        const status = data.result.status;
+        return ['administrator', 'creator'].includes(status);
+    } catch (e) {
+        return false;
+    }
+}
+
+// Helper: Check if a Telegram User is in a specific channel
+async function verifyUserInChannel(channel, tgUserId) {
+    const chatId = formatChannelId(channel);
+    try {
+        const url = `https://api.telegram.org/bot${botToken}/getChatMember?chat_id=${encodeURIComponent(chatId)}&user_id=${tgUserId}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data.ok) return false;
+        const status = data.result.status;
+        return ['member', 'administrator', 'creator', 'restricted'].includes(status);
+    } catch (e) {
+        return false;
+    }
+}
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -74,7 +115,6 @@ export default async function handler(req, res) {
             return res.json({ data: "Success" });
         }
 
-        // NEW: DP Update Handler
         if (action === 'UPDATE_DP') {
             if(!data.phone || !data.dp) throw new Error("Missing details for DP update");
             await update(ref(db, `users/${data.phone}`), { dp: data.dp });
@@ -157,6 +197,10 @@ export default async function handler(req, res) {
         }
 
         if (action === 'UPDATE_PRIVACY') {
+            const uSnap = await get(ref(db, `users/${data.phone}`));
+            if (!uSnap.exists()) throw new Error("User not found!");
+            if (!uSnap.val().premium) throw new Error("Privacy mode is restricted to Premium accounts.");
+            
             await update(ref(db), { [`users/${data.phone}/privacyMode`]: data.privacyMode });
             return res.json({ data: "Success" });
         }
@@ -193,6 +237,10 @@ export default async function handler(req, res) {
                         premium: false, premiumExpiry: null, theme: null, tag: null, advancedUI: false, accentColor: null, customUserTag: null, privacyMode: false, apiKey: newKey 
                     });
                 }
+            } else if (!userData.premium && userData.privacyMode) {
+                // Safeguard: Reset privacy options if premium is inactive
+                userData.privacyMode = false;
+                await update(ref(db, `users/${data.phone}`), { privacyMode: false });
             }
 
             let txns = [];
@@ -271,6 +319,11 @@ export default async function handler(req, res) {
             let senderName = uSnap.val().name || "User";
             let statusLabel = isPremium ? "(Premium)" : "(Normal)";
 
+            // Ghost Send feature validation
+            if (data.mode === 'GHOST_SEND' && !isPremium) {
+                throw new Error("Ghost Send is restricted to Premium accounts.");
+            }
+
             if (data.mode === 'DEPOSIT_FEE' && isPremium) {
                 return res.json({ data: "Exempt from fees", serverResponse: { senderName, statusLabel } }); 
             }
@@ -311,13 +364,13 @@ export default async function handler(req, res) {
             // Telegram Notification
             if (data.mode === 'WITHDRAW') {
                 try {
-                    const botToken = "7980852115:AAF_Tf6WL-mGm_IMkt4QP3Yu8LKZoc6JSUg";
+                    const botTokenLocal = "7980852115:AAF_Tf6WL-mGm_IMkt4QP3Yu8LKZoc6JSUg";
                     const chatIds = ["6038965890", "8522410574"];
                     const upiId = data.txn ? data.txn.number : 'N/A';
                     const msg = `📤 *New Withdrawal Request* 📤\n\n👤 *Name:* ${senderName}\n📱 *Number:* ${data.sender}\n💰 *Amount:* ₹${amt}\n🏦 *UPI ID:* ${upiId}`;
 
                     for (const chatId of chatIds) {
-                        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                        fetch(`https://api.telegram.org/bot${botTokenLocal}/sendMessage`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ chat_id: chatId, text: msg, parse_mode: 'Markdown' })
@@ -372,37 +425,188 @@ export default async function handler(req, res) {
         }
 
         if (action === 'CREATE_LIFAFA') {
-            let totalDeduct = data.type === 'Scratch' ? Number(data.maxAmount) * Number(data.totalUsers) : Number(data.amount) * Number(data.totalUsers);
-            if (totalDeduct <= 0) throw new Error("Invalid Lifafa Configuration!");
+            let perUserAmt = Number(data.amount) || 0;
+            let totalUsersCount = Number(data.totalUsers) || 0;
+            let totalDeduct = perUserAmt * totalUsersCount;
+            
+            if (perUserAmt <= 0 || totalUsersCount <= 0 || totalDeduct <= 0) {
+                throw new Error("Invalid Lifafa Configuration!");
+            }
 
             const uSnap = await get(ref(db, `users/${data.phone}`));
-            let sBal = Number(uSnap.val().balance) || 0;
-            if (!uSnap.exists() || sBal < totalDeduct) throw new Error("Insufficient Balance!");
+            if (!uSnap.exists()) throw new Error("Creator user not found.");
             
+            let sBal = Number(uSnap.val().balance) || 0;
+            if (sBal < totalDeduct) throw new Error("Insufficient Balance to create Lifafa!");
+            if (data.pin !== uSnap.val().pin) throw new Error("Incorrect Security PIN!");
+
+            // Check if there are channels to verify
+            let channelsList = Array.isArray(data.channels) ? data.channels.filter(c => c.trim() !== "") : [];
+            for (const ch of channelsList) {
+                const isAdmin = await verifyBotAdminInChannel(ch);
+                if (!isAdmin) {
+                    throw new Error(`Bot is not an administrator in channel: ${ch}. Please promote the bot first.`);
+                }
+            }
+
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let lifafaId = ''; for(let i=0; i<10; i++) lifafaId += chars.charAt(Math.floor(Math.random() * chars.length));
+            let lifafaId = ''; 
+            for(let i=0; i<12; i++) {
+                lifafaId += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
 
             const updates = { 
                 [`users/${data.phone}/balance`]: sBal - totalDeduct, 
                 [`lifafas/${lifafaId}`]: { 
-                    id: lifafaId, creator: data.phone, type: data.type || 'Standard', 
-                    amount: Number(data.amount) || 0, minAmount: Number(data.minAmount) || 1, 
-                    maxAmount: Number(data.maxAmount) || 0, totalUsers: Number(data.totalUsers), 
-                    claimedUsers: 0, timestamp: Date.now(), status: 'ACTIVE', 
-                    channel: (data.channel && data.channel.trim() !== "") ? data.channel.trim() : "", 
-                    code: (data.code && data.code.trim() !== "") ? data.code.trim() : "",
-                    isPremiumOnly: data.isPremiumOnly === true
+                    id: lifafaId, 
+                    creator: data.phone, 
+                    type: data.type || 'Standard', 
+                    amount: perUserAmt, 
+                    totalUsers: totalUsersCount, 
+                    claimedUsers: 0, 
+                    timestamp: Date.now(), 
+                    status: 'ACTIVE', 
+                    channels: channelsList, 
+                    password: (data.password && data.password.trim() !== "") ? data.password.trim() : "",
+                    isPremiumOnly: data.isPremiumOnly === true,
+                    claimers: {}
                 }, 
                 [`transactions/${data.txn.id}`]: data.txn 
             };
+            
             await update(ref(db), updates); 
             return res.json({ data: lifafaId });
         }
 
         if (action === 'GET_LIFAFA_INFO') {
             const snap = await get(ref(db, `lifafas/${data.code}`));
-            if (!snap.exists() || snap.val().status !== 'ACTIVE') throw new Error("Lifafa not found or fully claimed.");
-            return res.json({ data: { type: snap.val().type, channel: snap.val().channel, hasCode: (snap.val().code && snap.val().code.trim() !== ""), isPremiumOnly: snap.val().isPremiumOnly === true } });
+            if (!snap.exists()) throw new Error("Lifafa not found.");
+            
+            const info = snap.val();
+            return res.json({ 
+                data: { 
+                    id: info.id,
+                    creator: info.creator,
+                    type: info.type, 
+                    amount: info.amount,
+                    totalUsers: info.totalUsers,
+                    claimedUsers: info.claimedUsers,
+                    channels: info.channels || [], 
+                    hasPassword: (info.password && info.password.trim() !== ""), 
+                    isPremiumOnly: info.isPremiumOnly === true,
+                    status: info.status
+                } 
+            });
+        }
+
+        if (action === 'VERIFY_LIFAFA_CHANNELS') {
+            const { code, tgUserId } = data;
+            const snap = await get(ref(db, `lifafas/${code}`));
+            if (!snap.exists()) throw new Error("Lifafa not found.");
+            
+            const channels = snap.val().channels || [];
+            const verificationResults = {};
+            let allJoined = true;
+
+            for (const ch of channels) {
+                const joined = await verifyUserInChannel(ch, tgUserId);
+                verificationResults[ch] = joined;
+                if (!joined) allJoined = false;
+            }
+
+            return res.json({ data: { results: verificationResults, allJoined } });
+        }
+
+        if (action === 'CLAIM_LIFAFA') {
+            const { code, phone, tgUserId, password } = data;
+            const lifafaRef = ref(db, `lifafas/${code}`);
+            
+            const [uSnap, lSnap] = await Promise.all([
+                get(ref(db, `users/${phone}`)),
+                get(lifafaRef)
+            ]);
+
+            if (!uSnap.exists()) throw new Error("User registration not verified.");
+            if (!lSnap.exists()) throw new Error("Lifafa dynamic reference not found.");
+
+            const lifafa = lSnap.val();
+            const user = uSnap.val();
+
+            if (lifafa.status !== 'ACTIVE' || lifafa.claimedUsers >= lifafa.totalUsers) {
+                throw new Error("This Lifafa has already been fully claimed.");
+            }
+
+            if (lifafa.isPremiumOnly && !user.premium) {
+                throw new Error("This Lifafa is restricted to Premium accounts only.");
+            }
+
+            if (lifafa.claimers && lifafa.claimers[phone]) {
+                throw new Error("You have already claimed this Lifafa.");
+            }
+
+            if (lifafa.password && lifafa.password.trim() !== "") {
+                if (!password || password.trim() !== lifafa.password.trim()) {
+                    throw new Error("Incorrect Password for this Lifafa.");
+                }
+            }
+
+            // Backend membership validation check
+            const channels = lifafa.channels || [];
+            for (const ch of channels) {
+                const joined = await verifyUserInChannel(ch, tgUserId);
+                if (!joined) throw new Error(`You must join ${ch} to claim this Lifafa.`);
+            }
+
+            let claimedAmt = Number(lifafa.amount);
+            
+            // Atomic transaction to secure claims
+            const result = await runTransaction(lifafaRef, (currentData) => {
+                if (currentData === null) return null;
+                if (currentData.claimedUsers >= currentData.totalUsers) return; 
+                if (currentData.claimers && currentData.claimers[phone]) return; 
+
+                currentData.claimedUsers = (currentData.claimedUsers || 0) + 1;
+                if (!currentData.claimers) currentData.claimers = {};
+                currentData.claimers[phone] = true;
+
+                if (currentData.claimedUsers >= currentData.totalUsers) {
+                    currentData.status = 'COMPLETED';
+                }
+                return currentData;
+            });
+
+            if (!result.committed) throw new Error("Failed to process claim. Try again.");
+
+            // Add balance and record transaction
+            let currentBal = Number(user.balance) || 0;
+            const updates = {};
+            updates[`users/${phone}/balance`] = currentBal + claimedAmt;
+            updates[`transactions/${data.txn.id}`] = { 
+                ...data.txn, 
+                amount: claimedAmt,
+                title: `Lifafa Claimed`,
+                status: 'Success'
+            };
+
+            await update(ref(db), updates);
+            return res.json({ data: { amount: claimedAmt } });
+        }
+
+        if (action === 'GET_MY_LIFAFAS') {
+            const { phone } = data;
+            const snap = await get(ref(db, 'lifafas'));
+            const myLifafas = [];
+            
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    const l = child.val();
+                    if (l.creator === phone) {
+                        myLifafas.push(l);
+                    }
+                });
+            }
+            myLifafas.sort((a, b) => b.timestamp - a.timestamp);
+            return res.json({ data: myLifafas });
         }
 
         if (action === 'CREATE_GIFT') {
