@@ -108,14 +108,6 @@
         
         .dp-image { object-fit: cover; width: 100%; height: 100%; border-radius: 50%; }
         
-        .step-container { display: none; animation: slideLeft 0.3s ease forwards; }
-        .step-container.active { display: block; }
-        @keyframes slideLeft { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-        
-        /* Modal & UI fix */
-        .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); transition: opacity 0.3s ease; }
-
-        /* Scanner */
         #reader video { object-fit: cover !important; width: 100% !important; height: 100% !important; border-radius: 2rem; }
         @keyframes scanline { 0% { top: 5%; opacity: 0; } 10% { opacity: 1; } 50% { top: 95%; } 90% { opacity: 1; } 100% { top: 5%; opacity: 0; } }
         .animate-scanline { animation: scanline 2.5s ease-in-out infinite; background: var(--accent-main); box-shadow: 0 0 15px 3px var(--accent-glow); }
@@ -126,38 +118,28 @@
 
     <input type="file" id="dp-upload" accept="image/*" class="hidden" onchange="handleDPUpload(event)">
 
-    <div id="public-lifafa-wrapper" class="fixed inset-0 theme-card z-[1000] hidden flex-col items-center justify-center p-6 overflow-y-auto">
-        <div class="w-full max-w-md mx-auto relative pt-10">
-            <div class="absolute top-4 right-4"><button onclick="window.location.href='/'" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200"><i class="fas fa-times"></i></button></div>
-            <div class="text-center mb-8">
-                <div class="w-24 h-24 bg-gradient-to-br from-amber-400 to-orange-500 text-white rounded-full mx-auto flex items-center justify-center text-5xl mb-4 shadow-[0_10px_25px_rgba(245,158,11,0.4)] border-4 border-white"><i class="fas fa-envelope-open-text"></i></div>
-                <h1 class="text-3xl font-black tracking-tight mb-1">Claim Lifafa 🎁</h1>
-                <p class="text-sm font-bold text-gray-400">Unlock your digital reward</p>
-            </div>
-            <div id="lif-step-phone" class="step-container active w-full theme-card rounded-[2rem] p-6 shadow-xl border border-gray-100">
-                <h2 class="text-lg font-black mb-4 text-center">Enter your Number 📱</h2>
-                <input type="tel" id="public-lif-phone" placeholder="Registered Number or Custom ID" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center text-lg mb-6 focus-accent font-bold theme-card transition-all">
-                <button type="button" onclick="verifyLifafaUser()" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg text-lg tracking-wide">Continue <i class="fas fa-arrow-right ml-1"></i></button>
-            </div>
-            <div id="lif-step-channels" class="step-container w-full theme-card rounded-[2rem] p-6 shadow-xl border border-gray-100">
-                <h2 class="text-lg font-black mb-2 text-center">Join Channels 📢</h2>
-                <p class="text-xs text-center text-gray-500 mb-6 font-semibold">You must join all to claim!</p>
-                <div id="lifafa-channels-grid" class="grid grid-cols-2 gap-3 mb-6"></div>
-                <button type="button" onclick="proceedToLifafaPassword()" class="btn-animate w-full bg-blue-500 text-white font-black py-4 rounded-full shadow-lg text-lg tracking-wide">Verify & Proceed <i class="fas fa-check-circle ml-1"></i></button>
-            </div>
-            <div id="lif-step-password" class="step-container w-full theme-card rounded-[2rem] p-6 shadow-xl border border-gray-100">
-                <h2 class="text-lg font-black mb-2 text-center">Secured Lifafa 🔒</h2>
-                <p class="text-xs text-center text-gray-500 mb-6 font-semibold">Enter the secret password</p>
-                <input type="password" id="public-lif-pass" placeholder="Enter Password" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center text-lg mb-6 focus-accent font-bold tracking-widest theme-card">
-                <button type="button" onclick="executeLifafaClaim()" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg text-lg tracking-wide">Claim Now 💸</button>
-            </div>
-            <div id="lif-step-success" class="step-container w-full text-center py-10 hidden">
-                <div class="w-20 h-20 bg-green-500 text-white rounded-full mx-auto flex items-center justify-center text-4xl mb-4 shadow-[0_10px_25px_rgba(34,197,94,0.4)] animate-bounce"><i class="fas fa-check"></i></div>
-                <h2 class="text-3xl font-black text-green-500 mb-2">Claimed! 🎉</h2>
-                <p class="text-gray-500 font-bold mb-6" id="lif-success-amt">₹0.00 added to wallet.</p>
-                <button onclick="window.location.href='/'" class="text-blue-500 font-bold underline">Go to Home Dashboard</button>
-            </div>
+    <div id="public-lifafa-wrapper" class="fixed inset-0 theme-card z-[1000] hidden flex-col items-center justify-center p-6 text-center overflow-y-auto">
+        <div class="absolute top-4 right-4"><button onclick="window.location.href='/'" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200"><i class="fas fa-times"></i></button></div>
+        <div class="w-24 h-24 bg-gradient-to-br from-amber-400 to-orange-500 text-white rounded-[2rem] mx-auto flex items-center justify-center text-5xl mb-6 shadow-[0_10px_25px_rgba(245,158,11,0.4)] border-4 border-white"><i class="fas fa-envelope-open-text"></i></div>
+        <h1 class="text-3xl font-black tracking-tight mb-2">Claim Lifafa 🎁</h1>
+        <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-8">Unlock your reward</p>
+
+        <div id="lifafa-step-1" class="hidden w-full max-w-sm theme-card rounded-[2rem] p-6 shadow-xl border border-gray-100 mb-4">
+            <label class="block text-xs font-bold text-gray-400 mb-4 tracking-wide uppercase">Step 1: Join Channel</label>
+            <p id="lifafa-join-error" class="hidden text-xs text-red-500 font-bold mb-3 bg-red-50 py-2 rounded-xl border border-red-100">First join the channel!</p>
+            <a id="lifafa-channel-btn" href="#" target="_blank" onclick="window.isChannelClicked = true; document.getElementById('lifafa-join-error').classList.add('hidden');" class="block w-full bg-blue-50 text-blue-500 font-black py-4 rounded-full shadow-sm border border-blue-100 hover:bg-blue-100 transition-colors mb-4"><i class="fab fa-telegram-plane mr-2"></i> JOIN CHANNEL</a>
+            <button type="button" onclick="verifyLifafaJoin()" class="btn-animate w-full bg-green-500 text-white font-black py-4 rounded-full shadow-lg transition-colors">Verify & Continue</button>
         </div>
+
+        <form id="form-public-lifafa" onsubmit="event.preventDefault(); processPublicLifafaClaim()" class="w-full max-w-sm theme-card rounded-[2rem] p-6 shadow-xl border border-gray-100 text-left">
+            <input type="hidden" id="public-lif-id">
+            <div id="lifafa-code-box" class="hidden mb-6">
+                <label class="block text-[11px] font-bold text-gray-400 mb-2 tracking-wider">SECRET CODE</label>
+                <input type="text" id="public-lif-code" placeholder="Enter Code" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 focus-accent font-mono shadow-inner uppercase text-center font-black tracking-widest theme-card">
+            </div>
+            <button type="submit" id="btn-public-lifafa" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg text-lg tracking-wide"><i class="fas fa-gift"></i> CLAIM NOW</button>
+            <div class="text-center mt-6"><button type="button" onclick="window.location.href='/'" class="text-gray-400 hover:text-amber-600 text-xs font-bold transition-colors">Go to Home Dashboard</button></div>
+        </form>
     </div>
 
     <div id="toast" class="fixed top-12 left-1/2 transform -translate-x-1/2 bg-gray-900/90 backdrop-blur-md text-white px-6 py-3.5 rounded-full shadow-2xl z-[300] hidden opacity-0 transition-opacity duration-300 flex items-center gap-3 border border-gray-700 font-medium tracking-wide">
@@ -257,11 +239,13 @@
                     <button onclick="showView('api')" class="btn-animate flex flex-col items-center gap-2 group"><div class="ios-grid-icon bg-white theme-card text-gray-700 shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-code text-indigo-500"></i></div><span class="text-[11px] font-bold text-gray-500">API</span></button>
                     <button onclick="showView('statistics')" class="btn-animate flex flex-col items-center gap-2 group"><div class="ios-grid-icon bg-white theme-card text-gray-700 shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-chart-pie text-teal-500"></i></div><span class="text-[11px] font-bold text-gray-500">Stats</span></button>
                     
-                    <button id="btn-premium-menu" onclick="showView('themes')" class="btn-animate flex flex-col items-center gap-2 group"><div class="ios-grid-icon bg-gradient-to-br from-yellow-300 to-yellow-500 text-white shadow-md"><i class="fas fa-crown"></i></div><span class="text-[11px] font-bold text-yellow-600">Premium UI</span></button>
-                    <button id="btn-tags-menu" onclick="showView('tags')" class="btn-animate flex flex-col items-center gap-2 group"><div class="ios-grid-icon bg-white theme-card text-gray-700 shadow-sm border border-gray-100"><i class="fas fa-tags accent-text"></i></div><span class="text-[11px] font-bold text-gray-500">Tags</span></button>
+                    <button id="btn-premium-menu" onclick="showView('premium')" class="btn-animate flex flex-col items-center gap-2 group"><div class="ios-grid-icon bg-gradient-to-br from-yellow-300 to-yellow-500 text-white shadow-md"><i class="fas fa-crown"></i></div><span class="text-[11px] font-bold text-yellow-600">Premium</span></button>
+                    <button id="btn-theme-menu" onclick="showView('themes')" class="hidden btn-animate flex flex-col items-center gap-2 group"><div class="ios-grid-icon bg-white theme-card text-gray-700 shadow-sm border border-gray-100"><i class="fas fa-palette accent-text"></i></div><span class="text-[11px] font-bold text-gray-500">Settings</span></button>
+                    <button id="btn-tags-menu" onclick="showView('tags')" class="hidden btn-animate flex flex-col items-center gap-2 group"><div class="ios-grid-icon bg-white theme-card text-gray-700 shadow-sm border border-gray-100"><i class="fas fa-tags accent-text"></i></div><span class="text-[11px] font-bold text-gray-500">Tags</span></button>
                     
                     <button onclick="showView('official')" class="btn-animate flex flex-col items-center gap-2 group"><div class="ios-grid-icon bg-white theme-card text-gray-700 shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-bullhorn text-cyan-500"></i></div><span class="text-[11px] font-bold text-gray-500">Posts</span></button>
                     <button onclick="showView('keeper')" class="btn-animate flex flex-col items-center gap-2 group"><div class="ios-grid-icon bg-white theme-card text-gray-700 shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-vault text-slate-500"></i></div><span class="text-[11px] font-bold text-gray-500">Keeper</span></button>
+                    <button onclick="showView('help')" class="btn-animate flex flex-col items-center gap-2 group"><div class="ios-grid-icon bg-white theme-card text-gray-700 shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-headset text-orange-500"></i></div><span class="text-[11px] font-bold text-gray-500">Support</span></button>
                 </div>
             </div>
 
@@ -270,7 +254,7 @@
                     <h3 class="font-black text-[15px] tracking-wide text-gray-800 theme-text">Recent Activity 🕒</h3>
                     <button onclick="showView('statistics')" class="text-[11px] font-bold accent-text bg-blue-50 px-3 py-1 rounded-full active:scale-95 transition-transform">View All</button>
                 </div>
-                <div id="home-txn-list" class="theme-card rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col"></div>
+                <div id="home-txn-list" class="theme-card rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col"></div>
             </div>
         </div>
 
@@ -341,7 +325,7 @@
                     <input type="number" id="send-amt" required min="1" placeholder="0.00" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-2xl font-black mb-6 focus-accent text-center theme-card transition-colors">
                     <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">Comment (Optional)</label>
                     <input type="text" id="send-comment" placeholder="What's this for? 📝" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-sm mb-6 focus-accent font-medium theme-card transition-colors">
-                    <div id="ghost-transfer-box" class="mb-6 theme-card rounded-2xl p-4 border border-purple-200 bg-purple-50 flex items-center justify-between">
+                    <div id="ghost-transfer-box" class="hidden mb-6 theme-card rounded-2xl p-4 border border-purple-200 bg-purple-50 flex items-center justify-between">
                         <div>
                             <p class="text-sm font-black text-purple-700 flex items-center gap-1"><i class="fas fa-ghost"></i> Ghost Mode</p>
                             <p class="text-[10px] text-purple-500 font-bold mt-0.5">Hide from receiver's history</p>
@@ -355,76 +339,6 @@
                     <input type="password" id="send-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center tracking-[0.5em] font-black text-xl mb-8 focus-accent theme-card transition-colors">
                     <button type="submit" id="btn-send-submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-[0_8px_20px_var(--accent-glow)] text-lg">Send Securely</button>
                 </form>
-            </div>
-        </div>
-
-        <div id="view-lifafa" class="view-section relative min-h-screen pb-24">
-            <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
-                <h1 class="ml-4 text-[18px] font-black tracking-wide">Lifafa ✉️</h1>
-            </header>
-            <div class="px-5 mt-4 mb-6">
-                <div class="flex theme-card rounded-full p-1.5 gap-1 border border-gray-200 shadow-sm bg-gray-50">
-                    <button onclick="switchLifafaTab('lifafa-create')" id="tab-lifafa-create" class="flex-1 py-3 text-sm font-bold rounded-full transition-all tab-btn active">Create</button>
-                    <button onclick="switchLifafaTab('lifafa-my')" id="tab-lifafa-my" class="flex-1 py-3 text-sm font-bold rounded-full transition-all tab-btn">My Lifafas</button>
-                </div>
-            </div>
-            <div id="lifafa-create" class="tab-content active px-5">
-                <div class="theme-card rounded-[2rem] p-6 text-center shadow-sm border border-gray-100 mb-6 relative overflow-hidden">
-                    <div class="absolute -right-4 -top-4 text-6xl opacity-5">✉️</div>
-                    <p class="text-[11px] font-bold uppercase opacity-90 mb-1 tracking-wider text-gray-400">Available Balance</p>
-                    <div class="text-4xl font-black tracking-tight accent-text">₹<span class="global-balance transition-all">0.00</span></div>
-                </div>
-                <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-6 flex items-start gap-3">
-                    <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
-                    <div>
-                        <p class="text-xs font-bold text-blue-800 mb-1">Channel Verification Note</p>
-                        <p class="text-[10px] text-blue-600 font-medium">To force users to join a channel, add the channel username below. You MUST make our bot <b>@Lion_Pay_Alert_Bot</b> an admin in those channels first!</p>
-                    </div>
-                </div>
-                <form onsubmit="event.preventDefault(); processLifafaCreate()" class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100">
-                    <div class="grid grid-cols-2 gap-4 mb-5">
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Per User (₹)</label>
-                            <input type="number" id="lif-amt" required min="1" placeholder="₹10" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 text-lg font-black focus-accent theme-card text-center">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Total Users</label>
-                            <input type="number" id="lif-users" required min="1" placeholder="e.g. 5" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 text-lg font-black focus-accent theme-card text-center">
-                        </div>
-                    </div>
-                    <div class="mb-6">
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="block text-[11px] font-bold text-gray-400 uppercase">Channels (Optional)</label>
-                            <button type="button" onclick="addLifafaChannelInput()" class="text-[10px] font-black bg-gray-200 text-gray-600 px-3 py-1 rounded-full hover:bg-gray-300 transition-colors"><i class="fas fa-plus"></i> Add</button>
-                        </div>
-                        <div id="lifafa-channels-container" class="space-y-3">
-                            <input type="text" placeholder="@yourchannel" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm focus-accent font-medium theme-card">
-                        </div>
-                    </div>
-                    <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Password (Optional)</label>
-                    <input type="text" id="lif-pass-opt" placeholder="Leave blank for none" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm mb-6 focus-accent font-medium theme-card">
-                    <div id="premium-lifafa-box" class="mb-6 theme-card rounded-2xl p-4 border border-amber-200 bg-amber-50 flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-black text-amber-700 flex items-center gap-1"><i class="fas fa-crown"></i> Premium Only</p>
-                            <p class="text-[10px] text-amber-600 font-bold mt-0.5">Only premium members can claim</p>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                          <input type="checkbox" id="lif-premium-only" class="sr-only peer">
-                          <div class="w-11 h-6 bg-amber-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
-                        </label>
-                    </div>
-                    <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Security PIN</label>
-                    <input type="password" id="lif-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center tracking-[0.5em] font-black text-xl mb-8 focus-accent theme-card">
-                    <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg text-lg">Generate Link 🚀</button>
-                </form>
-            </div>
-            <div id="lifafa-my" class="tab-content px-5">
-                <div class="flex justify-between items-center mb-4 px-1">
-                    <h3 class="font-black text-sm text-gray-800 theme-text">Your Envelopes</h3>
-                    <button onclick="loadMyLifafas()" class="text-xs font-bold text-blue-500 bg-blue-50 px-3 py-1.5 rounded-full"><i class="fas fa-sync-alt"></i> Refresh</button>
-                </div>
-                <div id="my-lifafas-list" class="space-y-4"></div>
             </div>
         </div>
 
@@ -474,30 +388,61 @@
             </div>
         </div>
 
-        <div id="view-bulk" class="view-section min-h-screen theme-card relative pb-24">
+        <div id="view-bulk" class="view-section relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
                 <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
-                <h1 class="ml-4 text-[18px] font-black tracking-wide">Bulk Send 👥</h1>
+                <h1 class="ml-4 text-[18px] font-black tracking-wide">Bulk Send</h1>
             </header>
             <div class="p-5">
                 <form onsubmit="event.preventDefault(); processBulk()" class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100">
-                    <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Numbers (One per line)</label>
-                    <textarea id="bulk-nums" rows="5" required placeholder="9876543210&#10;rahul123" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm mb-4 focus-accent font-mono theme-card"></textarea>
-                    <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Amount per user</label>
-                    <input type="number" id="bulk-amt" required placeholder="0.00" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm mb-4 focus-accent font-bold theme-card text-center">
-                    <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Comment</label>
-                    <input type="text" id="bulk-comment" placeholder="Optional Comment" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm mb-4 focus-accent theme-card text-center">
-                    <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Security PIN</label>
-                    <input type="password" id="bulk-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-center tracking-widest font-black mb-6 focus-accent theme-card">
+                    <textarea id="bulk-nums" rows="5" required placeholder="Numbers separated by line" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm mb-4 focus-accent font-mono theme-card"></textarea>
+                    <input type="number" id="bulk-amt" required placeholder="Amount per user" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm mb-4 focus-accent font-bold theme-card text-center">
+                    <input type="text" id="bulk-comment" placeholder="Comment" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm mb-4 focus-accent theme-card text-center">
+                    <input type="password" id="bulk-pin" required maxlength="4" placeholder="PIN" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-center tracking-widest font-black mb-6 focus-accent theme-card">
                     <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg">Send to All</button>
                 </form>
             </div>
         </div>
 
-        <div id="view-gift" class="view-section min-h-screen theme-card relative pb-24">
+        <div id="view-lifafa" class="view-section relative min-h-screen pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
                 <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
-                <h1 class="ml-4 text-[18px] font-black tracking-wide">Gift Codes 🎁</h1>
+                <h1 class="ml-4 text-[18px] font-black tracking-wide">Lifafa ✉️</h1>
+            </header>
+            
+            <div class="px-5 mt-4 mb-6">
+                <div class="flex theme-card rounded-full p-1.5 gap-1 border border-gray-200 shadow-sm bg-gray-50">
+                    <button onclick="switchTab('lifafa-create')" id="tab-lifafa-create" class="flex-1 py-3 text-sm font-bold rounded-full transition-all tab-btn active">Create</button>
+                    <button onclick="switchTab('lifafa-claim')" id="tab-lifafa-claim" class="flex-1 py-3 text-sm font-bold rounded-full transition-all tab-btn">Claim</button>
+                </div>
+            </div>
+
+            <div id="lifafa-create" class="tab-content active px-5">
+                <form onsubmit="event.preventDefault(); processLifafaCreate()" class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100">
+                    <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Total Users</label>
+                    <input type="number" id="lif-users" required placeholder="Users" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center font-bold mb-4 focus-accent theme-card">
+                    
+                    <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Amount / User</label>
+                    <input type="number" id="lif-amt" required placeholder="Amt/User" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center font-bold mb-4 focus-accent theme-card">
+                    
+                    <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Security PIN</label>
+                    <input type="password" id="lif-pin" required maxlength="4" placeholder="PIN" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center tracking-widest font-black mb-6 focus-accent theme-card">
+                    <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg">Generate Link</button>
+                </form>
+            </div>
+            <div id="lifafa-claim" class="tab-content px-5">
+                <form onsubmit="event.preventDefault(); processLifafaClaim()" class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100 text-center">
+                    <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Lifafa Code</label>
+                    <input type="text" id="lif-claim-code" required placeholder="CODE" class="w-full bg-gray-50 border rounded-2xl px-4 py-6 text-center tracking-[0.3em] text-2xl font-black mb-6 focus-accent theme-card uppercase">
+                    <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg">Claim</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="view-gift" class="view-section relative pb-24">
+            <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
+                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
+                <h1 class="ml-4 text-[18px] font-black tracking-wide">Gift Codes</h1>
             </header>
             <div class="p-5">
                 <div class="flex theme-card rounded-full p-1.5 gap-1 border border-gray-200 shadow-sm bg-gray-50 mb-6">
@@ -506,20 +451,16 @@
                 </div>
                 <div id="gift-create" class="tab-content active">
                     <form onsubmit="event.preventDefault(); processGiftCreate()" class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100">
-                        <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Number of Users</label>
-                        <input type="number" id="gift-users" required placeholder="5" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center font-bold mb-4 focus-accent theme-card">
-                        <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Amount per User</label>
-                        <input type="number" id="gift-amt" required placeholder="10" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center font-bold mb-4 focus-accent theme-card">
-                        <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Security PIN</label>
-                        <input type="password" id="gift-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center tracking-widest font-black mb-6 focus-accent theme-card">
+                        <input type="number" id="gift-users" required placeholder="Users" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center font-bold mb-4 focus-accent theme-card">
+                        <input type="number" id="gift-amt" required placeholder="Amt/User" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center font-bold mb-4 focus-accent theme-card">
+                        <input type="password" id="gift-pin" required maxlength="4" placeholder="PIN" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center tracking-widest font-black mb-6 focus-accent theme-card">
                         <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg">Generate Code</button>
                     </form>
                 </div>
                 <div id="gift-claim" class="tab-content">
                     <form onsubmit="event.preventDefault(); processGiftClaim()" class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100 text-center">
-                        <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Enter 5-Digit Code</label>
                         <input type="text" id="claim-code" required maxlength="5" placeholder="CODE" class="w-full bg-gray-50 border rounded-2xl px-4 py-6 text-center tracking-[0.3em] text-2xl font-black mb-6 focus-accent theme-card uppercase">
-                        <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg text-lg">Claim Reward</button>
+                        <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg">Claim</button>
                     </form>
                 </div>
             </div>
@@ -537,66 +478,10 @@
                         https://lionpay.app/api?key=<span class="accent-text" id="ui-api-key-url">LP-PENDING</span>&paytm=<span class="text-green-400">{number}</span>&amount=<span class="text-green-400">{amount}</span>&comment=<span class="text-green-400">{comment}</span>
                     </p>
                 </div>
-                <div class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100">
-                    <p class="text-[11px] text-gray-400 font-bold mb-3 tracking-wider uppercase">UPI Withdrawal API</p>
-                    <p class="text-xs font-mono text-gray-300 break-all leading-relaxed mb-4 p-4 bg-slate-900 rounded-2xl shadow-inner" id="ui-api-url-upi">
-                        https://Lion-pay.vercel.app/Api/upi.php?token=<span class="accent-text" id="ui-api-key-upi">LP-PENDING</span>&upi_id=<span class="text-green-400">{upi_id}</span>&amount=<span class="text-green-400">{amount}</span>&comment=<span class="text-green-400">{comment}</span>
-                    </p>
-                </div>
                 <div class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100 text-center">
                     <p class="text-[11px] accent-text font-bold mb-1 tracking-wider uppercase">Your Secret Key</p>
                     <p class="accent-text font-mono font-black tracking-widest text-xl mb-4" id="ui-api-key-display">LP-PENDING</p>
                     <button onclick="regenerateApiKey()" class="btn-animate w-full border-2 accent-border accent-text font-bold py-3.5 rounded-full">Regenerate API Key</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="view-official" class="view-section min-h-screen theme-card relative pb-24">
-            <header class="flex items-center p-5 sticky top-0 z-30 glass-nav border-b border-gray-100">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
-                <div class="w-8 h-8 ml-4 accent-bg text-white rounded-full flex items-center justify-center"><i class="fas fa-bullhorn text-xs"></i></div>
-                <h1 class="ml-2 text-[18px] font-bold tracking-wide">Official Posts</h1>
-            </header>
-            <div class="p-5 space-y-4" id="official-posts-container">
-                <p class="text-center text-gray-400 text-sm font-bold">No official posts yet</p>
-            </div>
-        </div>
-
-        <div id="view-keeper" class="view-section min-h-screen theme-card relative pb-24">
-            <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
-                <h1 class="ml-4 text-[18px] font-black tracking-wide">Balance Keeper 🛡️</h1>
-            </header>
-            <div class="p-5">
-                <div class="flex gap-4 mb-6">
-                    <div class="flex-1 theme-card rounded-[2rem] p-5 shadow-sm border border-gray-100 flex flex-col items-center justify-center">
-                        <p class="text-[10px] text-gray-400 font-bold tracking-wider mb-1">WALLET</p>
-                        <p class="text-xl font-black">₹<span class="global-balance transition-all">0.00</span></p>
-                    </div>
-                    <div class="flex-1 theme-card rounded-[2rem] p-5 shadow-sm border border-gray-100 flex flex-col items-center justify-center bg-gray-50">
-                        <p class="text-[10px] text-gray-400 font-bold tracking-wider mb-1">KEEPER</p>
-                        <p class="text-xl font-black text-slate-700">₹<span class="global-keeper-balance">0.00</span></p>
-                    </div>
-                </div>
-                <div class="theme-card rounded-[2rem] p-5 shadow-md border border-gray-100 mb-6">
-                    <div class="flex theme-card rounded-full p-1.5 gap-1 border border-gray-200 shadow-sm bg-gray-50 mb-5">
-                        <button onclick="switchKeeperTab('keeper-lock')" id="btn-keeper-lock" class="flex-1 py-3 text-sm font-bold rounded-full transition-all keeper-tab-btn active bg-slate-800 text-white">Lock In</button>
-                        <button onclick="switchKeeperTab('keeper-with')" id="btn-keeper-with" class="flex-1 py-3 text-sm font-bold rounded-full transition-all keeper-tab-btn text-gray-500">Withdraw</button>
-                    </div>
-                    <div id="keeper-lock" class="keeper-tab-content active">
-                        <form onsubmit="event.preventDefault(); processKeeperLock()">
-                            <input type="number" id="kl-amt" required placeholder="Amount to Lock" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center font-bold theme-card mb-4">
-                            <input type="password" id="kl-pin" required maxlength="4" placeholder="PIN" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center tracking-widest font-black mb-6 theme-card">
-                            <button type="submit" class="w-full bg-slate-800 text-white font-bold py-4 rounded-full shadow-lg">Lock Balance</button>
-                        </form>
-                    </div>
-                    <div id="keeper-with" class="keeper-tab-content hidden">
-                        <form onsubmit="event.preventDefault(); processKeeperWithdraw()">
-                            <input type="number" id="kw-amt" required placeholder="Amount to Withdraw" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center font-bold theme-card mb-4">
-                            <input type="password" id="kw-pin" required maxlength="4" placeholder="PIN" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center tracking-widest font-black mb-6 theme-card">
-                            <button type="submit" class="w-full bg-green-600 text-white font-bold py-4 rounded-full shadow-lg">Withdraw to Wallet</button>
-                        </form>
-                    </div>
                 </div>
             </div>
         </div>
@@ -612,40 +497,48 @@
                 <div class="space-y-4">
                     <button onclick="setGlobalTheme('light')" class="w-full bg-gray-100 text-gray-800 font-bold py-4 rounded-2xl shadow-sm">Enable Light Mode</button>
                     <button onclick="setGlobalTheme('dark')" class="w-full bg-gray-900 text-white font-bold py-4 rounded-2xl shadow-md">Enable Dark Mode</button>
-                    <div class="h-px bg-gray-200 my-4"></div>
-                    <label class="theme-card rounded-2xl p-4 flex items-center justify-between border border-gray-200 shadow-sm">
-                        <span class="font-bold">Colorful Gradient Mode</span>
-                        <input type="checkbox" id="toggle-colorful-ui" onchange="toggleColorfulTheme()" class="w-6 h-6 rounded focus-accent">
-                    </label>
-                    <label class="theme-card rounded-2xl p-4 flex items-center justify-between border border-gray-200 shadow-sm">
-                        <span class="font-bold">Privacy UI (Hide Balance)</span>
-                        <input type="checkbox" id="toggle-privacy-ui" onchange="togglePrivacyMode()" class="w-6 h-6 rounded focus-accent">
-                    </label>
                 </div>
             </div>
         </div>
 
-        <div id="view-tags" class="view-section min-h-screen theme-card relative pb-24">
+        <div id="view-official" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
                 <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
-                <h1 class="ml-4 text-[18px] font-black tracking-wide">Profile Tags 🏷️</h1>
+                <h1 class="ml-4 text-[18px] font-bold tracking-wide">Official Posts</h1>
             </header>
-            <div class="p-5">
-                <div id="tags-container" class="mb-6"></div>
-                <p class="text-xs text-gray-500 font-bold text-center">Tags update automatically based on admin verification.</p>
-            </div>
+            <div class="p-5 space-y-4" id="official-posts-container"><p class="text-center text-gray-400 text-sm font-bold">No posts</p></div>
         </div>
 
-        <div id="view-help" class="view-section min-h-screen theme-card relative pb-24">
+        <div id="view-keeper" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
                 <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
-                <h1 class="ml-4 text-[18px] font-black tracking-wide">Support 🎧</h1>
+                <h1 class="ml-4 text-[18px] font-black tracking-wide">Balance Keeper</h1>
             </header>
-            <div class="p-8 text-center mt-10">
-                <div class="w-24 h-24 accent-bg rounded-full text-white text-4xl flex items-center justify-center mx-auto mb-6 shadow-xl"><i class="fas fa-headset"></i></div>
-                <h2 class="text-2xl font-black mb-2">Need Help?</h2>
-                <p class="text-sm text-gray-500 mb-8">Click below to chat directly with our official support channel.</p>
-                <button id="help-support-link" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg"><i class="fas fa-comments"></i> Chat with Admin</button>
+            <div class="p-5">
+                <div class="flex gap-4 mb-6">
+                    <div class="flex-1 theme-card rounded-[2rem] p-5 shadow-sm border border-gray-100 text-center"><p class="text-[10px] text-gray-400 font-bold tracking-wider mb-1">WALLET</p><p class="text-xl font-black">₹<span class="global-balance">0.00</span></p></div>
+                    <div class="flex-1 theme-card rounded-[2rem] p-5 shadow-sm border border-gray-100 text-center bg-gray-50"><p class="text-[10px] text-gray-400 font-bold tracking-wider mb-1">KEEPER</p><p class="text-xl font-black text-slate-700">₹<span class="global-keeper-balance">0.00</span></p></div>
+                </div>
+                <div class="theme-card rounded-[2rem] p-5 shadow-md border border-gray-100 mb-6">
+                    <div class="flex theme-card rounded-full p-1.5 gap-1 border border-gray-200 shadow-sm bg-gray-50 mb-5">
+                        <button onclick="switchKeeperTab('keeper-lock')" id="btn-keeper-lock" class="flex-1 py-3 text-sm font-bold rounded-full transition-all keeper-tab-btn active bg-slate-800 text-white">Lock In</button>
+                        <button onclick="switchKeeperTab('keeper-with')" id="btn-keeper-with" class="flex-1 py-3 text-sm font-bold rounded-full transition-all keeper-tab-btn text-gray-500">Withdraw</button>
+                    </div>
+                    <div id="keeper-lock" class="keeper-tab-content active">
+                        <form onsubmit="event.preventDefault(); processKeeperLock()">
+                            <input type="number" id="kl-amt" required placeholder="Amount" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center font-bold mb-4 theme-card">
+                            <input type="password" id="kl-pin" required maxlength="4" placeholder="PIN" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center font-black mb-6 theme-card">
+                            <button type="submit" class="w-full bg-slate-800 text-white font-bold py-4 rounded-full shadow-lg">Lock Balance</button>
+                        </form>
+                    </div>
+                    <div id="keeper-with" class="keeper-tab-content hidden">
+                        <form onsubmit="event.preventDefault(); processKeeperWithdraw()">
+                            <input type="number" id="kw-amt" required placeholder="Amount" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center font-bold mb-4 theme-card">
+                            <input type="password" id="kw-pin" required maxlength="4" placeholder="PIN" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center font-black mb-6 theme-card">
+                            <button type="submit" class="w-full bg-green-600 text-white font-bold py-4 rounded-full shadow-lg">Withdraw to Wallet</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -656,9 +549,6 @@
             <div class="flex flex-col items-center justify-center px-4 pt-10 relative z-10" id="scanner-container">
                 <div id="scanner-box" class="relative w-72 h-72 rounded-[2rem] overflow-hidden border-4 accent-border shadow-[0_0_40px_var(--accent-glow)] bg-gray-900 transition-all duration-300">
                     <div id="reader" class="w-full h-full absolute inset-0"></div>
-                    <div class="absolute inset-0 pointer-events-none z-10 scanner-corners">
-                        <div class="absolute left-0 w-full h-1 animate-scanline"></div>
-                    </div>
                 </div>
                 <p class="text-white/90 text-xl font-black tracking-[0.2em] mt-12 drop-shadow-md">SCAN TO PAY</p>
             </div>
@@ -669,75 +559,24 @@
                 </div>
                 <form onsubmit="event.preventDefault(); processScanPay()" class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100">
                     <input type="number" id="scan-amt" required min="1" placeholder="Amount ₹" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-2xl font-black mb-5 text-center focus-accent theme-card">
-                    <input type="text" id="scan-comment" placeholder="Optional Note" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-sm mb-5 focus-accent theme-card text-center">
-                    <input type="password" id="scan-pin" required maxlength="4" placeholder="PIN" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center tracking-widest font-black text-xl mb-6 focus-accent theme-card">
+                    <input type="password" id="scan-pin" required maxlength="4" placeholder="PIN" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center font-black text-xl mb-6 focus-accent theme-card">
                     <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg">Pay Now</button>
                     <button type="button" onclick="resetScanner()" class="w-full mt-4 py-3 text-sm font-bold text-gray-400">Cancel & Scan Again</button>
                 </form>
             </div>
         </div>
 
-        <div id="auth-wrapper" class="fixed inset-0 theme-card z-[200] overflow-y-auto hidden">
-            <div id="auth-login" class="min-h-screen flex flex-col p-8 items-center justify-center relative">
-                <div class="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 text-white rounded-[2rem] flex items-center justify-center text-5xl mb-6 shadow-lg border-4 border-white"><i class="fas fa-paw"></i></div>
-                <h1 class="text-4xl font-black tracking-tight mb-2">LionPay</h1>
-                <p class="text-sm font-bold text-gray-400 mb-10">Secure Mobile Wallet</p>
-                <form onsubmit="event.preventDefault(); processLogin()" class="w-full max-w-sm">
-                    <input type="tel" id="login-phone" required placeholder="Phone Number" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-lg mb-4 focus-accent font-bold transition-all text-center">
-                    <a href="https://t.me/Lion_Pay_Alert_Bot" target="_blank" class="block bg-blue-50 text-blue-500 font-bold text-xs py-3 px-4 rounded-full mb-4 text-center hover:bg-blue-100"><i class="fab fa-telegram"></i> Bot OTP Required First</a>
-                    <input type="password" id="login-pass" required placeholder="Password" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-lg mb-8 focus-accent font-bold tracking-widest text-center transition-all">
-                    <button type="submit" class="btn-animate w-full bg-gray-900 text-white font-black py-4 rounded-full shadow-xl mb-6 text-lg">Sign In</button>
-                    <div class="flex justify-between text-sm font-bold px-2"><button type="button" onclick="showAuthView('reset-pin')" class="text-gray-400 hover:text-gray-800">Forgot?</button><button type="button" onclick="showAuthView('signup')" class="text-blue-500">Create Account</button></div>
-                </form>
-            </div>
-            
-            <div id="auth-signup" class="min-h-screen flex flex-col p-8 items-center justify-center relative hidden">
-                <form onsubmit="event.preventDefault(); processSignupStep1()" class="w-full max-w-sm">
-                    <h2 class="text-3xl font-black mb-8 text-center">Register</h2>
-                    <input type="text" id="reg-name" required placeholder="Name" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 mb-3 font-bold text-center focus-accent">
-                    <input type="tel" id="reg-phone" required placeholder="Phone" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 mb-3 font-bold text-center focus-accent">
-                    <input type="password" id="reg-pass" required placeholder="Password" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 mb-3 font-bold text-center focus-accent">
-                    <input type="password" id="reg-pin" required maxlength="4" pattern="\d{4}" placeholder="4-Digit PIN" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 mb-3 font-bold tracking-widest text-center focus-accent">
-                    <input type="text" id="reg-telegram" required placeholder="Telegram User ID" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 mb-6 font-bold text-center focus-accent">
-                    <button type="submit" id="btn-signup-otp" class="btn-animate w-full bg-blue-500 text-white font-black py-4 rounded-full shadow-xl mb-6 text-lg">Send Telegram OTP</button>
-                    <button type="button" onclick="showAuthView('login')" class="w-full text-center text-gray-500 font-bold">Back to Login</button>
-                </form>
-            </div>
-            
-            <div id="auth-otp" class="min-h-screen flex flex-col p-8 items-center justify-center relative hidden">
-                <form onsubmit="event.preventDefault(); verifyOTP()" class="w-full max-w-sm">
-                    <h2 class="text-2xl font-black mb-2 text-center">Verify OTP</h2>
-                    <p class="text-center text-gray-500 mb-8 font-medium">Check telegram bot.</p>
-                    <input type="text" id="otp-input" required maxlength="6" placeholder="------" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-5 text-3xl text-center mb-8 focus-accent font-black tracking-[0.5em]">
-                    <button type="submit" class="btn-animate w-full bg-gray-900 text-white font-black py-4 rounded-full shadow-xl mb-6 text-lg">Verify</button>
-                </form>
-            </div>
-            
-            <div id="auth-reset-pin" class="min-h-screen flex flex-col p-8 items-center justify-center relative hidden">
-                <form onsubmit="event.preventDefault(); processResetPinStep1()" id="form-reset-1" class="w-full max-w-sm">
-                    <h2 class="text-2xl font-black mb-8 text-center">Reset Info</h2>
-                    <input type="tel" id="reset-phone" required placeholder="Registered Phone" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 mb-8 font-bold text-center focus-accent">
-                    <button type="submit" class="btn-animate w-full bg-gray-900 text-white font-black py-4 rounded-full shadow-xl mb-6 text-lg">Send OTP</button>
-                    <button type="button" onclick="showAuthView('login')" class="w-full text-center text-gray-500 font-bold">Cancel</button>
-                </form>
-                <form onsubmit="event.preventDefault(); processResetPinStep2()" id="form-reset-2" class="w-full max-w-sm hidden">
-                    <input type="password" id="reset-new-pass" required placeholder="New Password" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 mb-4 font-bold text-center focus-accent">
-                    <input type="password" id="reset-new-pin" required maxlength="4" placeholder="New PIN" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 mb-8 font-bold text-center focus-accent">
-                    <button type="submit" class="btn-animate w-full bg-green-500 text-white font-black py-4 rounded-full shadow-xl text-lg">Save Changes</button>
-                </form>
-            </div>
-        </div>
     </main>
 
     <nav class="fixed bottom-0 left-0 w-full glass-nav z-40 pb-safe shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
         <div class="flex justify-between items-center px-6 py-2">
-            <a href="#" onclick="showView('home')" id="nav-home" class="nav-item flex flex-col items-center gap-1 accent-text pt-2 pb-1 w-12"><i class="fas fa-home text-xl btn-animate"></i><span class="text-[9px] font-bold">Home</span></a>
-            <a href="#" onclick="showView('send')" id="nav-send" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800 pt-2 pb-1 w-12"><i class="fas fa-paper-plane text-xl btn-animate"></i><span class="text-[9px] font-bold">Send</span></a>
-            <a href="#" onclick="showView('scan'); startScanner();" id="nav-scan" class="relative -top-5 group flex flex-col items-center">
+            <a href="#" onclick="showView('home')" class="nav-item flex flex-col items-center gap-1 accent-text pt-2 pb-1 w-12"><i class="fas fa-home text-xl btn-animate"></i><span class="text-[9px] font-bold">Home</span></a>
+            <a href="#" onclick="showView('send')" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800 pt-2 pb-1 w-12"><i class="fas fa-paper-plane text-xl btn-animate"></i><span class="text-[9px] font-bold">Send</span></a>
+            <a href="#" onclick="showView('scan'); startScanner();" class="relative -top-5 group flex flex-col items-center">
                 <div class="w-14 h-14 accent-bg text-white rounded-full flex items-center justify-center shadow-[0_8px_20px_var(--accent-glow)] border-[3px] theme-card btn-animate"><i class="fas fa-qrcode text-2xl"></i></div>
             </a>
-            <a href="#" onclick="showView('statistics')" id="nav-statistics" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800 pt-2 pb-1 w-12"><i class="fas fa-chart-pie text-xl btn-animate"></i><span class="text-[9px] font-bold">Stats</span></a>
-            <a href="#" onclick="showView('add')" id="nav-add" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800 pt-2 pb-1 w-12"><i class="fas fa-wallet text-xl btn-animate"></i><span class="text-[9px] font-bold">Add</span></a>
+            <a href="#" onclick="showView('statistics')" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800 pt-2 pb-1 w-12"><i class="fas fa-chart-pie text-xl btn-animate"></i><span class="text-[9px] font-bold">Stats</span></a>
+            <a href="#" onclick="showView('add')" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800 pt-2 pb-1 w-12"><i class="fas fa-wallet text-xl btn-animate"></i><span class="text-[9px] font-bold">Add</span></a>
         </div>
     </nav>
 
@@ -755,15 +594,6 @@
         let currentBalance = 0, keeperBalance = 0;
         let isBalanceVisible = false;
 
-        const sndClick = new Audio("https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3");
-        const sndSuccess = new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"); 
-
-        document.addEventListener('click', (e) => { 
-            if(e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.closest('.ios-grid-icon') || e.target.closest('.nav-item')) {
-                if(currentUser && currentUser.premium) { try { sndClick.play(); } catch(e){} }
-            }
-        });
-
         let isActionOnCooldown = false;
         function checkCooldown() {
             if (isActionOnCooldown) { showToast("Please wait..."); return false; }
@@ -779,10 +609,10 @@
                 try { result = JSON.parse(responseText); } catch (e) { throw new Error("API Route Missing or Invalid JSON."); }
                 if(!res.ok || result.error) throw new Error(result.error || "Server error");
                 return result.data;
-            } catch(err) { throw err; } // Let caller handle toast
+            } catch(err) { throw err; }
         }
 
-        // DP LOGIC
+        // DP UPLOAD LOGIC
         function handleDPUpload(event) {
             const file = event.target.files[0];
             if(!file) return;
@@ -829,123 +659,7 @@
             }
         }
 
-        // LIFAFA
-        function addLifafaChannelInput() {
-            const container = document.getElementById('lifafa-channels-container');
-            if (container.children.length >= 5) return showToast("Max 5 channels allowed.");
-            const input = document.createElement('input');
-            input.type = 'text'; input.placeholder = '@yourchannel';
-            input.className = "w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm focus-accent font-medium theme-card mt-3";
-            container.appendChild(input);
-        }
-
-        async function processLifafaCreate() {
-            if(!checkCooldown()) return;
-            let pin = document.getElementById('lif-pin').value; if(pin !== currentUser.pin) return showToast("Incorrect PIN!");
-            let amt = parseFloat(document.getElementById('lif-amt').value); 
-            let users = parseInt(document.getElementById('lif-users').value); 
-            let isPremOnly = document.getElementById('lif-premium-only') && document.getElementById('lif-premium-only').checked;
-            let password = document.getElementById('lif-pass-opt').value.trim();
-            
-            let channels = [];
-            const container = document.getElementById('lifafa-channels-container');
-            for(let i=0; i<container.children.length; i++) {
-                let val = container.children[i].value.trim();
-                if(val) channels.push(val);
-            }
-            if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
-            let total = amt * users;
-            if(total > currentBalance) return showToast(`Need ₹${total} balance`);
-
-            let txn = { id: 'TXN' + Date.now().toString(36).toUpperCase(), type: 'out', title: `Lifafa Created ${isPremOnly ? '(Premium)' : ''}`, amount: total, status: 'Success', date: new Date().toLocaleString(), timestamp: Date.now(), icon: 'fa-envelope-open-text', color: 'yellow', name: 'Lifafa System', number: 'N/A', senderId: currentUser.phone, receiverId: 'SYSTEM', senderName: currentUser.name, comment: '' };
-            document.getElementById('toastMsg').innerText = "Creating Lifafa..."; document.getElementById('toast').classList.remove('hidden');
-            
-            try {
-                let lifafaId = await apiCall('CREATE_LIFAFA', { phone: currentUser.phone, amount: amt, totalUsers: users, isPremiumOnly: isPremOnly, password: password, channels: channels, txn });
-                try { sndSuccess.play(); } catch(e){}
-                let link = `https://${window.location.host}/?lifafa=${lifafaId}`; alert(`Created!\nLink: ${link}`); copyText(link);
-                currentBalance -= total; updateUI(); 
-                document.getElementById('lif-amt').value=''; document.getElementById('lif-users').value=''; document.getElementById('lif-pin').value=''; document.getElementById('lif-pass-opt').value='';
-                document.getElementById('lifafa-channels-container').innerHTML = '<input type="text" placeholder="@yourchannel" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm focus-accent font-medium theme-card">';
-                showView('home');
-            } catch(e) { showToast(e.message); }
-        }
-
-        async function loadMyLifafas() {
-            const listEl = document.getElementById('my-lifafas-list');
-            listEl.innerHTML = '<p class="text-center text-gray-400 font-bold">Loading...</p>';
-            try {
-                let myLifs = await apiCall('GET_MY_LIFAFAS', { phone: currentUser.phone });
-                listEl.innerHTML = '';
-                if(myLifs.length === 0) { listEl.innerHTML = '<p class="text-center text-sm font-bold text-gray-400 py-10">No lifafas created yet</p>'; return; }
-                myLifs.forEach(lif => {
-                    let link = `https://${window.location.host}/?lifafa=${lif.id}`;
-                    let statusColor = lif.status === 'ACTIVE' ? 'text-green-500' : 'text-gray-400';
-                    listEl.innerHTML += `<div class="theme-card border border-gray-100 shadow-sm rounded-2xl p-4 mb-4"><div class="flex justify-between items-center mb-3"><span class="text-xs font-black bg-gray-100 text-gray-600 px-3 py-1 rounded-full uppercase tracking-wider">${lif.id}</span><span class="text-[10px] font-bold uppercase ${statusColor}">${lif.status}</span></div><div class="flex justify-between mb-4"><div><p class="text-[10px] text-gray-400 font-bold uppercase">Amount</p><p class="font-black">₹${lif.amount}</p></div><div class="text-right"><p class="text-[10px] text-gray-400 font-bold uppercase">Claimed</p><p class="font-black">${lif.claimedUsers} / ${lif.totalUsers}</p></div></div><button onclick="copyText('${link}')" class="w-full bg-blue-50 text-blue-500 font-bold py-2.5 rounded-xl text-xs"><i class="fas fa-link"></i> Copy Link</button></div>`;
-                });
-            } catch(e) { listEl.innerHTML = '<p class="text-center text-red-500 font-bold">Failed to load</p>'; }
-        }
-
-        function switchLifafaTab(tabId) { 
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'accent-bg', 'text-white', 'shadow-md')); 
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); 
-            let activeBtn = document.getElementById('tab-'+tabId); 
-            if(activeBtn) activeBtn.classList.add('active', 'accent-bg', 'text-white', 'shadow-md'); 
-            let tabContent = document.getElementById(tabId);
-            if(tabContent) tabContent.classList.add('active'); 
-            if(tabId === 'lifafa-my') loadMyLifafas();
-        }
-
-        function switchKeeperTab(tabId) {
-            document.querySelectorAll('.keeper-tab-btn').forEach(btn => {
-                btn.classList.remove('active', 'bg-slate-800', 'text-white');
-                btn.classList.add('text-gray-500');
-            });
-            document.querySelectorAll('.keeper-tab-content').forEach(c => c.classList.add('hidden'));
-            
-            let btn = document.getElementById('btn-' + tabId);
-            if(btn) {
-                btn.classList.add('active', 'bg-slate-800', 'text-white');
-                btn.classList.remove('text-gray-500');
-            }
-            let cnt = document.getElementById(tabId);
-            if(cnt) cnt.classList.remove('hidden');
-        }
-
-        let activeLifafaCode = null, activeLifafaData = null, claimingPhone = null;
-        function showPublicLifafa(code) { activeLifafaCode = code; document.getElementById('public-lifafa-wrapper').classList.remove('hidden'); document.getElementById('public-lifafa-wrapper').style.display = 'flex'; }
-        function switchLifafaStep(stepId) { document.querySelectorAll('.step-container').forEach(el => { el.classList.remove('active'); }); document.getElementById('lif-step-' + stepId).classList.add('active'); }
-
-        async function verifyLifafaUser() {
-            let phone = document.getElementById('public-lif-phone').value.trim(); if(!phone) return showToast("Enter your number");
-            document.getElementById('toastMsg').innerText = "Verifying..."; document.getElementById('toast').classList.remove('hidden');
-            try {
-                let userCheck = await apiCall('CHECK_USER', { phone });
-                if(!userCheck) { alert("You don't have an account! Please register first to claim."); window.location.href='/'; return; }
-                claimingPhone = userCheck.resolvedPhone || phone;
-                activeLifafaData = await apiCall('GET_LIFAFA_INFO', { code: activeLifafaCode });
-                if(activeLifafaData.status !== 'ACTIVE') { alert("Lifafa is fully claimed or inactive."); window.location.href='/'; return; }
-                if(activeLifafaData.channels && activeLifafaData.channels.length > 0) {
-                    let grid = document.getElementById('lifafa-channels-grid'); grid.innerHTML = '';
-                    activeLifafaData.channels.forEach(ch => { let chLink = ch.startsWith('http') ? ch : `https://t.me/${ch.replace('@','')}`; grid.innerHTML += `<a href="${chLink}" target="_blank" class="bg-blue-50 text-blue-500 rounded-xl p-3 text-center font-bold text-xs flex flex-col items-center justify-center border border-blue-100 hover:bg-blue-100"><i class="fab fa-telegram text-xl mb-1"></i> ${ch}</a>`; });
-                    switchLifafaStep('channels');
-                } else { proceedToLifafaPassword(); }
-            } catch(e) { showToast(e.message); }
-        }
-
-        function proceedToLifafaPassword() { if(activeLifafaData.hasPassword) { switchLifafaStep('password'); } else { executeLifafaClaim(); } }
-
-        async function executeLifafaClaim() {
-            let pass = document.getElementById('public-lif-pass') ? document.getElementById('public-lif-pass').value.trim() : '';
-            document.getElementById('toastMsg').innerText = "Claiming..."; document.getElementById('toast').classList.remove('hidden');
-            try {
-                let resultAmt = await apiCall('CLAIM_LIFAFA', { code: activeLifafaCode, targetPhone: claimingPhone, password: pass });
-                try{ sndSuccess.play(); }catch(e){}
-                document.getElementById('lif-success-amt').innerText = `₹${resultAmt} added to your wallet!`; switchLifafaStep('success');
-            } catch(e) { showToast(e.message); }
-        }
-
-        // STATS
+        // STATS RENDERING LOGIC
         function renderStatistics() {
             let filterStatus = document.getElementById('stat-filter-status') ? document.getElementById('stat-filter-status').value : 'ALL';
             let filterType = document.getElementById('stat-filter-type') ? document.getElementById('stat-filter-type').value : 'ALL';
@@ -979,8 +693,8 @@
             });
         }
 
-        // SYNC & UI
         async function syncLoop() { if(!currentUser) return; await syncData(); setTimeout(syncLoop, 3000); }
+
         async function syncData() {
             if(!currentUser) return;
             try {
@@ -993,22 +707,10 @@
                 }
                 if(data.settings) { globalSettings = data.settings; let upiEl = document.getElementById('ui-upi-id'); if(upiEl && globalSettings.upiId) upiEl.innerText = globalSettings.upiId; }
                 if(data.txns) transactions = data.txns;
-                if(data.posts) {
-                    let postContainer = document.getElementById('official-posts-container');
-                    if(postContainer) {
-                        postContainer.innerHTML = '';
-                        if(data.posts.length === 0) { postContainer.innerHTML = '<p class="text-center text-gray-400 text-sm font-bold">No official posts yet</p>'; }
-                        else {
-                            [...data.posts].sort((a,b) => b.timestamp - a.timestamp).forEach(p => {
-                                postContainer.innerHTML += `<div class="theme-card rounded-2xl p-4 border border-gray-100 shadow-sm"><p class="text-xs font-black text-blue-500 mb-2">ADMIN UPDATE</p><p class="text-sm font-medium whitespace-pre-wrap">${p.text}</p><p class="text-[10px] text-gray-400 mt-3 text-right">${new Date(p.timestamp).toLocaleString()}</p></div>`;
-                            });
-                        }
-                    }
-                }
-                try { updateUI(); } catch(e) { console.error("UI Update Error", e); }
+                try { updateUI(); } catch(e) {}
                 let statsView = document.getElementById('view-statistics');
                 if(statsView && statsView.classList.contains('active')) renderStatistics();
-            } catch(e) {} // Silent catch to prevent loop break
+            } catch(e) {} // Auto-retry handled silently by loop
         }
 
         function updateUI() {
@@ -1019,21 +721,14 @@
             let sn = document.getElementById('sidebar-name'); if(sn) sn.innerText = currentUser.name || 'User';
             let sp = document.getElementById('sidebar-phone'); if(sp) sp.innerText = currentUser.phone || '';
             let up = document.getElementById('ui-user-phone'); if(up) up.innerText = currentUser.customId || currentUser.phone || '';
-            let ak = document.getElementById('sidebar-api-key'); if(ak) ak.innerText = currentUser.apiKey || 'None';
-            let cid = document.getElementById('sidebar-custom-id'); if(cid) cid.innerText = currentUser.customId || 'None';
             let apiDis = document.getElementById('ui-api-key-display'); if(apiDis) apiDis.innerText = currentUser.apiKey || 'LP-PENDING';
-            let apiKeyUrl = document.getElementById('ui-api-key-url'); if(apiKeyUrl) apiKeyUrl.innerText = currentUser.apiKey || 'LP-PENDING';
-            let apiKeyUpi = document.getElementById('ui-api-key-upi'); if(apiKeyUpi) apiKeyUpi.innerText = currentUser.apiKey || 'LP-PENDING';
 
             let badge = document.getElementById('ui-verified-badge');
-            let sidebarTag = document.getElementById('sidebar-tag');
             if(currentUser.premium) {
                 let tagTxt = currentUser.customUserTag || currentUser.tag || 'Premium';
                 if(badge) badge.innerHTML = `<i class="fas fa-crown text-amber-400"></i> ${tagTxt}`;
-                if(sidebarTag) sidebarTag.innerHTML = `<i class="fas fa-crown"></i> ${tagTxt}`;
             } else {
                 if(badge) badge.innerHTML = `<i class="fas fa-check-circle"></i> Verified`;
-                if(sidebarTag) sidebarTag.innerHTML = `Standard`;
             }
 
             const listEl = document.getElementById('home-txn-list'); 
@@ -1058,26 +753,8 @@
             let currentAccent = currentUser.accentColor || '#f59e0b';
             document.documentElement.style.setProperty('--accent-main', currentAccent);
             document.documentElement.style.setProperty('--accent-glow', hexToRgba(currentAccent, 0.4));
-            document.documentElement.style.setProperty('--premium-grad-1', hexToRgba(currentAccent, 0.15));
-            document.documentElement.style.setProperty('--premium-grad-2', hexToRgba(currentAccent, 0.05));
             
-            let btnPrem = document.getElementById('btn-premium-menu');
-            let btnThemes = document.getElementById('btn-theme-menu');
-            let btnTags = document.getElementById('btn-tags-menu');
-            let ghostBox = document.getElementById('ghost-transfer-box');
-            let premLifafa = document.getElementById('premium-lifafa-box');
-
             if (currentUser.premium) {
-                if(btnPrem) btnPrem.classList.add('hidden');
-                if(btnThemes) btnThemes.classList.remove('hidden');
-                if(btnTags) btnTags.classList.remove('hidden');
-                if(ghostBox) ghostBox.classList.remove('hidden');
-                if(premLifafa) premLifafa.classList.remove('hidden');
-                
-                if (currentUser.advancedUI !== false) document.documentElement.classList.add('premium-mode');
-                else document.documentElement.classList.remove('premium-mode');
-                if (currentUser.colorfulMode) document.documentElement.classList.add('colorful-mode');
-                else document.documentElement.classList.remove('colorful-mode');
                 if (currentUser.privacyMode) {
                     let eyeEl = document.getElementById('eye-balance'); if (eyeEl) eyeEl.classList.remove('hidden');
                     if(!isBalanceVisible) { document.querySelectorAll('.global-balance').forEach(el => el.classList.add('privacy-blur')); }
@@ -1085,19 +762,17 @@
                     let eyeEl = document.getElementById('eye-balance'); if (eyeEl) eyeEl.classList.add('hidden');
                     document.querySelectorAll('.global-balance').forEach(el => el.classList.remove('privacy-blur'));
                 }
-            } else {
-                if(btnPrem) btnPrem.classList.remove('hidden');
-                if(btnThemes) btnThemes.classList.add('hidden');
-                if(btnTags) btnTags.classList.add('hidden');
-                if(ghostBox) ghostBox.classList.add('hidden');
-                if(premLifafa) premLifafa.classList.add('hidden');
-                document.documentElement.classList.remove('premium-mode');
-                document.documentElement.classList.remove('colorful-mode');
             }
             if (currentUser.theme === 'dark') document.documentElement.classList.add('dark-mode');
             else document.documentElement.classList.remove('dark-mode');
 
-            renderTagsAndColors();
+            let colorHtml = '';
+            ACCENT_COLORS.forEach(c => {
+                let isSelected = currentUser.accentColor === c.hex;
+                let activeClass = isSelected ? 'border-4 border-white shadow-[0_0_15px_var(--accent-glow)] scale-110' : 'border-2 border-transparent opacity-80 hover:opacity-100 hover:scale-105';
+                colorHtml += `<div onclick="setAccentColor('${c.hex}')" class="w-10 h-10 rounded-full cursor-pointer transition-all mx-auto ${activeClass}" style="background-color: ${c.hex};" title="${c.name}"></div>`;
+            });
+            let pc = document.getElementById('color-palette'); if(pc) pc.innerHTML = colorHtml;
         }
 
         function toggleBalanceVisibility() {
@@ -1131,10 +806,6 @@
             document.querySelectorAll('.nav-item').forEach(el => { 
                 el.classList.remove('accent-text'); el.classList.add('text-gray-400'); 
             }); 
-            let activeNav = document.getElementById('nav-' + viewId);
-            if(activeNav) {
-                activeNav.classList.remove('text-gray-400'); activeNav.classList.add('accent-text'); 
-            }
             window.scrollTo({top:0, behavior:'smooth'}); 
             if(viewId === 'statistics') renderStatistics();
         }
@@ -1171,7 +842,6 @@
                         initApp();
                     } else { logoutUser(); }
                 } catch(e) { 
-                    // Network error, retry instead of logging out
                     showToast("Network delay, retrying...");
                     setTimeout(checkAuth, 3000); 
                 }
@@ -1188,14 +858,10 @@
         }
 
         function initApp() {
-            try { updateUI(); updateDPUI(); applyPremiumUI(); } catch(e) { console.error("Init UI Error", e); }
+            try { updateUI(); updateDPUI(); applyPremiumUI(); } catch(e) {}
             syncLoop(); 
-            const urlParams = new URLSearchParams(window.location.search);
-            const lifafaCode = urlParams.get('lifafa');
-            if(lifafaCode) { setTimeout(() => showPublicLifafa(lifafaCode), 1000); window.history.replaceState({}, document.title, "/"); }
         }
 
-        // AUTO FETCH SENDER NAME LOGIC
         let sendResolvedPhone = null; let debounceTimer;
         let sNumEl = document.getElementById('send-num');
         if(sNumEl) {
@@ -1209,59 +875,26 @@
                             let user = await apiCall('CHECK_USER', { phone: val }); 
                             if(user) {
                                 sendResolvedPhone = user.resolvedPhone || user.phone;
-                                if (user.premium) {
-                                    let tagToShow = user.customUserTag || user.tag || 'PREMIUM';
-                                    nameField.className = "w-full rounded-2xl px-5 py-4 text-sm mb-6 font-bold cursor-not-allowed transition-all flex justify-between items-center min-h-[54px] accent-bg accent-shadow text-white";
-                                    nameField.innerHTML = `<div class="flex items-center gap-2"><span>${user.name}</span> <i class="fas fa-check-circle text-blue-400 bg-white rounded-full text-lg"></i></div> <span class="bg-white/20 text-white text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider">${tagToShow}</span>`;
-                                } else {
-                                    nameField.className = "w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-sm mb-6 font-bold text-gray-600 cursor-not-allowed transition-all min-h-[54px] flex items-center theme-card";
-                                    nameField.innerHTML = user.name;
-                                }
-                            } else { nameField.innerHTML = 'User Not Found'; sendResolvedPhone = null; nameField.className = "w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-sm mb-6 font-bold text-gray-600 cursor-not-allowed transition-all min-h-[54px] flex items-center theme-card"; }
+                                nameField.innerHTML = user.name;
+                            } else { nameField.innerHTML = 'User Not Found'; sendResolvedPhone = null; }
                         } catch(e) { nameField.innerHTML = 'Error'; }
                     }, 500);
-                } else { nameField.innerHTML = 'Auto-fetching receiver...'; sendResolvedPhone = null; }
+                } else { nameField.innerHTML = ''; sendResolvedPhone = null; }
             });
         }
 
-        // TRANSACTION & THEME HELPERS
-        async function setGlobalTheme(mode) { await apiCall('UPDATE_PREFS', { phone: currentUser.phone, theme: mode }); currentUser.theme = mode; applyPremiumUI(); showToast(mode.charAt(0).toUpperCase() + mode.slice(1) + " Mode Activated"); }
-        async function toggleColorfulTheme() { let isEnabled = document.getElementById('toggle-colorful-ui').checked; await apiCall('UPDATE_PREFS', { phone: currentUser.phone, colorfulMode: isEnabled }); currentUser.colorfulMode = isEnabled; applyPremiumUI(); showToast("Colorful Theme Saved"); }
-        async function togglePrivacyMode() { let isEnabled = document.getElementById('toggle-privacy-ui').checked; await apiCall('UPDATE_PRIVACY', { phone: currentUser.phone, privacyMode: isEnabled }); currentUser.privacyMode = isEnabled; isBalanceVisible = false; applyPremiumUI(); showToast("Privacy Settings Saved"); }
+        async function setGlobalTheme(mode) { await apiCall('UPDATE_PREFS', { phone: currentUser.phone, theme: mode }); currentUser.theme = mode; applyPremiumUI(); showToast(mode + " Mode Activated"); }
         async function setAccentColor(hex) { await apiCall('UPDATE_PREFS', { phone: currentUser.phone, accentColor: hex }); currentUser.accentColor = hex; applyPremiumUI(); showToast("Color Updated"); }
-        async function regenerateApiKey() { if(!confirm("Are you sure?")) return; let newKey = 'LP-' + Math.random().toString(36).substring(2, 10).toUpperCase(); await apiCall('GENERATE_API', { phone: currentUser.phone, newKey }); currentUser.apiKey = newKey; updateUI(); showToast("API Key Regenerated!"); }
-
-        function renderTagsAndColors() {
-            let tc = document.getElementById('tags-container');
-            if(tc) {
-                let currentTag = currentUser.customUserTag || currentUser.tag || 'Premium';
-                tc.innerHTML = `<div class="w-full border-2 p-4 rounded-2xl font-black transition-all accent-border accent-bg text-white shadow-lg flex items-center justify-center gap-2 tracking-wide text-lg"><i class="fas fa-crown text-yellow-300"></i> ${currentTag}</div>`;
-            }
-            let colorHtml = '';
-            ACCENT_COLORS.forEach(c => {
-                let isSelected = currentUser.accentColor === c.hex;
-                let activeClass = isSelected ? 'border-[3px] border-white shadow-[0_0_15px_var(--accent-glow)] scale-110' : 'border-2 border-transparent opacity-80 hover:opacity-100 hover:scale-105';
-                colorHtml += `<div onclick="setAccentColor('${c.hex}')" class="w-12 h-12 rounded-full cursor-pointer transition-all mx-auto ${activeClass}" style="background-color: ${c.hex};" title="${c.name}"></div>`;
-            });
-            let pc = document.getElementById('color-palette'); if(pc) pc.innerHTML = colorHtml;
-            
-            let tglC = document.getElementById('toggle-colorful-ui'); if(tglC) tglC.checked = currentUser.colorfulMode === true;
-            let tglP = document.getElementById('toggle-privacy-ui'); if(tglP) tglP.checked = currentUser.privacyMode === true;
-        }
-
         function switchTab(tabId) { document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'accent-bg', 'text-white')); document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('text-[#6b7280]')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); let activeBtn = document.getElementById('tab-'+tabId); if(activeBtn) { activeBtn.classList.remove('text-[#6b7280]'); activeBtn.classList.add('active', 'accent-bg', 'text-white'); } let tC = document.getElementById(tabId); if(tC) tC.classList.add('active'); }
+        function switchKeeperTab(tabId) { document.querySelectorAll('.keeper-tab-btn').forEach(btn => { btn.classList.remove('active', 'bg-slate-800', 'text-white'); btn.classList.add('text-gray-500'); }); document.querySelectorAll('.keeper-tab-content').forEach(c => c.classList.add('hidden')); let btn = document.getElementById('btn-' + tabId); if(btn) { btn.classList.add('active', 'bg-slate-800', 'text-white'); btn.classList.remove('text-gray-500'); } let cnt = document.getElementById(tabId); if(cnt) cnt.classList.remove('hidden'); }
 
-        // MAIN TXN LOGIC
         async function processSend() {
             if(!checkCooldown()) return;
-            let pin = document.getElementById('send-pin').value; if(pin !== currentUser.pin) return showToast("Incorrect PIN!");
             if (!sendResolvedPhone) return showToast("Invalid Receiver!");
-            if (sendResolvedPhone === currentUser.phone) return showToast("Cannot send to yourself!");
             let amt = parseFloat(document.getElementById('send-amt').value); 
             if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
-            let isGhost = document.getElementById('send-ghost') && document.getElementById('send-ghost').checked;
-            let txn = { id: 'TXN' + Date.now().toString(36).toUpperCase(), type: 'out', title: (isGhost?'Ghost Sent to ':'Sent to ')+'User', amount: amt, status: 'Success', date: new Date().toLocaleString(), timestamp: Date.now(), icon: isGhost?'fa-ghost':'fa-paper-plane', color: 'yellow', name: 'User', number: sendResolvedPhone, senderId: currentUser.phone, receiverId: sendResolvedPhone, comment: document.getElementById('send-comment').value };
-            try { await apiCall('EXECUTE_TXN', { mode: isGhost?'GHOST_SEND':'SEND', sender: currentUser.phone, receiver: sendResolvedPhone, amount: amt, txn }); try{ sndSuccess.play(); }catch(e){} showToast("Sent!"); currentBalance -= amt; updateUI(); showView('home'); document.getElementById('form-send').reset(); } catch(e) { showToast(e.message); }
+            let txn = { id: 'TXN' + Date.now().toString(36).toUpperCase(), type: 'out', title: 'Sent to User', amount: amt, status: 'Success', date: new Date().toLocaleString(), timestamp: Date.now(), icon: 'fa-paper-plane', color: 'yellow', name: 'User', number: sendResolvedPhone, senderId: currentUser.phone, receiverId: sendResolvedPhone };
+            try { await apiCall('EXECUTE_TXN', { mode: 'SEND', sender: currentUser.phone, receiver: sendResolvedPhone, amount: amt, txn }); showToast("Sent!"); currentBalance -= amt; updateUI(); showView('home'); document.getElementById('form-send').reset(); } catch(e) { showToast(e.message); }
         }
         async function processAdd() {
             if(!checkCooldown()) return;
@@ -1277,78 +910,69 @@
         }
         async function processBulk() {
             if(!checkCooldown()) return;
-            let pin = document.getElementById('bulk-pin').value; if(pin !== currentUser.pin) return showToast("Incorrect PIN!");
             let numsText = document.getElementById('bulk-nums').value.trim(); let amt = parseFloat(document.getElementById('bulk-amt').value); let comment = document.getElementById('bulk-comment').value.trim();
             if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!"); if(!numsText) return;
             let rawLines = numsText.split('\n').filter(n => n.trim() !== ''); let resolvedReceivers = [];
             for (let r of rawLines) { try { let userCheck = await apiCall('CHECK_USER', { phone: r }); if (userCheck && userCheck.resolvedPhone && userCheck.resolvedPhone !== currentUser.phone) { resolvedReceivers.push(userCheck.resolvedPhone); } } catch(e) {} }
             if (resolvedReceivers.length === 0) return showToast("No valid receivers found.");
-            let totalAmt = resolvedReceivers.length * amt; if(totalAmt > currentBalance) return showToast(`Need ₹${totalAmt} for ${resolvedReceivers.length} users.`);
-            try { await apiCall('BULK_PAY', { sender: currentUser.phone, receivers: resolvedReceivers, amount: amt, comment: comment, date: new Date().toLocaleString() }); try{ sndSuccess.play(); }catch(e){} showToast(`Sent to ${resolvedReceivers.length} users!`); currentBalance -= totalAmt; updateUI(); document.getElementById('bulk-nums').value = ''; document.getElementById('bulk-amt').value = ''; document.getElementById('bulk-pin').value = ''; document.getElementById('bulk-comment').value = ''; setTimeout(() => showView('home'), 1200); } catch(e) { showToast(e.message); }
+            let totalAmt = resolvedReceivers.length * amt; if(totalAmt > currentBalance) return showToast(`Need ₹${totalAmt}`);
+            try { await apiCall('BULK_PAY', { sender: currentUser.phone, receivers: resolvedReceivers, amount: amt, comment: comment, date: new Date().toLocaleString() }); showToast(`Sent!`); currentBalance -= totalAmt; updateUI(); document.getElementById('bulk-nums').value = ''; document.getElementById('bulk-amt').value = ''; showView('home'); } catch(e) { showToast(e.message); }
         }
         async function processGiftCreate() {
             if(!checkCooldown()) return;
-            let pin = document.getElementById('gift-pin').value; if(pin !== currentUser.pin) return showToast("Incorrect PIN!");
             let amt = parseFloat(document.getElementById('gift-amt').value); let users = parseInt(document.getElementById('gift-users').value); 
             if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!"); let total = amt * users; if(total > currentBalance) return alert(`Need ₹${total}`);
             let code = Math.random().toString(36).substring(2, 7).toUpperCase();
             let txn = { id: 'TXN' + Date.now().toString(36).toUpperCase(), type: 'out', title: `Gift Code Created`, amount: total, status: 'Success', date: new Date().toLocaleString(), timestamp: Date.now(), icon: 'fa-gift', color: 'pink', name: 'Gift System', number: 'N/A', senderId: currentUser.phone, receiverId: 'SYSTEM', comment: `Code: ${code}` };
-            try { await apiCall('CREATE_GIFT', { phone: currentUser.phone, code, amount: amt, users, txn }); try{ sndSuccess.play(); }catch(e){} alert(`Gift Code Created: ${code}\nShare this with users!`); currentBalance -= total; updateUI(); document.getElementById('gift-amt').value=''; document.getElementById('gift-users').value=''; document.getElementById('gift-pin').value=''; showView('home'); } catch(e) { showToast(e.message); }
+            try { await apiCall('CREATE_GIFT', { phone: currentUser.phone, code, amount: amt, users, txn }); alert(`Gift Code Created: ${code}`); currentBalance -= total; updateUI(); showView('home'); } catch(e) { showToast(e.message); }
         }
         async function processGiftClaim() {
             let code = document.getElementById('claim-code').value.toUpperCase(); if(code.length !== 5) return alert("Invalid Code format");
             let txn = { id: 'TXN' + Date.now().toString(36).toUpperCase(), type: 'in', title: `Claimed Gift Code`, amount: 0, status: 'Success', date: new Date().toLocaleString(), timestamp: Date.now(), icon: 'fa-gift', color: 'green', name: 'Gift Code', number: 'N/A', senderId: 'SYSTEM', receiverId: currentUser.phone, comment: `Code: ${code}` };
-            try { let reward = await apiCall('CLAIM_GIFT', { phone: currentUser.phone, code, txn }); try{ sndSuccess.play(); }catch(e){} document.getElementById('claim-code').value = ''; showToast(`Yay! You claimed ₹${reward}`); currentBalance += reward; updateUI(); setTimeout(() => showView('home'), 1500); } catch(e) { showToast(e.message); }
+            try { let reward = await apiCall('CLAIM_GIFT', { phone: currentUser.phone, code, txn }); showToast(`Yay! You claimed ₹${reward}`); currentBalance += reward; updateUI(); setTimeout(() => showView('home'), 1500); } catch(e) { showToast(e.message); }
         }
         async function processKeeperLock() {
             if(!checkCooldown()) return;
-            let pin = document.getElementById('kl-pin').value; if(pin !== currentUser.pin) return showToast("Incorrect PIN!");
             let amt = parseFloat(document.getElementById('kl-amt').value); 
-            if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!"); if(amt > currentBalance) return alert("Insufficient Wallet Balance!");
+            if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!"); if(amt > currentBalance) return alert("Insufficient Balance!");
             let txn = { id: 'TXN' + Date.now().toString(36).toUpperCase(), type: 'out', title: 'Locked in Keeper', amount: amt, status: 'Success', date: new Date().toLocaleString(), timestamp: Date.now(), icon: 'fa-lock', color: 'orange', name: 'Self Vault', number: 'N/A', senderId: currentUser.phone, receiverId: 'SYSTEM' };
-            try { await apiCall('EXECUTE_TXN', { mode: 'KEEPER_LOCK', sender: currentUser.phone, amount: amt, txn }); currentBalance -= amt; keeperBalance += amt; updateUI(); document.getElementById('kl-amt').value = ''; document.getElementById('kl-pin').value = ''; showToast(`₹${amt} safely locked!`); } catch(e) { showToast(e.message); }
+            try { await apiCall('EXECUTE_TXN', { mode: 'KEEPER_LOCK', sender: currentUser.phone, amount: amt, txn }); currentBalance -= amt; keeperBalance += amt; updateUI(); showToast(`₹${amt} safely locked!`); } catch(e) { showToast(e.message); }
         }
         async function processKeeperWithdraw() {
             if(!checkCooldown()) return;
-            let pin = document.getElementById('kw-pin').value; if(pin !== currentUser.pin) return showToast("Incorrect PIN!");
             let amt = parseFloat(document.getElementById('kw-amt').value); 
             if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!"); if(amt > keeperBalance) return alert("Insufficient Keeper Balance!");
             let txn = { id: 'TXN' + Date.now().toString(36).toUpperCase(), type: 'in', title: 'Withdrawn from Keeper', amount: amt, status: 'Success', date: new Date().toLocaleString(), timestamp: Date.now(), icon: 'fa-unlock', color: 'green', name: 'Self Vault', number: 'N/A', senderId: 'SYSTEM', receiverId: currentUser.phone };
-            try { await apiCall('EXECUTE_TXN', { mode: 'KEEPER_WITHDRAW', sender: currentUser.phone, amount: amt, txn }); try{ sndSuccess.play(); }catch(e){} keeperBalance -= amt; currentBalance += amt; updateUI(); document.getElementById('kw-amt').value = ''; document.getElementById('kw-pin').value = ''; showToast(`₹${amt} moved to Wallet!`); } catch(e) { showToast(e.message); }
+            try { await apiCall('EXECUTE_TXN', { mode: 'KEEPER_WITHDRAW', sender: currentUser.phone, amount: amt, txn }); keeperBalance -= amt; currentBalance += amt; updateUI(); showToast(`₹${amt} moved to Wallet!`); } catch(e) { showToast(e.message); }
         }
 
-        // SCANNER LOGIC
         let html5QrcodeScanner = null;
         function startScanner() {
-            let box = document.getElementById('scanner-container').querySelector('.relative');
-            if(currentUser && currentUser.premium) box.classList.add('premium-scanner'); else box.classList.remove('premium-scanner');
             document.getElementById('scanner-container').classList.remove('hidden'); document.getElementById('scan-result').classList.add('hidden');
             if(html5QrcodeScanner) html5QrcodeScanner.clear();
             html5QrcodeScanner = new Html5Qrcode("reader");
             Html5Qrcode.getCameras().then(devices => {
                 if(devices && devices.length) { html5QrcodeScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, handleQRResult, ()=>{}); }
-            }).catch(err => alert("Please grant Camera Permission to scan QR codes."));
+            }).catch(err => alert("Camera permission required."));
         }
         function stopScanner() { if(html5QrcodeScanner) { html5QrcodeScanner.stop().then(()=>html5QrcodeScanner.clear()).catch(()=>{}); } }
         function handleQRResult(text) {
-            try{ sndSuccess.play(); }catch(e){} stopScanner(); let parsedName = "Unknown", parsedNumber = text;
+            stopScanner(); let parsedName = "Unknown", parsedNumber = text;
             if(text.startsWith("LIONPAY:")) { let parts = text.split(":"); if(parts.length>=3) { parsedNumber = parts[1]; parsedName = decodeURIComponent(parts[2]); } }
             document.getElementById('scanner-container').classList.add('hidden'); document.getElementById('scan-result').classList.remove('hidden');
             document.getElementById('scan-res-name').innerText = parsedName; document.getElementById('scan-res-phone').innerText = parsedNumber;
-            document.getElementById('scan-amt').value = ''; document.getElementById('scan-pin').value = ''; document.getElementById('scan-comment').value = '';
         }
         function resetScanner() { startScanner(); }
         async function processScanPay() {
             if(!checkCooldown()) return;
-            let pin = document.getElementById('scan-pin').value; if(pin !== currentUser.pin) return showToast("Incorrect PIN!");
             let num = document.getElementById('scan-res-phone').innerText; if(num === currentUser.phone) return showToast("Cannot send to yourself!");
-            let amt = parseFloat(document.getElementById('scan-amt').value); let comment = document.getElementById('scan-comment').value.trim();
+            let amt = parseFloat(document.getElementById('scan-amt').value); 
             if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!"); if(amt > currentBalance) return showToast("Insufficient Balance!");
             try {
                 let receiver = await apiCall('CHECK_USER', { phone: num }); if (!receiver) return showToast("Receiver not found!");
-                let name = receiver.name || 'Unknown User'; let txn = { id: 'TXN' + Date.now().toString(36).toUpperCase(), type: 'out', title: 'Sent to ' + name, amount: amt, status: 'Success', date: new Date().toLocaleString(), timestamp: Date.now(), icon: 'fa-paper-plane', color: 'yellow', name: name, number: num, senderId: currentUser.phone, receiverId: num, comment: comment };
+                let name = receiver.name || 'Unknown User'; let txn = { id: 'TXN' + Date.now().toString(36).toUpperCase(), type: 'out', title: 'Sent to ' + name, amount: amt, status: 'Success', date: new Date().toLocaleString(), timestamp: Date.now(), icon: 'fa-paper-plane', color: 'yellow', name: name, number: num, senderId: currentUser.phone, receiverId: num };
                 await apiCall('EXECUTE_TXN', { mode: 'SEND', sender: currentUser.phone, receiver: num, amount: amt, txn });
-                try{ sndSuccess.play(); }catch(e){} showToast("Payment Successful!"); currentBalance -= amt; updateUI(); setTimeout(() => { showView('home'); document.getElementById('scan-result').classList.add('hidden'); }, 1000);
+                showToast("Payment Successful!"); currentBalance -= amt; updateUI(); setTimeout(() => { showView('home'); document.getElementById('scan-result').classList.add('hidden'); }, 1000);
             } catch(e) { showToast(e.message); }
         }
 
