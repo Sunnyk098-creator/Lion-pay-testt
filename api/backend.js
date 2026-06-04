@@ -223,15 +223,17 @@ export default async function handler(req, res) {
             if (!data.phone) throw new Error("Phone number missing for Sync");
             const safeRoundId = data.gameRoundId || 'NONE';
             
+            // Safe fetches to prevent complete crash if a node has permission issues
             const [uSnap, cSnap, tSnap, gSnap, pSnap] = await Promise.all([ 
-                get(ref(db, `users/${data.phone}`)), 
-                get(ref(db, "settings")), 
-                get(ref(db, "transactions")), 
-                get(ref(db, `game_rounds/${safeRoundId}`)),
-                get(ref(db, "posts"))
+                get(ref(db, `users/${data.phone}`)).catch(() => null), 
+                get(ref(db, "settings")).catch(() => null), 
+                get(ref(db, "transactions")).catch(() => null), 
+                get(ref(db, `game_rounds/${safeRoundId}`)).catch(() => null),
+                get(ref(db, "posts")).catch(() => null)
             ]);
             
-            let userData = uSnap.val() || {};
+            let userData = (uSnap && uSnap.exists()) ? uSnap.val() : {};
+            let settingsData = (cSnap && cSnap.exists()) ? cSnap.val() : {};
             
             if (userData.premium && userData.premiumExpiry) {
                 if (Date.now() > Number(userData.premiumExpiry)) {
@@ -245,7 +247,7 @@ export default async function handler(req, res) {
             }
 
             let txns = [];
-            if(tSnap.exists()) {
+            if(tSnap && tSnap.exists()) {
                 tSnap.forEach(c => {
                     let t = c.val();
                     if(t.senderId === data.phone || t.receiverId === data.phone) {
@@ -266,7 +268,7 @@ export default async function handler(req, res) {
                         } 
                         else if (t.receiverId === data.phone) { 
                             adaptedTxn.type = 'in'; 
-                            if (t.senderId === 'SYSTEM' || t.senderId === data.phone || t.title.includes('Lifafa') || t.title.includes('Deposit via') || t.title.includes('Game') || t.title.includes('Gift') || t.title.includes('Maintenance Fee')) {
+                            if (t.senderId === 'SYSTEM' || t.senderId === data.phone || t.title.includes('Lifafa') || t.title.includes('Deposit via') || t.title.includes('Game') || t.title.includes('Gift') || t.title.includes('Maintenance Fee') || t.title.includes('Refer Reward')) {
                                 adaptedTxn.title = t.title;
                             } else {
                                 adaptedTxn.title = t.isApi ? `API Payment Received from ${sName}` : `Received from ${sName}`; 
@@ -281,9 +283,9 @@ export default async function handler(req, res) {
             txns.sort((a, b) => b.timestamp - a.timestamp);
 
             let postsArr = [];
-            if (pSnap.exists()) { pSnap.forEach(p => { postsArr.push(p.val()); }); }
+            if (pSnap && pSnap.exists()) { pSnap.forEach(p => { postsArr.push(p.val()); }); }
 
-            return res.json({ data: { user: userData, settings: cSnap.val() || {}, txns: txns, gameRound: gSnap.val() || { totalRed: 0, totalGreen: 0 }, posts: postsArr }});
+            return res.json({ data: { user: userData, settings: settingsData, txns: txns, gameRound: (gSnap && gSnap.exists()) ? gSnap.val() : { totalRed: 0, totalGreen: 0 }, posts: postsArr }});
         }
 
         if (action === 'EXECUTE_TXN') {
@@ -450,6 +452,10 @@ export default async function handler(req, res) {
                     channels: channelsList, 
                     password: (data.password && data.password.trim() !== "") ? data.password.trim() : "",
                     isPremiumOnly: data.isPremiumOnly === true,
+                    referAmount: data.referAmount || 0,
+                    minAmount: data.minAmount || 0,
+                    maxAmount: data.maxAmount || 0,
+                    winningSide: data.winningSide || '',
                     claimers: {}
                 }, 
                 [`transactions/${data.txn.id}`]: data.txn 
@@ -475,7 +481,11 @@ export default async function handler(req, res) {
                     channels: info.channels || [], 
                     hasPassword: (info.password && info.password.trim() !== ""), 
                     isPremiumOnly: info.isPremiumOnly === true,
-                    status: info.status
+                    status: info.status,
+                    referAmount: info.referAmount || 0,
+                    minAmount: info.minAmount || 0,
+                    maxAmount: info.maxAmount || 0,
+                    winningSide: info.winningSide || ''
                 } 
             });
         }
@@ -537,7 +547,7 @@ export default async function handler(req, res) {
                 if (!joined) throw new Error(`You must join ${ch} to claim this Lifafa.`);
             }
 
-            let claimedAmt = Number(lifafa.amount);
+            let claimedAmt = Number(data.amount) || Number(lifafa.amount);
             
             const result = await runTransaction(lifafaRef, (currentData) => {
                 if (currentData === null) return null;
@@ -616,26 +626,6 @@ export default async function handler(req, res) {
             const updates = { [`users/${data.phone}/balance`]: uBal + resultAmount, [`transactions/${data.txn.id}`]: { ...data.txn, amount: resultAmount } };
             if (result.snapshot.val().remainingUsers <= 0) updates[`giftcodes/${data.code}`] = null; 
             await update(ref(db), updates); return res.json({ data: resultAmount });
-        }
-
-        if (action === 'GAME_BET') {
-            let amt = Number(data.amount) || 0;
-            if (amt <= 0) throw new Error("Amount must be greater than zero!");
-
-            const uSnap = await get(ref(db, `users/${data.phone}`));
-            let uBal = Number(uSnap.val().balance) || 0;
-            if (!uSnap.exists() || uBal < amt) throw new Error("Insufficient Balance! Server sync failed.");
-
-            const grSnap = await get(ref(db, `game_rounds/${data.roundId}`));
-            let redTot = Number(grSnap.exists() ? grSnap.val().totalRed || 0 : 0);
-            let greenTot = Number(grSnap.exists() ? grSnap.val().totalGreen || 0 : 0);
-
-            const updates = { [`users/${data.phone}/balance`]: uBal - amt };
-            if(data.color === 'red') updates[`game_rounds/${data.roundId}/totalRed`] = redTot + amt; 
-            else updates[`game_rounds/${data.roundId}/totalGreen`] = greenTot + amt;
-            
-            if(data.txn) updates[`transactions/${data.txn.id}`] = data.txn;
-            await update(ref(db), updates); return res.json({ data: "Success" });
         }
 
         return res.status(400).json({ error: "Unknown Action" });
