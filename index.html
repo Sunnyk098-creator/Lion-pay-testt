@@ -52,77 +52,38 @@
         html.dark-mode .theme-card { background-color: var(--theme-card) !important; border-color: rgba(255,255,255,0.08) !important; }
         html.dark-mode input, html.dark-mode textarea, html.dark-mode select { background-color: #2c2c2e !important; color: white !important; border-color: #3a3a3c !important; }
 
-        /* Dark Mode Text Visibility Fixes */
         html.dark-mode .theme-text, 
         html.dark-mode h1, html.dark-mode h2, html.dark-mode h3, html.dark-mode h4, html.dark-mode h5, html.dark-mode h6,
-        html.dark-mode p:not(.text-gray-400):not(.text-gray-500) {
-            color: #f3f4f6 !important;
-        }
-        html.dark-mode .text-gray-800, 
-        html.dark-mode .text-gray-700, 
-        html.dark-mode .text-gray-900 {
-            color: #e5e7eb !important;
-        }
-        html.dark-mode .text-gray-600, 
-        html.dark-mode .text-gray-500 {
-            color: #9ca3af !important;
-        }
-        html.dark-mode .text-gray-400 {
-            color: #a1a1aa !important;
-        }
-        html.dark-mode button {
-            color: #ffffff !important;
-        }
+        html.dark-mode p:not(.text-gray-400):not(.text-gray-500) { color: #f3f4f6 !important; }
+        html.dark-mode .text-gray-800, html.dark-mode .text-gray-700, html.dark-mode .text-gray-900 { color: #e5e7eb !important; }
+        html.dark-mode .text-gray-600, html.dark-mode .text-gray-500 { color: #9ca3af !important; }
+        html.dark-mode .text-gray-400 { color: #a1a1aa !important; }
+        html.dark-mode button { color: #ffffff !important; }
 
         body { background-color: var(--theme-bg); color: var(--theme-text); transition: background-color 0.3s ease, color 0.3s ease; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent;}
         .theme-card { background-color: var(--theme-card); color: var(--theme-text); transition: background-color 0.3s ease, border-color 0.3s ease; }
         
-        /* Dynamic Theme Palette Rules */
         .accent-bg { background-color: var(--accent-main) !important; color: white !important; }
         .accent-text { color: var(--accent-main) !important; }
         .accent-border { border-color: var(--accent-main) !important; }
         .accent-shadow { box-shadow: 0 4px 15px var(--accent-glow) !important; }
         .focus-accent:focus { border-color: var(--accent-main) !important; box-shadow: 0 0 0 3px var(--accent-glow) !important; outline: none; }
 
-        /* NEON THEME MODE FIXES */
-        html.neon-active body {
-            background-color: #000000 !important;
-            --theme-bg: #000000;
-            --theme-card: #080808;
-            /* Removed heavy text blurs causing readability issues */
-        }
-        html.neon-active .theme-card {
-            background-color: #080808 !important;
-            box-shadow: inset 0 0 10px var(--accent-glow), 0 0 15px var(--accent-glow) !important;
-            border: 1px solid var(--accent-main) !important;
-        }
-        html.neon-active input, html.neon-active select { border: 1px solid var(--accent-main) !important; box-shadow: inset 0 0 5px var(--accent-glow); }
-        /* Only apply to icons and main buttons to avoid square borders on small elements */
-        html.neon-active .ios-grid-icon, html.neon-active button.btn-animate, html.neon-active .nav-item .w-14 {
-            box-shadow: 0 0 20px var(--accent-glow) !important;
-            border: 1px solid var(--accent-main) !important;
-        }
+        /* NEON THEME MODE - REFINED */
+        html.neon-active body { background-color: #000000 !important; --theme-bg: #000000; --theme-card: #080808; color: #ffffff !important; }
+        html.neon-active .theme-card { background-color: #080808 !important; box-shadow: 0 0 15px var(--accent-glow) !important; border: 1px solid var(--accent-main) !important; }
+        html.neon-active .ios-grid-icon { box-shadow: 0 0 20px var(--accent-glow) !important; border: 1px solid var(--accent-main) !important; }
+        html.neon-active button.accent-bg, html.neon-active .nav-item .w-14 { box-shadow: 0 0 20px var(--accent-glow) !important; border: 1px solid var(--accent-main) !important; }
+        html.neon-active input, html.neon-active select { border: 1px solid var(--accent-main) !important; box-shadow: inset 0 0 8px var(--accent-glow); background-color: #111 !important; color: #fff !important; }
 
-        /* AMBIENT BACKGROUND GLOW */
         #ambient-glow { position: fixed; top: -20vh; left: -20vw; width: 140vw; height: 140vh; pointer-events: none; background: radial-gradient(circle at 50% 20%, var(--premium-grad-1) 0%, transparent 60%); z-index: -1; transition: background 0.5s ease, opacity 0.5s ease; opacity: 0; }
         html.better-visuals-active #ambient-glow { opacity: 1; }
 
-        /* BETTER VISUALS EFFECTS */
-        html.better-visuals-active * {
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        }
+        html.better-visuals-active * { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important; }
         html.better-visuals-active .theme-card { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-        html.better-visuals-active .btn-animate:active {
-            transform: scale(0.9) translateY(-2px);
-            filter: brightness(1.1);
-        }
-        html.better-visuals-active .view-section.active {
-            animation: scaleUpFadeVisuals 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        @keyframes scaleUpFadeVisuals {
-            0% { opacity: 0; transform: scale(0.94) translateY(15px); filter: blur(5px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
-        }
+        html.better-visuals-active .btn-animate:active { transform: scale(0.9) translateY(-2px); filter: brightness(1.1); }
+        html.better-visuals-active .view-section.active { animation: scaleUpFadeVisuals 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes scaleUpFadeVisuals { 0% { opacity: 0; transform: scale(0.94) translateY(15px); filter: blur(5px); } 100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); } }
 
         .transition-transform { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         ::-webkit-scrollbar { display: none; }
@@ -142,42 +103,29 @@
         
         .ios-grid-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: all 0.3s ease; }
         
-        .premium-mode body {
-            background: linear-gradient(135deg, var(--premium-grad-1), var(--premium-grad-2), var(--theme-bg));
-            background-size: 400% 400%;
-            animation: premiumBg 15s ease infinite;
-        }
-        .dark-mode.premium-mode body {
-            background: linear-gradient(135deg, #000000, #1c1c1e, var(--premium-grad-1));
-            background-size: 300% 300%;
-            animation: premiumBg 15s ease infinite;
-        }
+        .premium-mode body { background: linear-gradient(135deg, var(--premium-grad-1), var(--premium-grad-2), var(--theme-bg)); background-size: 400% 400%; animation: premiumBg 15s ease infinite; }
+        .dark-mode.premium-mode body { background: linear-gradient(135deg, #000000, #1c1c1e, var(--premium-grad-1)); background-size: 300% 300%; animation: premiumBg 15s ease infinite; }
         @keyframes premiumBg { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
         
-        html.premium-mode .theme-card {
-            background: rgba(var(--theme-card), 0.75) !important;
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
+        html.premium-mode .theme-card { background: rgba(var(--theme-card), 0.75) !important; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
 
+        /* COLORFUL MODE - FOOLPROOF IDs */
         .colorful-mode .ios-grid-icon { color: white !important; box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important; border: none !important; }
         .colorful-mode .ios-grid-icon i { color: white !important; }
-        .colorful-mode #grid-container-actions button:nth-child(1) .ios-grid-icon { background: linear-gradient(135deg, #ff3b30, #ff2d55); }
-        .colorful-mode #grid-container-actions button:nth-child(2) .ios-grid-icon { background: linear-gradient(135deg, #007aff, #5856d6); }
-        .colorful-mode #grid-container-actions button:nth-child(3) .ios-grid-icon { background: linear-gradient(135deg, #34c759, #30b0c7); }
-        .colorful-mode #grid-container-actions button:nth-child(4) .ios-grid-icon { background: linear-gradient(135deg, #ff9500, #ffcc00); }
-        .colorful-mode #grid-container-actions button:nth-child(5) .ios-grid-icon { background: linear-gradient(135deg, #af52de, #ff2d55); }
-        .colorful-mode #grid-container-actions button:nth-child(6) .ios-grid-icon { background: linear-gradient(135deg, #ff2d55, #ff3b30); }
-        .colorful-mode #grid-container-actions button:nth-child(7) .ios-grid-icon { background: linear-gradient(135deg, #30b0c7, #007aff); }
-        .colorful-mode #grid-container-actions button:nth-child(8) .ios-grid-icon { background: linear-gradient(135deg, #5856d6, #af52de); }
-        .colorful-mode #grid-container-actions button:nth-child(9) .ios-grid-icon { background: linear-gradient(135deg, #ffcc00, #ff9500); }
-        .colorful-mode #grid-container-actions button:nth-child(10) .ios-grid-icon { background: linear-gradient(135deg, #007aff, #34c759); }
-        .colorful-mode #grid-container-actions button:nth-child(11) .ios-grid-icon { background: linear-gradient(135deg, #ff3b30, #af52de); }
-        .colorful-mode #grid-container-actions button:nth-child(12) .ios-grid-icon { background: linear-gradient(135deg, #34c759, #5856d6); }
-        .colorful-mode #grid-container-actions button:nth-child(13) .ios-grid-icon { background: linear-gradient(135deg, #64748b, #94a3b8); } /* Keeper */
-        .colorful-mode #grid-container-actions button:nth-child(14) .ios-grid-icon { background: linear-gradient(135deg, #f97316, #fb923c); } /* Support */
+        .colorful-mode #grid-btn-send .ios-grid-icon { background: linear-gradient(135deg, #ff3b30, #ff2d55); }
+        .colorful-mode #grid-btn-bulk .ios-grid-icon { background: linear-gradient(135deg, #007aff, #5856d6); }
+        .colorful-mode #grid-btn-add .ios-grid-icon { background: linear-gradient(135deg, #34c759, #30b0c7); }
+        .colorful-mode #grid-btn-withdraw .ios-grid-icon { background: linear-gradient(135deg, #ff9500, #ffcc00); }
+        .colorful-mode #grid-btn-lifafa .ios-grid-icon { background: linear-gradient(135deg, #af52de, #ff2d55); }
+        .colorful-mode #grid-btn-gift .ios-grid-icon { background: linear-gradient(135deg, #ff2d55, #ff3b30); }
+        .colorful-mode #grid-btn-api .ios-grid-icon { background: linear-gradient(135deg, #30b0c7, #007aff); }
+        .colorful-mode #grid-btn-stats .ios-grid-icon { background: linear-gradient(135deg, #5856d6, #af52de); }
+        .colorful-mode #btn-premium-menu .ios-grid-icon { background: linear-gradient(135deg, #ffcc00, #ff9500); }
+        .colorful-mode #btn-theme-menu .ios-grid-icon { background: linear-gradient(135deg, #007aff, #34c759); }
+        .colorful-mode #btn-tags-menu .ios-grid-icon { background: linear-gradient(135deg, #ff3b30, #af52de); }
+        .colorful-mode #grid-btn-official .ios-grid-icon { background: linear-gradient(135deg, #34c759, #5856d6); }
+        .colorful-mode #grid-btn-keeper .ios-grid-icon { background: linear-gradient(135deg, #64748b, #94a3b8); } 
+        .colorful-mode #grid-btn-help .ios-grid-icon { background: linear-gradient(135deg, #f97316, #fb923c); }
 
         .privacy-blur { filter: blur(10px); user-select: none; transition: filter 0.3s ease; }
         .glass-nav { background: rgba(var(--theme-card), 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(128,128,128,0.1); border-bottom: 1px solid rgba(128,128,128,0.1); }
@@ -190,26 +138,14 @@
         
         .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); transition: opacity 0.3s ease; }
 
-        /* Interactive Elements styling */
         #reader video { object-fit: cover !important; width: 100% !important; height: 100% !important; border-radius: 2rem; }
         @keyframes scanline { 0% { top: 5%; opacity: 0; } 10% { opacity: 1; } 50% { top: 95%; } 90% { opacity: 1; } 100% { top: 5%; opacity: 0; } }
         .animate-scanline { animation: scanline 2.5s ease-in-out infinite; background: var(--accent-main); box-shadow: 0 0 15px 3px var(--accent-glow); }
         .premium-scanner { border-color: var(--accent-main) !important; box-shadow: 0 0 30px var(--accent-glow); }
 
-        /* Animation: Coin Spin */
-        @keyframes coin-spin {
-            0% { transform: rotateY(0deg); }
-            100% { transform: rotateY(1800deg); }
-        }
-        .coin-spinning {
-            animation: coin-spin 2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        /* Scratch Card Canvas and Layering */
-        #scratch-canvas {
-            cursor: pointer;
-            touch-action: none;
-        }
+        @keyframes coin-spin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(1800deg); } }
+        .coin-spinning { animation: coin-spin 2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        #scratch-canvas { cursor: pointer; touch-action: none; }
     </style>
 </head>
 <body class="font-sans pb-24 text-gray-800 transition-all duration-500">
@@ -229,7 +165,7 @@
         <div class="w-24 h-24 bg-red-600 rounded-full flex items-center justify-center text-4xl mb-6 shadow-lg animate-bounce"><i class="fas fa-ban"></i></div>
         <h1 class="text-3xl font-black tracking-tight mb-2">Account Terminated</h1>
         <p class="text-sm text-gray-400 max-w-sm leading-relaxed mb-6">Your access has been suspended for terms of service violations. Please contact administration for appeal status.</p>
-        <button id="ban-support-btn" onclick="window.open(adminSupportLink, '_blank')" class="bg-red-600 text-white font-black px-8 py-3.5 rounded-full shadow-lg">Support Appeal</button>
+        <button id="ban-support-btn" onclick="" class="bg-red-600 text-white font-black px-8 py-3.5 rounded-full shadow-lg">Support Appeal</button>
     </div>
 
     <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity backdrop-blur-sm" onclick="toggleSidebar()"></div>
@@ -288,13 +224,17 @@
     <main id="app-container">
         
         <div id="view-home" class="view-section active">
+            <div id="app-notice-banner" class="hidden accent-bg text-white text-xs font-bold px-4 py-2 text-center shadow-md animate-pulse">
+                📢 <span id="app-notice-text">Notice</span>
+            </div>
+
             <header class="flex justify-between items-center p-5 sticky top-0 z-30 glass-nav">
                 <div class="flex items-center gap-3">
                     <button onclick="toggleSidebar(); playBtnSound();" class="w-10 h-10 rounded-full bg-white theme-card shadow-sm flex items-center justify-center text-gray-700 border border-gray-100 active:scale-95 transition-transform"><i class="fas fa-bars"></i></button>
                     <h1 class="text-xl font-black tracking-wide accent-text flex items-center gap-1">Lion<span class="text-gray-800 theme-text">Pay</span><i class="fas fa-paw text-[14px] ml-1"></i></h1>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button id="home-telegram-btn" onclick="window.open(adminChannelLink, '_blank'); playBtnSound();" class="w-10 h-10 rounded-full bg-white theme-card shadow-sm flex items-center justify-center text-blue-500 border border-gray-100 hover:bg-blue-50 active:scale-95 transition-transform"><i class="fab fa-telegram-plane"></i></button>
+                    <button id="home-telegram-btn" onclick="" class="w-10 h-10 rounded-full bg-white theme-card shadow-sm flex items-center justify-center text-blue-500 border border-gray-100 hover:bg-blue-50 active:scale-95 transition-transform"><i class="fab fa-telegram-plane"></i></button>
                     <div class="w-10 h-10 rounded-full accent-bg text-white flex items-center justify-center font-bold border-[3px] accent-border cursor-pointer shadow-md overflow-hidden" id="ui-top-dp" onclick="toggleSidebar(); playBtnSound();">U</div>
                 </div>
             </header>
@@ -331,42 +271,42 @@
 
             <div class="mt-8 px-5 pb-6">
                 <div class="grid grid-cols-4 gap-y-6 gap-x-4" id="grid-container-actions">
-                    <button onclick="showView('send'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
+                    <button id="grid-btn-send" onclick="showView('send'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
                         <div class="ios-grid-icon bg-white theme-card accent-text shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-paper-plane"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Send</span>
                     </button>
-                    <button onclick="showView('bulk'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
+                    <button id="grid-btn-bulk" onclick="showView('bulk'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
                         <div class="ios-grid-icon bg-white theme-card accent-text shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-users"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Bulk</span>
                     </button>
-                    <button onclick="showView('add'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
+                    <button id="grid-btn-add" onclick="showView('add'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
                         <div class="ios-grid-icon bg-white theme-card accent-text shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-plus"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Add</span>
                     </button>
-                    <button onclick="showView('withdraw'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
+                    <button id="grid-btn-withdraw" onclick="showView('withdraw'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
                         <div class="ios-grid-icon bg-white theme-card accent-text shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-arrow-up"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Payout</span>
                     </button>
                     
-                    <button onclick="showView('lifafa'); loadMyLifafas(); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
+                    <button id="grid-btn-lifafa" onclick="showView('lifafa'); loadMyLifafas(); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
                         <div class="ios-grid-icon bg-white theme-card accent-text shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-envelope-open-text"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Lifafa</span>
                     </button>
-                    <button onclick="showView('gift'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
+                    <button id="grid-btn-gift" onclick="showView('gift'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
                         <div class="ios-grid-icon bg-white theme-card accent-text shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-gift"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Gifts</span>
                     </button>
-                    <button onclick="showView('api'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
+                    <button id="grid-btn-api" onclick="showView('api'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
                         <div class="ios-grid-icon bg-white theme-card accent-text shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-code"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">API</span>
                     </button>
-                    <button onclick="showView('statistics'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
+                    <button id="grid-btn-stats" onclick="showView('statistics'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
                         <div class="ios-grid-icon bg-white theme-card accent-text shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-chart-pie"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Stats</span>
                     </button>
                     
                     <button id="btn-premium-menu" onclick="showView('premium'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
-                        <div class="ios-grid-icon accent-bg text-white shadow-md"><i class="fas fa-crown"></i></div>
+                        <div class="ios-grid-icon accent-bg text-white shadow-md"><i class="fas fa-crown text-yellow-300"></i></div>
                         <span class="text-[11px] font-bold text-yellow-600">Premium</span>
                     </button>
                     <button id="btn-theme-menu" onclick="showView('themes'); playBtnSound();" class="hidden btn-animate flex flex-col items-center gap-2 group">
@@ -378,15 +318,15 @@
                         <span class="text-[11px] font-bold text-gray-500">Tags</span>
                     </button>
                     
-                    <button onclick="showView('official'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
+                    <button id="grid-btn-official" onclick="showView('official'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
                         <div class="ios-grid-icon bg-white theme-card accent-text shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-bullhorn"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Posts</span>
                     </button>
-                    <button onclick="showView('keeper'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
+                    <button id="grid-btn-keeper" onclick="showView('keeper'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
                         <div class="ios-grid-icon bg-white theme-card accent-text shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-vault"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Keeper</span>
                     </button>
-                    <button onclick="showView('help'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
+                    <button id="grid-btn-help" onclick="showView('help'); playBtnSound();" class="btn-animate flex flex-col items-center gap-2 group">
                         <div class="ios-grid-icon bg-white theme-card accent-text shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-headset"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Support</span>
                     </button>
@@ -396,7 +336,7 @@
             <div class="px-5 mt-2 pb-4">
                 <div class="flex justify-between items-end mb-4 px-1">
                     <h3 class="font-black text-[15px] tracking-wide text-gray-800 theme-text">Recent Activity 🕒</h3>
-                    <button onclick="showView('statistics'); playBtnSound();" class="text-[11px] font-bold accent-text bg-blue-50 px-3 py-1 rounded-full active:scale-95 transition-transform">View All</button>
+                    <button onclick="showView('statistics'); playBtnSound();" class="text-[11px] font-bold accent-text bg-gray-100 px-3 py-1 rounded-full active:scale-95 transition-transform theme-card">View All</button>
                 </div>
                 <div id="home-txn-list" class="theme-card rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col"></div>
             </div>
@@ -605,11 +545,13 @@
                         https://Lion-pay.vercel.app/Api/upi.php?token=<span class="accent-text" id="ui-api-key-upi">LP-PENDING</span>&upi_id=<span class="text-green-400">{upi_id}</span>&amount=<span class="text-green-400">{amount}</span>&comment=<span class="text-green-400">{comment}</span>
                     </p>
                 </div>
+                
                 <div class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100 text-center">
                     <p class="text-[11px] accent-text font-bold mb-1 tracking-wider uppercase">Your Secret Key</p>
                     
                     <div id="api-display-mode" class="block">
                         <p class="accent-text font-mono font-black tracking-widest text-xl mb-4" id="ui-api-key-display">LP-PENDING</p>
+                        
                         <div class="grid grid-cols-2 gap-2">
                             <button onclick="regenerateApiKey(); playBtnSound();" class="btn-animate w-full border-2 accent-border accent-text font-bold py-2.5 rounded-full text-xs">Generate Random</button>
                             <button onclick="document.getElementById('api-display-mode').classList.add('hidden'); document.getElementById('api-edit-mode').classList.remove('hidden'); playBtnSound();" class="hidden btn-animate w-full accent-bg text-white font-bold py-2.5 rounded-full text-xs" id="btn-custom-api">Set Custom Key</button>
@@ -739,7 +681,7 @@
                 <div class="w-24 h-24 accent-bg rounded-full text-white text-4xl flex items-center justify-center mx-auto mb-6 shadow-xl"><i class="fas fa-headset"></i></div>
                 <h2 class="text-2xl font-black mb-2">Need Help?</h2>
                 <p class="text-sm text-gray-500 mb-8">Click below to chat directly with our official support channel.</p>
-                <button id="help-support-link" onclick="window.open(adminSupportLink, '_blank'); playBtnSound();" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg"><i class="fas fa-comments"></i> Chat with Admin</button>
+                <button id="help-support-link" onclick="" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg"><i class="fas fa-comments"></i> Chat with Admin</button>
             </div>
         </div>
 
@@ -1223,7 +1165,6 @@
             } catch (e) { return false; }
         }
 
-        // PREMIUM SOUND SYSTEM
         function playBtnSound() {
             if(currentUser && currentUser.premium && currentUser.soundEnabled) {
                 let au = document.getElementById('audio-click'); if(au) { au.currentTime=0; au.play().catch(e=>{}); }
@@ -1345,7 +1286,7 @@
             localStorage.removeItem('lionUserCache');
             localStorage.removeItem('lionTxnCache');
             currentUser = null; 
-            location.reload(); 
+            window.location.href = window.location.pathname; // Safely re-routes instead of reload bugs 
         }
 
         async function checkAuth() {
@@ -1355,7 +1296,9 @@
 
             const urlParams = new URLSearchParams(window.location.search);
             const userReferPhone = urlParams.get('user');
-            if (userReferPhone) { refererPhone = userReferPhone; }
+            if (userReferPhone) {
+                refererPhone = userReferPhone;
+            }
 
             if (sessionPhone) {
                 if (cachedUser) {
@@ -1478,7 +1421,6 @@
             try {
                 let data = await apiCall('SYNC', { phone: currentUser.phone });
                 
-                // Realtime Settings Sync
                 if(data.settings) {
                     globalSettings = data.settings;
                     adminUpiId = globalSettings.upiId || "Loading...";
@@ -1488,7 +1430,6 @@
                     let upiEl = document.getElementById('ui-upi-id');
                     if(upiEl) upiEl.innerText = adminUpiId;
 
-                    // Bind dynamic links to HTML elements
                     let homeTelBtn = document.getElementById('home-telegram-btn');
                     if(homeTelBtn) homeTelBtn.setAttribute('onclick', `window.open('${adminChannelLink}', '_blank'); playBtnSound();`);
                     
@@ -1510,7 +1451,7 @@
                     currentBalance = Number(data.user.balance) || 0; 
                     keeperBalance = Number(data.user.keeperBalance) || 0;
                     
-                    if(currentBalance > oldBal) { playReceiveSound(); }
+                    if(currentBalance > oldBal) { playReceiveSound(); } 
                     
                     if(data.user.apiKey && data.user.apiKey !== currentUser.apiKey) { currentUser.apiKey = data.user.apiKey; updateApiKeyUI(); }
                     applyPremiumUI(); updateDPUI();
@@ -1764,6 +1705,20 @@
             });
         }
 
+        function getQueryStringValue() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let code = urlParams.get('id') || urlParams.get('lifafa');
+            if (!code) {
+                const search = window.location.search;
+                if (search.startsWith('?=')) {
+                    code = search.substring(2);
+                } else if (search.length >= 11) {
+                    code = search.substring(1);
+                }
+            }
+            return code;
+        }
+
         // RECEIPT MODAL LOGIC
         let activeReceiptData = null;
         function openReceipt(txnId) {
@@ -1927,9 +1882,6 @@
             });
         }
 
-        function showToast(msg) { const toast = document.getElementById('toast'); document.getElementById('toastMsg').innerText = msg; toast.classList.remove('hidden'); setTimeout(()=>toast.classList.remove('opacity-0'),10); setTimeout(()=>{toast.classList.add('opacity-0'); setTimeout(()=>toast.classList.add('hidden'),300);}, 3000); }
-        function copyText(text) { navigator.clipboard.writeText(text); showToast("Copied!"); }
-        
         function showView(viewId) { 
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); 
             let targetView = document.getElementById('view-' + viewId);
@@ -2204,475 +2156,4 @@
                 scratchBlock.classList.add('hidden');
                 tossBlock.classList.remove('hidden');
             } else if (type === 'Scratch') {
-                standardAmtBlock.classList.add('hidden');
-                scratchBlock.classList.remove('hidden');
-                tossBlock.classList.add('hidden');
-            }
-        }
-
-        function toggleReferFields() {
-            const isEnabled = document.getElementById('lifafa-refer-toggle').checked;
-            const referRateBlock = document.getElementById('lifafa-refer-rate-block');
-            if (isEnabled) {
-                referRateBlock.classList.remove('hidden');
-            } else {
-                referRateBlock.classList.add('hidden');
-            }
-        }
-
-        async function processLifafaCreate() {
-            if(!checkCooldown()) return;
-            const pin = document.getElementById('lifafa-pin').value;
-            if(pin !== currentUser.pin) return showToast("Incorrect Security PIN!");
-
-            const type = document.getElementById('lifafa-type').value;
-            const users = parseInt(document.getElementById('lifafa-total-users').value);
-            const pass = document.getElementById('lifafa-claim-password').value;
-            const isPremOnly = document.getElementById('lifafa-premium-only') && document.getElementById('lifafa-premium-only').checked;
-            const isReferCampaign = document.getElementById('lifafa-refer-toggle').checked;
-            const referAmt = isReferCampaign ? (parseFloat(document.getElementById('lifafa-refer-amt').value) || 0) : 0;
-
-            let perUserAmt = 0;
-            let minAmt = 0;
-            let maxAmt = 0;
-            let winningSide = "";
-
-            if (type === 'Standard' || type === 'Toss') {
-                perUserAmt = parseFloat(document.getElementById('lifafa-per-user').value) || 0;
-                if (type === 'Toss') {
-                    winningSide = document.getElementById('lifafa-winning-side').value;
-                }
-            } else if (type === 'Scratch') {
-                minAmt = parseFloat(document.getElementById('lifafa-min-amt').value) || 0;
-                maxAmt = parseFloat(document.getElementById('lifafa-max-amt').value) || 0;
-                if (maxAmt < minAmt) return showToast("Max range must be greater than Min!");
-                perUserAmt = maxAmt; // Deducts based on maximum possible reward
-            }
-
-            if (perUserAmt === 0 && (type === 'Standard' || type === 'Toss')) {
-                if (!isReferCampaign || referAmt < 1) return showToast("Refer reward must be at least ₹1 if claim balance is zero.");
-            }
-            if (type === 'Scratch' && minAmt === 0 && maxAmt === 0) {
-                if (!isReferCampaign || referAmt < 1) return showToast("Refer reward must be at least ₹1 if claim balance is zero.");
-            }
-
-            const claimBudget = perUserAmt * users;
-            const referBudget = referAmt * users;
-            const totalCost = claimBudget + referBudget;
-
-            if (totalCost > currentBalance) return showToast(`Insufficient balance! Requires ₹${totalCost}`);
-
-            const channelInputs = document.querySelectorAll('.lifafa-channel-input');
-            const channels = [];
-            channelInputs.forEach(input => {
-                const val = input.value.trim();
-                if(val !== '') channels.push(val);
-            });
-
-            const randomTxnId = generateTxnId();
-            const txn = createTxnObj('out', `Created ${type} Lifafa`, totalCost, `Pending Creation`, 'fa-envelope-open-text', 'yellow', 'Lifafa System', 'N/A');
-            txn.id = randomTxnId;
-
-            try {
-                showToast("Verifying channel bot status...");
-                const code = await apiCall('CREATE_LIFAFA', {
-                    phone: currentUser.phone,
-                    type: type,
-                    amount: perUserAmt,
-                    totalUsers: users,
-                    channels: channels,
-                    password: pass,
-                    isPremiumOnly: isPremOnly,
-                    pin: pin,
-                    txn: txn,
-                    minAmount: minAmt,
-                    maxAmount: maxAmt,
-                    winningSide: winningSide,
-                    referAmount: referAmt
-                });
-
-                const shareLink = window.location.origin + "?id=" + code;
-                alert(`🧧 Lifafa successfully created!\n\nLink: ${shareLink}\n\nShare this with users.`);
-                currentBalance -= totalCost;
-                
-                document.getElementById('lifafa-per-user').value = '';
-                document.getElementById('lifafa-total-users').value = '';
-                document.getElementById('lifafa-claim-password').value = '';
-                document.getElementById('lifafa-pin').value = '';
-                document.getElementById('lifafa-refer-toggle').checked = false;
-                document.getElementById('lifafa-refer-amt').value = '';
-                document.getElementById('lifafa-channels-container').innerHTML = `<input type="text" placeholder="E.g. @Lion_Pay" class="lifafa-channel-input w-full bg-gray-50 border rounded-2xl px-4 py-3 font-semibold focus-accent theme-card">`;
-                
-                playSuccessSound();
-                loadMyLifafas();
-                switchLifafaTab('lifafa-my');
-                updateUI();
-            } catch(e) {
-                alert(e.message);
-            }
-        }
-
-        async function loadMyLifafas() {
-            try {
-                const arr = await apiCall('GET_MY_LIFAFAS', { phone: currentUser.phone });
-                const wrap = document.getElementById('my-lifafas-container');
-                if(!wrap) return;
-                wrap.innerHTML = '';
-                if(arr.length === 0) {
-                    wrap.innerHTML = '<p class="text-center text-gray-400 text-sm font-bold py-10">You have not created any Lifafas yet.</p>';
-                    return;
-                }
-                arr.forEach(l => {
-                    const progress = Math.min(100, (l.claimedUsers / l.totalUsers) * 100);
-                    const link = window.location.origin + "?id=" + l.id;
-                    const passText = l.password ? l.password : "No Password";
-                    
-                    const isStop = l.status === 'STOPPED';
-                    const stopClass = isStop ? 'bg-green-600' : 'bg-orange-500';
-                    const stopLabel = isStop ? 'Start Campaign' : 'Stop Campaign';
-
-                    let amountDetailsLabel = `₹${parseFloat(l.amount).toFixed(2)} each`;
-                    if (l.type === 'Scratch') {
-                        amountDetailsLabel = `₹${parseFloat(l.minAmount || 0).toFixed(2)} - ₹${parseFloat(l.maxAmount || 0).toFixed(2)}`;
-                    }
-
-                    wrap.innerHTML += `
-                        <div class="theme-card rounded-[2rem] p-5 border border-gray-100 shadow-sm relative">
-                            <span class="absolute top-4 right-4 bg-amber-500 text-white font-black text-[9px] uppercase px-3 py-1 rounded-full">${l.status}</span>
-                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Code: ${l.id} (${l.type})</p>
-                            <h3 class="font-black text-lg mb-2">${amountDetailsLabel}</h3>
-                            
-                            <div class="space-y-1 mb-4 text-xs font-semibold text-gray-500">
-                                <p><i class="fas fa-lock"></i> Password: <span class="font-mono bg-gray-100 px-2 py-0.5 rounded">${passText}</span></p>
-                                <p><i class="fas fa-users text-[10px]"></i> Scope: ${l.isPremiumOnly ? 'Premium Only' : 'Everyone'}</p>
-                                <p><i class="fas fa-share-nodes text-[10px]"></i> Refer Reward: ₹${parseFloat(l.referAmount || 0).toFixed(2)}</p>
-                            </div>
-
-                            <div class="mb-4">
-                                <div class="flex justify-between text-xs font-bold mb-1">
-                                    <span>Claims progress</span>
-                                    <span>${l.claimedUsers} / ${l.totalUsers} Claimed</span>
-                                </div>
-                                <div class="w-full bg-gray-100 rounded-full h-2">
-                                    <div class="bg-amber-500 h-2 rounded-full" style="width: ${progress}%"></div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-3 gap-2">
-                                <button onclick="copyText('${link}'); playBtnSound();" class="bg-gray-100 text-gray-800 font-bold text-xs py-3 rounded-full hover:bg-gray-200 transition-colors flex items-center justify-center gap-1"><i class="fas fa-copy"></i> Copy Link</button>
-                                <button onclick="toggleLifafaStatus('${l.id}', '${l.status}'); playBtnSound();" class="${stopClass} text-white font-bold text-xs py-3 rounded-full flex items-center justify-center gap-1">${stopLabel}</button>
-                                <button onclick="deleteLifafaCampaign('${l.id}'); playBtnSound();" class="bg-red-500 text-white font-bold text-xs py-3 rounded-full flex items-center justify-center gap-1"><i class="fas fa-trash"></i> Delete</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch(e) {}
-        }
-
-        async function toggleLifafaStatus(id, currentStatus) {
-            const nextStatus = currentStatus === 'STOPPED' ? 'ACTIVE' : 'STOPPED';
-            if (!confirm(`Are you sure you want to change status to ${nextStatus}?`)) return;
-            try {
-                await apiCall('UPDATE_PREFS', { phone: currentUser.phone }); // Dummy trigger to establish connection
-                const updates = {};
-                updates[`lifafas/${id}/status`] = nextStatus;
-                await apiCall('UPDATE_PRIVACY', { phone: currentUser.phone, privacyMode: currentUser.privacyMode }); // Trigger sync update
-                alert(`Status successfully updated to ${nextStatus}!`);
-                loadMyLifafas();
-            } catch(e) { showToast(e.message); }
-        }
-
-        async function deleteLifafaCampaign(id) {
-            if (!confirm("Are you sure you want to delete this campaign? Unclaimed funds will be refunded to your balance minus a 3% platform tax.")) return;
-            try {
-                const lifafa = await apiCall('GET_LIFAFA_INFO', { code: id });
-                if (lifafa.claimedUsers >= lifafa.totalUsers) {
-                    const updates = {};
-                    updates[`lifafas/${id}`] = null;
-                    await apiCall('UPDATE_PRIVACY', { phone: currentUser.phone, privacyMode: currentUser.privacyMode });
-                    alert("Campaign cleared successfully.");
-                    loadMyLifafas();
-                    return;
-                }
-
-                const unclaimedCount = lifafa.totalUsers - lifafa.claimedUsers;
-                const unitAmt = parseFloat(lifafa.amount || 0);
-                const referAmt = parseFloat(lifafa.referAmount || 0);
-                const originalRefund = unclaimedCount * (unitAmt + referAmt);
-                const taxFee = originalRefund * 0.03;
-                const netRefund = originalRefund - taxFee;
-
-                let txn = createTxnObj('in', `Lifafa Refund: ${id}`, netRefund, 'Success', 'fa-receipt', 'green', 'Platform Refund', 'N/A');
-                await apiCall('EXECUTE_TXN', { mode: 'DEPOSIT', sender: currentUser.phone, amount: netRefund, txn });
-                
-                const updates = {};
-                updates[`lifafas/${id}`] = null;
-                await apiCall('UPDATE_PRIVACY', { phone: currentUser.phone, privacyMode: currentUser.privacyMode });
-                
-                currentBalance += netRefund;
-                updateUI();
-                alert(`Campaign deleted. ₹${netRefund.toFixed(2)} refunded to your balance (3% tax deducted).`);
-                loadMyLifafas();
-            } catch(e) { alert(e.message); }
-        }
-
-        // PUBLIC CLAIM ENGINE WITH GAMEPLAY SCENARIOS
-        async function initiateLifafaClaimFlow(code) {
-            activeClaimTargetId = code;
-            activeClaimingUser = null;
-            loadedTargetLifafaData = null;
-            showView('claim-lifafa');
-            resetToStep(1);
-        }
-
-        async function processClaimStep1() {
-            const phone = document.getElementById('claim-user-phone').value.trim();
-            try {
-                showToast("Verifying Registration...");
-                const user = await apiCall('CHECK_USER', { phone });
-                if(!user) {
-                    alert("Account details not found. Please register an account on Lion Pay first to claim.");
-                    return;
-                }
-                activeClaimingUser = user;
-                activeClaimingUser.phone = user.resolvedPhone || phone;
-
-                const lInfo = await apiCall('GET_LIFAFA_INFO', { code: activeClaimTargetId });
-                loadedTargetLifafaData = lInfo;
-                
-                if (lInfo.status === 'STOPPED') {
-                    alert("This Lifafa campaign is currently stopped by the creator.");
-                    showView('home');
-                    return;
-                }
-
-                if (lInfo.claimers && lInfo.claimers[phone]) {
-                    if (lInfo.referAmount && lInfo.referAmount > 0) {
-                        document.getElementById('claim-win-amount').innerText = parseFloat(lInfo.amount || 0).toFixed(2);
-                        document.getElementById('referral-box-success').classList.remove('hidden');
-                        resetToStep('success');
-                    } else {
-                        alert("You have already claimed this Lifafa.");
-                        showView('home');
-                    }
-                    return;
-                }
-
-                if(lInfo.isPremiumOnly && !user.premium) {
-                    alert("This Lifafa is reserved exclusively for Premium users.");
-                    return;
-                }
-
-                const grid = document.getElementById('claim-channels-grid');
-                grid.innerHTML = '';
-                
-                const channels = lInfo.channels || [];
-                if(channels.length === 0) {
-                    prepareFinalStep(lInfo);
-                } else {
-                    channels.forEach(ch => {
-                        let link = "https://t.me/" + ch.replace('@', '');
-                        grid.innerHTML += `
-                            <div class="theme-card p-4 rounded-2xl border border-gray-100 text-center flex flex-col justify-between">
-                                <p class="font-bold text-xs truncate mb-2">${ch}</p>
-                                <a href="${link}" target="_blank" class="bg-blue-500 text-white font-black text-[10px] py-2 rounded-full inline-block uppercase">Join Channel</a>
-                            </div>
-                        `;
-                    });
-                    resetToStep(2);
-                }
-            } catch(e) {
-                alert(e.message);
-            }
-        }
-
-        async function processClaimStep2() {
-            try {
-                showToast("Checking server join statuses...");
-                const verification = await apiCall('VERIFY_LIFAFA_CHANNELS', { code: activeClaimTargetId, tgUserId: activeClaimingUser.tgUserId });
-                
-                if(verification.allJoined) {
-                    prepareFinalStep(loadedTargetLifafaData);
-                } else {
-                    let alertMsg = "You have not joined all required channels yet:\n";
-                    Object.keys(verification.results).forEach(ch => {
-                        const state = verification.results[ch] ? '✅ Joined' : '❌ Left';
-                        alertMsg += `\n${ch}: ${state}`;
-                    });
-                    alert(alertMsg);
-                }
-            } catch(e) {
-                alert("Verification failed: " + e.message);
-            }
-        }
-
-        function prepareFinalStep(lInfo) {
-            if(lInfo.hasPassword) {
-                document.getElementById('claim-password-input').value = '';
-                resetToStep(3);
-            } else {
-                routeToGameplay();
-            }
-        }
-
-        function processClaimStep3() {
-            routeToGameplay();
-        }
-
-        function routeToGameplay() {
-            const type = loadedTargetLifafaData.type;
-            if (type === 'Standard') {
-                claimLifafaFunds(loadedTargetLifafaData.amount);
-            } else if (type === 'Toss') {
-                resetToStep('game-toss');
-            } else if (type === 'Scratch') {
-                initScratchGameplay();
-            }
-        }
-
-        function performCoinToss() {
-            const coin = document.getElementById('coin-graphic');
-            const btn = document.getElementById('btn-coin-toss-action');
-            btn.disabled = true;
-            btn.innerText = "Flipping...";
-            coin.classList.add('coin-spinning');
-
-            setTimeout(() => {
-                coin.classList.remove('coin-spinning');
-                const outcomes = ['Head', 'Tail'];
-                const tossResult = outcomes[Math.floor(Math.random() * outcomes.length)];
-                coin.innerText = tossResult.toUpperCase();
-
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.innerText = "Toss Coin";
-                    
-                    if (tossResult === loadedTargetLifafaData.winningSide) {
-                        claimLifafaFunds(loadedTargetLifafaData.amount);
-                    } else {
-                        if (loadedTargetLifafaData.referAmount && loadedTargetLifafaData.referAmount > 0) {
-                            document.getElementById('referral-box-badluck').classList.remove('hidden');
-                        }
-                        resetToStep('badluck');
-                    }
-                }, 500);
-            }, 2000);
-        }
-
-        function initScratchGameplay() {
-            resetToStep('game-scratch');
-            const canvas = document.getElementById('scratch-canvas');
-            const ctx = canvas.getContext('2d');
-            const wrap = canvas.parentElement;
-            
-            canvas.width = wrap.offsetWidth;
-            canvas.height = wrap.offsetHeight;
-
-            ctx.fillStyle = '#b0b0b0';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#555555';
-            ctx.font = 'bold 14px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('SCRATCH HERE TO CLAIM', canvas.width/2, canvas.height/2);
-
-            let isDrawing = false;
-            let scratchedPixels = 0;
-
-            function scratch(e) {
-                if(!isDrawing) return;
-                const rect = canvas.getBoundingClientRect();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                
-                const x = clientX - rect.left;
-                const y = clientY - rect.top;
-
-                ctx.globalCompositeOperation = 'destination-out';
-                ctx.beginPath();
-                ctx.arc(x, y, 20, 0, Math.PI * 2);
-                ctx.fill();
-
-                scratchedPixels++;
-                if (scratchedPixels > 70) {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    isDrawing = false;
-                    
-                    const min = parseFloat(loadedTargetLifafaData.minAmount || 0);
-                    const max = parseFloat(loadedTargetLifafaData.maxAmount || 0);
-                    const finalReward = min + (Math.random() * (max - min));
-                    
-                    document.getElementById('scratch-revealed-amount').innerText = `₹${finalReward.toFixed(2)}`;
-                    setTimeout(() => {
-                        claimLifafaFunds(finalReward);
-                    }, 800);
-                }
-            }
-
-            canvas.addEventListener('mousedown', () => { isDrawing = true; });
-            canvas.addEventListener('touchstart', () => { isDrawing = true; });
-            canvas.addEventListener('mouseup', () => { isDrawing = false; });
-            canvas.addEventListener('touchend', () => { isDrawing = false; });
-            canvas.addEventListener('mousemove', scratch);
-            canvas.addEventListener('touchmove', scratch);
-        }
-
-        async function claimLifafaFunds(finalCalculatedAmt) {
-            showToast("Processing Secure Claim...");
-            const txnId = generateTxnId();
-            const txn = createTxnObj('in', `Lifafa Claims Verification`, finalCalculatedAmt, `Pending Verification`, 'fa-envelope-open-text', 'green', 'Lifafa System', activeClaimTargetId);
-            txn.id = txnId;
-
-            const password = document.getElementById('claim-password-input').value.trim();
-
-            try {
-                const response = await apiCall('CLAIM_LIFAFA', {
-                    code: activeClaimTargetId,
-                    phone: activeClaimingUser.phone,
-                    tgUserId: activeClaimingUser.tgUserId,
-                    password: password,
-                    txn: txn,
-                    amount: finalCalculatedAmt
-                });
-
-                if (refererPhone && refererPhone !== activeClaimingUser.phone && loadedTargetLifafaData.referAmount > 0) {
-                    const refTxn = createTxnObj('in', `Lifafa Refer Reward`, loadedTargetLifafaData.referAmount, `Success`, 'fa-share-nodes', 'green', 'Refer Payout', activeClaimTargetId);
-                    await apiCall('EXECUTE_TXN', {
-                        mode: 'DEPOSIT',
-                        sender: refererPhone,
-                        amount: loadedTargetLifafaData.referAmount,
-                        txn: refTxn
-                    });
-                }
-
-                document.getElementById('claim-win-amount').innerText = parseFloat(finalCalculatedAmt).toFixed(2);
-                
-                if (loadedTargetLifafaData.referAmount && loadedTargetLifafaData.referAmount > 0) {
-                    document.getElementById('referral-box-success').classList.remove('hidden');
-                } else {
-                    document.getElementById('referral-box-success').classList.add('hidden');
-                }
-
-                resetToStep('success');
-                playSuccessSound();
-                
-                if (currentUser && currentUser.phone === activeClaimingUser.phone) {
-                    currentBalance += Number(finalCalculatedAmt);
-                    updateUI();
-                }
-            } catch(e) {
-                alert(e.message);
-                showView('home');
-            }
-        }
-
-        function copyReferralLink() {
-            const cleanUrl = window.location.origin + "?id=" + activeClaimTargetId + "&user=" + activeClaimingUser.phone;
-            copyText(cleanUrl);
-            showToast("Referral URL Copied to clipboard!");
-            playBtnSound();
-        }
-
-        window.onload = checkAuth;
-    </script>
-</body>
-</html>
+                standard
