@@ -33,9 +33,7 @@ async function verifyBotAdminInChannel(channel) {
         if (!data.ok) return false;
         const status = data.result.status;
         return ['administrator', 'creator'].includes(status);
-    } catch (e) {
-        return false;
-    }
+    } catch (e) { return false; }
 }
 
 async function verifyUserInChannel(channel, tgUserId) {
@@ -47,9 +45,7 @@ async function verifyUserInChannel(channel, tgUserId) {
         if (!data.ok) return false;
         const status = data.result.status;
         return ['member', 'administrator', 'creator', 'restricted'].includes(status);
-    } catch (e) {
-        return false;
-    }
+    } catch (e) { return false; }
 }
 
 export default async function handler(req, res) {
@@ -75,20 +71,14 @@ export default async function handler(req, res) {
             let normalizedInput = targetPhone.toLowerCase(); 
             
             const customSnap = await get(ref(db, `custom_ids/${normalizedInput}`));
-            if (customSnap.exists()) { 
-                targetPhone = customSnap.val(); 
-            }
+            if (customSnap.exists()) { targetPhone = customSnap.val(); }
             
             const snap = await get(ref(db, `users/${targetPhone}`));
             let userData = snap.exists() ? snap.val() : null;
-            if (userData) {
-                userData.resolvedPhone = targetPhone; 
-            } else {
+            if (userData) { userData.resolvedPhone = targetPhone; } 
+            else {
                 const fallbackSnap = await get(ref(db, `users/${data.phone || ''}`));
-                if (fallbackSnap.exists()) {
-                    userData = fallbackSnap.val();
-                    userData.resolvedPhone = data.phone;
-                }
+                if (fallbackSnap.exists()) { userData = fallbackSnap.val(); userData.resolvedPhone = data.phone; }
             }
             return res.json({ data: userData });
         }
@@ -167,12 +157,13 @@ export default async function handler(req, res) {
             if(data.accentColor !== undefined) updates[`users/${data.phone}/accentColor`] = data.accentColor;
             if(data.customUserTag !== undefined) updates[`users/${data.phone}/customUserTag`] = data.customUserTag;
             if(data.colorfulMode !== undefined) updates[`users/${data.phone}/colorfulMode`] = data.colorfulMode;
+            if(data.soundEnabled !== undefined) updates[`users/${data.phone}/soundEnabled`] = data.soundEnabled;
             await update(ref(db), updates);
             return res.json({ data: "Success" });
         }
 
         if (action === 'GENERATE_API') {
-            await update(ref(db, `users/${data.phone}`), { apiKey: data.newKey }); 
+            await update(ref(db, `users/${data.phone}`), { apiKey: data.newKey, apiKeyUpdated: Date.now() }); 
             return res.json({ data: "Success" });
         }
 
@@ -189,23 +180,13 @@ export default async function handler(req, res) {
             }
             if(exists) throw new Error("This API Key is already taken by someone else!");
             
-            await update(ref(db, `users/${phone}`), { apiKey: newKey });
+            await update(ref(db, `users/${phone}`), { apiKey: newKey, apiKeyUpdated: Date.now() });
             return res.json({ data: "Success" });
         }
 
-        if (action === 'SUBMIT_TAG_REQUEST') {
-            const { phone, tag } = data;
-            const uSnap = await get(ref(db, `users/${phone}`));
-            if (!uSnap.exists()) throw new Error("User not found!");
-            const user = uSnap.val();
-            
-            await set(ref(db, `tag_requests/${phone}`), {
-                phone,
-                name: user.name || 'User',
-                requestedTag: tag,
-                status: 'Pending',
-                timestamp: Date.now()
-            });
+        if (action === 'REQUEST_TAG') {
+            const { phone, tag, uid, username } = data;
+            await update(ref(db, `tag_requests/${phone}`), { tag, uid, username, status: 'Pending', date: Date.now() });
             return res.json({ data: "Success" });
         }
 
@@ -220,11 +201,8 @@ export default async function handler(req, res) {
 
         if (action === 'TOGGLE_TXN_VISIBILITY') {
             const { phone, txnId, isHidden } = data;
-            if (isHidden) {
-                await update(ref(db), { [`users/${phone}/hiddenTxns/${txnId}`]: true });
-            } else {
-                await update(ref(db), { [`users/${phone}/hiddenTxns/${txnId}`]: null });
-            }
+            if (isHidden) { await update(ref(db), { [`users/${phone}/hiddenTxns/${txnId}`]: true }); } 
+            else { await update(ref(db), { [`users/${phone}/hiddenTxns/${txnId}`]: null }); }
             return res.json({ data: "Success" });
         }
 
@@ -232,30 +210,27 @@ export default async function handler(req, res) {
             if (!data.phone) throw new Error("Phone number missing for Sync");
             const safeRoundId = data.gameRoundId || 'NONE';
             
-            const [uSnap, cSnap, tSnap, gSnap, pSnap, rSnap] = await Promise.all([ 
+            const [uSnap, cSnap, tSnap, gSnap, pSnap, aSnap] = await Promise.all([ 
                 get(ref(db, `users/${data.phone}`)), 
                 get(ref(db, "settings")), 
                 get(ref(db, "transactions")), 
                 get(ref(db, `game_rounds/${safeRoundId}`)),
                 get(ref(db, "posts")),
-                get(ref(db, `tag_requests/${data.phone}`))
+                get(ref(db, "admin_settings")) // Fully connect Admin Panel
             ]);
             
             let userData = uSnap.val() || {};
-            let tagRequestData = rSnap.exists() ? rSnap.val() : null;
-            userData.tagRequest = tagRequestData;
+            let adminSettings = aSnap.exists() ? aSnap.val() : {};
             
             if (userData.premium && userData.premiumExpiry) {
                 if (Date.now() > Number(userData.premiumExpiry)) {
                     let newKey = 'LP-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase();
-                    userData = { ...userData, premium: false, premiumExpiry: null, theme: null, tag: null, advancedUI: false, accentColor: null, customUserTag: null, privacyMode: false, apiKey: newKey };
-                    await update(ref(db, `users/${data.phone}`), { 
-                        premium: false, premiumExpiry: null, theme: null, tag: null, advancedUI: false, accentColor: null, customUserTag: null, privacyMode: false, apiKey: newKey 
-                    });
+                    userData = { ...userData, premium: false, premiumExpiry: null, theme: null, tag: null, advancedUI: false, accentColor: null, customUserTag: null, privacyMode: false, apiKey: newKey, soundEnabled: false };
+                    await update(ref(db, `users/${data.phone}`), userData);
                 }
-            } else if (!userData.premium && userData.privacyMode) {
-                userData.privacyMode = false;
-                await update(ref(db, `users/${data.phone}`), { privacyMode: false });
+            } else if (!userData.premium && (userData.privacyMode || userData.soundEnabled)) {
+                userData.privacyMode = false; userData.soundEnabled = false;
+                await update(ref(db, `users/${data.phone}`), { privacyMode: false, soundEnabled: false });
             }
 
             let txns = [];
@@ -267,26 +242,20 @@ export default async function handler(req, res) {
                         let rName = (t.name && t.name !== 'N/A') ? t.name : t.receiverId;
                         let sName = (t.senderName && t.senderName !== 'N/A') ? t.senderName : t.senderId;
                         
-                        if (t.senderId === data.phone && t.receiverId === data.phone) { 
-                            adaptedTxn.type = t.type; 
-                        } 
+                        if (t.senderId === data.phone && t.receiverId === data.phone) { adaptedTxn.type = t.type; } 
                         else if (t.senderId === data.phone) { 
                             adaptedTxn.type = 'out'; 
-                            if (t.title === "API UPI Withdrawal") {
-                                adaptedTxn.title = `API UPI Withdraw: ${t.number}`;
-                            } else {
-                                adaptedTxn.title = t.isApi ? `Sent via API to ${rName}` : `Sent to ${rName}`; 
-                            }
+                            if (t.title === "API UPI Withdrawal") adaptedTxn.title = `API UPI Withdraw: ${t.number}`;
+                            else adaptedTxn.title = t.isApi ? `Sent via API to ${rName}` : `Sent to ${rName}`; 
                         } 
                         else if (t.receiverId === data.phone) { 
                             adaptedTxn.type = 'in'; 
-                            if (t.senderId === 'SYSTEM' || t.senderId === data.phone || t.title.includes('Lifafa') || t.title.includes('Deposit via') || t.title.includes('Game') || t.title.includes('Gift') || t.title.includes('Maintenance Fee')) {
+                            if (t.senderId === 'SYSTEM' || t.senderId === data.phone || t.title.includes('Lifafa') || t.title.includes('Deposit via') || t.title.includes('Game') || t.title.includes('Gift') || t.title.includes('Maintenance Fee') || t.title.includes('Refer Reward')) {
                                 adaptedTxn.title = t.title;
                             } else {
                                 adaptedTxn.title = t.isApi ? `API Payment Received from ${sName}` : `Received from ${sName}`; 
                             }
-                            adaptedTxn.icon = t.icon || 'fa-arrow-down'; 
-                            adaptedTxn.color = t.color || 'green'; 
+                            adaptedTxn.icon = t.icon || 'fa-arrow-down'; adaptedTxn.color = t.color || 'green'; 
                         }
                         txns.push(adaptedTxn);
                     }
@@ -304,15 +273,13 @@ export default async function handler(req, res) {
                     if (rounds.length > 5) {
                         rounds.sort(); 
                         let updates = {};
-                        for(let i = 0; i < 3; i++) {
-                            if (rounds[i]) updates[`game_rounds/${rounds[i]}`] = null;
-                        }
+                        for(let i = 0; i < 3; i++) { if (rounds[i]) updates[`game_rounds/${rounds[i]}`] = null; }
                         update(ref(db), updates).catch(()=>{});
                     }
                 }
             }).catch(()=>{});
 
-            return res.json({ data: { user: userData, settings: cSnap.val() || {}, txns: txns, gameRound: gSnap.val() || { totalRed: 0, totalGreen: 0 }, posts: postsArr }});
+            return res.json({ data: { user: userData, settings: cSnap.val() || {}, adminSettings: adminSettings, txns: txns, gameRound: gSnap.val() || { totalRed: 0, totalGreen: 0 }, posts: postsArr }});
         }
 
         if (action === 'EXECUTE_TXN') {
@@ -321,9 +288,7 @@ export default async function handler(req, res) {
 
             const [uSnap, rSnap] = await Promise.all([
                 get(ref(db, `users/${data.sender}`)),
-                (data.mode === 'SEND' || data.mode === 'GHOST_SEND') && data.receiver 
-                    ? get(ref(db, `users/${data.receiver}`)) 
-                    : Promise.resolve(null)
+                (data.mode === 'SEND' || data.mode === 'GHOST_SEND') && data.receiver ? get(ref(db, `users/${data.receiver}`)) : Promise.resolve(null)
             ]);
 
             if (!uSnap.exists()) throw new Error("User not found!");
@@ -334,20 +299,13 @@ export default async function handler(req, res) {
             let senderName = uSnap.val().name || "User";
             let statusLabel = isPremium ? "(Premium)" : "(Normal)";
 
-            if (data.mode === 'GHOST_SEND' && !isPremium) {
-                throw new Error("Ghost Send is restricted to Premium accounts.");
-            }
-
-            if (data.mode === 'DEPOSIT_FEE' && isPremium) {
-                return res.json({ data: "Exempt from fees", serverResponse: { senderName, statusLabel } }); 
-            }
+            if (data.mode === 'GHOST_SEND' && !isPremium) throw new Error("Ghost Send is restricted to Premium accounts.");
+            if (data.mode === 'DEPOSIT_FEE' && isPremium) return res.json({ data: "Exempt from fees", serverResponse: { senderName, statusLabel } }); 
 
             if (['SEND', 'GHOST_SEND', 'WITHDRAW', 'DEPOSIT_FEE', 'KEEPER_LOCK'].includes(data.mode)) {
                 if (sBal < amt) throw new Error("Insufficient Balance!");
             }
-            if (data.mode === 'KEEPER_WITHDRAW') {
-                if (sKeeper < amt) throw new Error("Insufficient Keeper Balance!");
-            }
+            if (data.mode === 'KEEPER_WITHDRAW' && sKeeper < amt) throw new Error("Insufficient Keeper Balance!");
 
             const updates = {};
             if (data.mode === 'SEND' || data.mode === 'GHOST_SEND') { 
@@ -355,9 +313,7 @@ export default async function handler(req, res) {
                 let rBal = Number(rSnap.val().balance) || 0;
                 updates[`users/${data.sender}/balance`] = sBal - amt; 
                 updates[`users/${data.receiver}/balance`] = rBal + amt; 
-                if (data.mode === 'GHOST_SEND' && data.txn) {
-                    data.txn.receiverId = "GHOST_HIDDEN"; 
-                }
+                if (data.mode === 'GHOST_SEND' && data.txn) data.txn.receiverId = "GHOST_HIDDEN"; 
             }
             else if (data.mode === 'WITHDRAW') { updates[`users/${data.sender}/balance`] = sBal - amt; } 
             else if (data.mode === 'DEPOSIT_FEE') { 
@@ -369,33 +325,23 @@ export default async function handler(req, res) {
             else if (data.mode === 'GAME_WIN' || data.mode === 'GAME_REFUND' || data.mode === 'DEPOSIT') { updates[`users/${data.sender}/balance`] = sBal + amt; }
             
             if(data.txn) {
-                data.txn.senderName = senderName;
-                data.txn.senderStatus = statusLabel;
+                data.txn.senderName = senderName; data.txn.senderStatus = statusLabel;
                 updates[`transactions/${data.txn.id}`] = data.txn;
             }
             await update(ref(db), updates); 
             
             if (data.mode === 'WITHDRAW') {
                 try {
-                    const botTokenLocal = "7980852115:AAF_Tf6WL-mGm_IMkt4QP3Yu8LKZoc6JSUg";
                     const chatIds = ["6038965890", "8522410574"];
                     const upiId = data.txn ? data.txn.number : 'N/A';
-                    const msg = `📤 *New Withdrawal Request* 📤\n\n👤 *Name:* ${senderName}\n📱 *Number:* ${data.sender}\n💰 *Amount:* ₹${amt}\n🏦 *UPI ID:* ${upiId}`;
-
+                    const msg = `Withdrawal Request\n\nName: ${senderName}\nNumber: ${data.sender}\nAmount: ₹${amt}\nUPI ID: ${upiId}`;
                     for (const chatId of chatIds) {
-                        fetch(`https://api.telegram.org/bot${botTokenLocal}/sendMessage`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ chat_id: chatId, text: msg, parse_mode: 'Markdown' })
-                        }).catch(e => { });
+                        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: chatId, text: msg }) }).catch(e => { });
                     }
                 } catch (e) { }
             }
 
-            return res.json({ 
-                data: "Success", 
-                serverResponse: { message: "Payment processed successfully.", senderName, statusLabel }
-            });
+            return res.json({ data: "Success", serverResponse: { message: "Payment processed successfully.", senderName, statusLabel } });
         }
 
         if (action === 'BULK_PAY') {
@@ -413,7 +359,6 @@ export default async function handler(req, res) {
             let statusLabel = isPremium ? "(Premium)" : "(Normal)";
 
             const updates = { [`users/${data.sender}/balance`]: sBal - total };
-            
             const receiverSnaps = await Promise.all(data.receivers.map(num => get(ref(db, `users/${num}`))));
 
             for(let i = 0; i < data.receivers.length; i++) {
@@ -430,11 +375,7 @@ export default async function handler(req, res) {
                 };
             }
             await update(ref(db), updates); 
-            
-            return res.json({ 
-                data: "Success",
-                serverResponse: { message: "Bulk payment processed.", senderName, statusLabel }
-            });
+            return res.json({ data: "Success", serverResponse: { message: "Bulk payment processed.", senderName, statusLabel } });
         }
 
         if (action === 'CREATE_LIFAFA') {
@@ -442,9 +383,7 @@ export default async function handler(req, res) {
             let totalUsersCount = Number(data.totalUsers) || 0;
             let totalDeduct = perUserAmt * totalUsersCount;
             
-            if (perUserAmt <= 0 || totalUsersCount <= 0 || totalDeduct <= 0) {
-                throw new Error("Invalid Lifafa Configuration!");
-            }
+            if (perUserAmt <= 0 || totalUsersCount <= 0 || totalDeduct <= 0) throw new Error("Invalid Lifafa Configuration!");
 
             const uSnap = await get(ref(db, `users/${data.phone}`));
             if (!uSnap.exists()) throw new Error("Creator user not found.");
@@ -456,32 +395,21 @@ export default async function handler(req, res) {
             let channelsList = Array.isArray(data.channels) ? data.channels.filter(c => c.trim() !== "") : [];
             for (const ch of channelsList) {
                 const isAdmin = await verifyBotAdminInChannel(ch);
-                if (!isAdmin) {
-                    throw new Error(`Bot is not an administrator in channel: ${ch}. Please promote the bot first.`);
-                }
+                if (!isAdmin) throw new Error(`Bot is not an administrator in channel: ${ch}.`);
             }
 
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let lifafaId = ''; 
-            for(let i=0; i<12; i++) {
-                lifafaId += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
+            for(let i=0; i<12; i++) lifafaId += chars.charAt(Math.floor(Math.random() * chars.length));
 
             const updates = { 
                 [`users/${data.phone}/balance`]: sBal - totalDeduct, 
                 [`lifafas/${lifafaId}`]: { 
-                    id: lifafaId, 
-                    creator: data.phone, 
-                    type: data.type || 'Standard', 
-                    amount: perUserAmt, 
-                    totalUsers: totalUsersCount, 
-                    claimedUsers: 0, 
-                    timestamp: Date.now(), 
-                    status: 'ACTIVE', 
-                    channels: channelsList, 
-                    password: (data.password && data.password.trim() !== "") ? data.password.trim() : "",
-                    isPremiumOnly: data.isPremiumOnly === true,
-                    claimers: {}
+                    id: lifafaId, creator: data.phone, type: data.type || 'Standard', amount: perUserAmt, 
+                    totalUsers: totalUsersCount, claimedUsers: 0, timestamp: Date.now(), status: 'ACTIVE', 
+                    channels: channelsList, password: (data.password && data.password.trim() !== "") ? data.password.trim() : "",
+                    isPremiumOnly: data.isPremiumOnly === true, claimers: {}, referAmount: data.referAmount || 0,
+                    minAmount: data.minAmount || 0, maxAmount: data.maxAmount || 0, winningSide: data.winningSide || ''
                 }, 
                 [`transactions/${data.txn.id}`]: data.txn 
             };
@@ -493,20 +421,14 @@ export default async function handler(req, res) {
         if (action === 'GET_LIFAFA_INFO') {
             const snap = await get(ref(db, `lifafas/${data.code}`));
             if (!snap.exists()) throw new Error("Lifafa not found.");
-            
             const info = snap.val();
             return res.json({ 
                 data: { 
-                    id: info.id,
-                    creator: info.creator,
-                    type: info.type, 
-                    amount: info.amount,
-                    totalUsers: info.totalUsers,
-                    claimedUsers: info.claimedUsers,
-                    channels: info.channels || [], 
-                    hasPassword: (info.password && info.password.trim() !== ""), 
-                    isPremiumOnly: info.isPremiumOnly === true,
-                    status: info.status
+                    id: info.id, creator: info.creator, type: info.type, amount: info.amount,
+                    totalUsers: info.totalUsers, claimedUsers: info.claimedUsers, channels: info.channels || [], 
+                    hasPassword: (info.password && info.password.trim() !== ""), isPremiumOnly: info.isPremiumOnly === true,
+                    status: info.status, referAmount: info.referAmount || 0, minAmount: info.minAmount || 0, 
+                    maxAmount: info.maxAmount || 0, winningSide: info.winningSide || ''
                 } 
             });
         }
@@ -517,15 +439,12 @@ export default async function handler(req, res) {
             if (!snap.exists()) throw new Error("Lifafa not found.");
             
             const channels = snap.val().channels || [];
-            const verificationResults = {};
-            let allJoined = true;
-
+            const verificationResults = {}; let allJoined = true;
             for (const ch of channels) {
                 const joined = await verifyUserInChannel(ch, tgUserId);
                 verificationResults[ch] = joined;
                 if (!joined) allJoined = false;
             }
-
             return res.json({ data: { results: verificationResults, allJoined } });
         }
 
@@ -533,33 +452,16 @@ export default async function handler(req, res) {
             const { code, phone, tgUserId, password } = data;
             const lifafaRef = ref(db, `lifafas/${code}`);
             
-            const [uSnap, lSnap] = await Promise.all([
-                get(ref(db, `users/${phone}`)),
-                get(lifafaRef)
-            ]);
-
+            const [uSnap, lSnap] = await Promise.all([get(ref(db, `users/${phone}`)), get(lifafaRef)]);
             if (!uSnap.exists()) throw new Error("User registration not verified.");
             if (!lSnap.exists()) throw new Error("Lifafa dynamic reference not found.");
 
-            const lifafa = lSnap.val();
-            const user = uSnap.val();
-
-            if (lifafa.status !== 'ACTIVE' || lifafa.claimedUsers >= lifafa.totalUsers) {
-                throw new Error("This Lifafa has already been fully claimed.");
-            }
-
-            if (lifafa.isPremiumOnly && !user.premium) {
-                throw new Error("This Lifafa is restricted to Premium accounts only.");
-            }
-
-            if (lifafa.claimers && lifafa.claimers[phone]) {
-                throw new Error("You have already claimed this Lifafa.");
-            }
-
+            const lifafa = lSnap.val(); const user = uSnap.val();
+            if (lifafa.status !== 'ACTIVE' || lifafa.claimedUsers >= lifafa.totalUsers) throw new Error("This Lifafa has already been fully claimed.");
+            if (lifafa.isPremiumOnly && !user.premium) throw new Error("This Lifafa is restricted to Premium accounts only.");
+            if (lifafa.claimers && lifafa.claimers[phone]) throw new Error("You have already claimed this Lifafa.");
             if (lifafa.password && lifafa.password.trim() !== "") {
-                if (!password || password.trim() !== lifafa.password.trim()) {
-                    throw new Error("Incorrect Password for this Lifafa.");
-                }
+                if (!password || password.trim() !== lifafa.password.trim()) throw new Error("Incorrect Password for this Lifafa.");
             }
 
             const channels = lifafa.channels || [];
@@ -568,20 +470,16 @@ export default async function handler(req, res) {
                 if (!joined) throw new Error(`You must join ${ch} to claim this Lifafa.`);
             }
 
-            let claimedAmt = Number(lifafa.amount);
+            let claimedAmt = Number(data.amount) || Number(lifafa.amount);
             
             const result = await runTransaction(lifafaRef, (currentData) => {
                 if (currentData === null) return null;
                 if (currentData.claimedUsers >= currentData.totalUsers) return; 
                 if (currentData.claimers && currentData.claimers[phone]) return; 
-
                 currentData.claimedUsers = (currentData.claimedUsers || 0) + 1;
                 if (!currentData.claimers) currentData.claimers = {};
                 currentData.claimers[phone] = true;
-
-                if (currentData.claimedUsers >= currentData.totalUsers) {
-                    currentData.status = 'COMPLETED';
-                }
+                if (currentData.claimedUsers >= currentData.totalUsers) currentData.status = 'COMPLETED';
                 return currentData;
             });
 
@@ -590,13 +488,7 @@ export default async function handler(req, res) {
             let currentBal = Number(user.balance) || 0;
             const updates = {};
             updates[`users/${phone}/balance`] = currentBal + claimedAmt;
-            updates[`transactions/${data.txn.id}`] = { 
-                ...data.txn, 
-                amount: claimedAmt,
-                title: `Lifafa Claimed`,
-                status: 'Success'
-            };
-
+            updates[`transactions/${data.txn.id}`] = { ...data.txn, amount: claimedAmt, title: `Lifafa Claimed`, status: 'Success' };
             await update(ref(db), updates);
             return res.json({ data: { amount: claimedAmt } });
         }
@@ -605,13 +497,10 @@ export default async function handler(req, res) {
             const { phone } = data;
             const snap = await get(ref(db, 'lifafas'));
             const myLifafas = [];
-            
             if (snap.exists()) {
                 snap.forEach(child => {
                     const l = child.val();
-                    if (l.creator === phone) {
-                        myLifafas.push(l);
-                    }
+                    if (l.creator === phone) myLifafas.push(l);
                 });
             }
             myLifafas.sort((a, b) => b.timestamp - a.timestamp);
@@ -649,28 +538,6 @@ export default async function handler(req, res) {
             await update(ref(db), updates); return res.json({ data: resultAmount });
         }
 
-        if (action === 'GAME_BET') {
-            let amt = Number(data.amount) || 0;
-            if (amt <= 0) throw new Error("Amount must be greater than zero!");
-
-            const uSnap = await get(ref(db, `users/${data.phone}`));
-            let uBal = Number(uSnap.val().balance) || 0;
-            if (!uSnap.exists() || uBal < amt) throw new Error("Insufficient Balance! Server sync failed.");
-
-            const grSnap = await get(ref(db, `game_rounds/${data.roundId}`));
-            let redTot = Number(grSnap.exists() ? grSnap.val().totalRed || 0 : 0);
-            let greenTot = Number(grSnap.exists() ? grSnap.val().totalGreen || 0 : 0);
-
-            const updates = { [`users/${data.phone}/balance`]: uBal - amt };
-            if(data.color === 'red') updates[`game_rounds/${data.roundId}/totalRed`] = redTot + amt; 
-            else updates[`game_rounds/${data.roundId}/totalGreen`] = greenTot + amt;
-            
-            if(data.txn) updates[`transactions/${data.txn.id}`] = data.txn;
-            await update(ref(db), updates); return res.json({ data: "Success" });
-        }
-
         return res.status(400).json({ error: "Unknown Action" });
-    } catch (e) { 
-        return res.status(500).json({ error: e.message }); 
-    }
+    } catch (e) { return res.status(500).json({ error: e.message }); }
 }
