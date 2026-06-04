@@ -30,6 +30,7 @@
 
             document.documentElement.style.setProperty('--accent-main', savedColor);
             document.documentElement.style.setProperty('--accent-glow', hexToRgba(savedColor, 0.4));
+            document.documentElement.style.setProperty('--accent-bg-ultra-light', hexToRgba(savedColor, 0.04));
             document.documentElement.style.setProperty('--premium-grad-1', hexToRgba(savedColor, 0.15));
             document.documentElement.style.setProperty('--premium-grad-2', hexToRgba(savedColor, 0.05));
         })();
@@ -37,7 +38,7 @@
 
     <style>
         :root { 
-            --theme-bg: #f2f2f7; 
+            --theme-bg: var(--accent-bg-ultra-light, #f2f2f7); 
             --theme-text: #1c1c1e; 
             --theme-card: #ffffff; 
         }
@@ -84,36 +85,37 @@
         .accent-shadow { box-shadow: 0 4px 15px var(--accent-glow) !important; }
         .focus-accent:focus { border-color: var(--accent-main) !important; box-shadow: 0 0 0 3px var(--accent-glow) !important; outline: none; }
 
-        /* NEON THEME MODE */
+        /* NEON THEME MODE - Improved Sharp Text & Circular Glow Borders */
         html.neon-active body {
             background-color: #000000 !important;
             --theme-bg: #000000;
             --theme-card: #080808;
-            text-shadow: 0 0 4px var(--accent-glow);
         }
         html.neon-active .theme-card {
             background-color: #080808 !important;
-            box-shadow: 0 0 20px var(--accent-glow) !important;
-            border: 1px solid var(--accent-main) !important;
-        }
-        html.neon-active button, html.neon-active .ios-grid-icon {
             box-shadow: 0 0 15px var(--accent-glow) !important;
             border: 1px solid var(--accent-main) !important;
+            border-radius: 2rem;
+        }
+        html.neon-active button, html.neon-active .ios-grid-icon {
+            box-shadow: 0 0 12px var(--accent-glow) !important;
+            border: 1px solid var(--accent-main) !important;
+            border-radius: 9999px !important;
         }
 
-        /* BETTER VISUALS EFFECTS */
+        /* BETTER VISUALS EFFECTS - Smooth scale and elevated transitions */
         html.better-visuals-active * {
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
         html.better-visuals-active .btn-animate:active {
             transform: scale(0.9) translateY(-2px);
-            filter: brightness(1.1);
+            filter: brightness(1.15);
         }
         html.better-visuals-active .view-section.active {
             animation: scaleUpFadeVisuals 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         @keyframes scaleUpFadeVisuals {
-            0% { opacity: 0; transform: scale(0.94) translateY(15px); filter: blur(5px); }
+            0% { opacity: 0; transform: scale(0.94) translateY(15px); filter: blur(3px); }
             100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
         }
 
@@ -135,6 +137,11 @@
         
         .ios-grid-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: all 0.3s ease; }
         
+        /* Apply accent color globally to button icons when premium is set */
+        body:not(.colorful-mode) .ios-grid-icon {
+            color: var(--accent-main) !important;
+        }
+
         .premium-mode body {
             background: linear-gradient(135deg, var(--premium-grad-1), var(--premium-grad-2), var(--theme-bg));
             background-size: 400% 400%;
@@ -155,6 +162,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
 
+        /* Colorful gradient icons with distinct colors inside */
         .colorful-mode .ios-grid-icon { color: white !important; box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important; border: none !important; }
         .colorful-mode #grid-container-actions button:nth-child(1) .ios-grid-icon { background: linear-gradient(135deg, #ff3b30, #ff2d55); }
         .colorful-mode #grid-container-actions button:nth-child(2) .ios-grid-icon { background: linear-gradient(135deg, #007aff, #5856d6); }
@@ -186,7 +194,6 @@
         .animate-scanline { animation: scanline 2.5s ease-in-out infinite; background: var(--accent-main); box-shadow: 0 0 15px 3px var(--accent-glow); }
         .premium-scanner { border-color: var(--accent-main) !important; box-shadow: 0 0 30px var(--accent-glow); }
 
-        /* Animation: Coin Spin */
         @keyframes coin-spin {
             0% { transform: rotateY(0deg); }
             100% { transform: rotateY(1800deg); }
@@ -195,10 +202,18 @@
             animation: coin-spin 2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
-        /* Scratch Card Canvas and Layering */
         #scratch-canvas {
             cursor: pointer;
             touch-action: none;
+        }
+
+        /* iOS elastic active bounce animations */
+        .btn-elastic {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-elastic:active {
+            transform: scale(0.93) !important;
+            filter: brightness(0.95);
         }
     </style>
 </head>
@@ -208,6 +223,32 @@
 
     <div id="toast" class="fixed top-12 left-1/2 transform -translate-x-1/2 bg-gray-900/90 backdrop-blur-md text-white px-6 py-3.5 rounded-full shadow-2xl z-[300] hidden opacity-0 transition-opacity duration-300 flex items-center gap-3 border border-gray-700 font-medium tracking-wide">
         <i class="fas fa-bell accent-text text-lg"></i> <span id="toastMsg" class="text-sm">Message</span>
+    </div>
+
+    <!-- Transaction Receipt Modal Overlay -->
+    <div id="receiptModal" class="fixed inset-0 bg-black/50 z-[2000] hidden flex items-center justify-center p-4 backdrop-blur-md transition-opacity duration-300 opacity-0" onclick="closeReceiptModal()">
+        <div id="receiptModalContent" class="bg-white rounded-3xl p-6 transform scale-95 transition-transform duration-300 max-w-sm w-full shadow-2xl relative text-center border border-black/5 theme-card" onclick="event.stopPropagation()">
+            <div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl mb-4 bg-emerald-100 text-emerald-600" id="receipt-icon-container">
+                <i class="fas fa-receipt" id="receipt-icon"></i>
+            </div>
+            <h2 class="text-xl font-black tracking-tight text-gray-900 mb-1" id="receipt-title">Transaction Receipt</h2>
+            <div class="bg-gray-50 rounded-2xl p-4 my-4 border border-gray-100 text-left space-y-2.5 text-xs font-semibold theme-card">
+                <div class="flex justify-between"><span class="text-gray-400 uppercase">Sender:</span> <span id="receipt-sender" class="theme-text text-gray-900">User</span></div>
+                <div class="flex justify-between"><span class="text-gray-400 uppercase">Receiver:</span> <span id="receipt-receiver" class="theme-text text-gray-900">User</span></div>
+                <div class="flex justify-between"><span class="text-gray-400 uppercase">Amount:</span> <span id="receipt-amount" class="font-extrabold accent-text text-sm">₹0.00</span></div>
+                <div class="flex justify-between"><span class="text-gray-400 uppercase">Date/Time:</span> <span id="receipt-date" class="theme-text text-gray-900">01/01/2026, 12:00 PM</span></div>
+                <div class="flex justify-between"><span class="text-gray-400 uppercase">ID:</span> <span id="receipt-id" class="font-mono text-[10px] theme-text text-gray-500">TXNXXXXXXXX</span></div>
+                <div id="receipt-extra-row" class="flex justify-between hidden"><span class="text-gray-400 uppercase" id="receipt-extra-label">Info:</span> <span id="receipt-extra-val" class="theme-text font-bold text-amber-500">XXXXX</span></div>
+                <div id="receipt-comment-row" class="border-t border-gray-100 pt-2 flex flex-col gap-1 hidden">
+                    <span class="text-gray-400 uppercase text-[10px]">Comment:</span>
+                    <span id="receipt-comment" class="text-gray-600 italic">No Comment</span>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="copyReceiptDetails()" class="flex-1 accent-bg text-white font-black py-3 rounded-full shadow-md text-xs btn-elastic">Copy Details</button>
+                <button onclick="closeReceiptModal()" class="flex-1 bg-gray-100 text-gray-800 font-bold py-3 rounded-full text-xs btn-elastic">Close</button>
+            </div>
+        </div>
     </div>
 
     <!-- App Ban Screen Overlay -->
@@ -254,11 +295,11 @@
         <div id="view-home" class="view-section active">
             <header class="flex justify-between items-center p-5 sticky top-0 z-30 glass-nav">
                 <div class="flex items-center gap-3">
-                    <button onclick="toggleSidebar()" class="w-10 h-10 rounded-full bg-white theme-card shadow-sm flex items-center justify-center text-gray-700 border border-gray-100 active:scale-95 transition-transform"><i class="fas fa-bars"></i></button>
+                    <button onclick="toggleSidebar()" class="w-10 h-10 rounded-full bg-white theme-card shadow-sm flex items-center justify-center text-gray-700 border border-gray-100 active:scale-95 transition-transform btn-elastic"><i class="fas fa-bars"></i></button>
                     <h1 class="text-xl font-black tracking-wide accent-text flex items-center gap-1">Lion<span class="text-gray-800 theme-text">Pay</span><i class="fas fa-paw text-[14px] ml-1"></i></h1>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button onclick="window.open('https://t.me/lionpay', '_blank')" class="w-10 h-10 rounded-full bg-white theme-card shadow-sm flex items-center justify-center text-blue-500 border border-gray-100 hover:bg-blue-50 active:scale-95 transition-transform"><i class="fab fa-telegram-plane"></i></button>
+                    <button onclick="window.open('https://t.me/lionpay', '_blank')" class="w-10 h-10 rounded-full bg-white theme-card shadow-sm flex items-center justify-center text-blue-500 border border-gray-100 hover:bg-blue-50 active:scale-95 transition-transform btn-elastic"><i class="fab fa-telegram-plane"></i></button>
                     <div class="w-10 h-10 rounded-full accent-bg text-white flex items-center justify-center font-bold border-[3px] accent-border cursor-pointer shadow-md overflow-hidden" id="ui-top-dp" onclick="toggleSidebar()">U</div>
                 </div>
             </header>
@@ -295,63 +336,63 @@
 
             <div class="mt-8 px-5 pb-6">
                 <div class="grid grid-cols-4 gap-y-6 gap-x-4" id="grid-container-actions">
-                    <button onclick="showView('send')" class="btn-animate flex flex-col items-center gap-2 group">
-                        <div class="ios-grid-icon bg-white theme-card text-blue-500 shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-paper-plane"></i></div>
+                    <button onclick="showView('send')" class="btn-animate flex flex-col items-center gap-2 group btn-elastic">
+                        <div class="ios-grid-icon bg-white theme-card shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-paper-plane"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Send</span>
                     </button>
-                    <button onclick="showView('bulk')" class="btn-animate flex flex-col items-center gap-2 group">
-                        <div class="ios-grid-icon bg-white theme-card text-purple-500 shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-users"></i></div>
+                    <button onclick="showView('bulk')" class="btn-animate flex flex-col items-center gap-2 group btn-elastic">
+                        <div class="ios-grid-icon bg-white theme-card shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-users"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Bulk</span>
                     </button>
-                    <button onclick="showView('add')" class="btn-animate flex flex-col items-center gap-2 group">
-                        <div class="ios-grid-icon bg-white theme-card text-green-500 shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-plus"></i></div>
+                    <button onclick="showView('add')" class="btn-animate flex flex-col items-center gap-2 group btn-elastic">
+                        <div class="ios-grid-icon bg-white theme-card shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-plus"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Add</span>
                     </button>
-                    <button onclick="showView('withdraw')" class="btn-animate flex flex-col items-center gap-2 group">
-                        <div class="ios-grid-icon bg-white theme-card text-red-500 shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-arrow-up"></i></div>
+                    <button onclick="showView('withdraw')" class="btn-animate flex flex-col items-center gap-2 group btn-elastic">
+                        <div class="ios-grid-icon bg-white theme-card shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-arrow-up"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Payout</span>
                     </button>
                     
-                    <button onclick="showView('lifafa'); loadMyLifafas();" class="btn-animate flex flex-col items-center gap-2 group">
-                        <div class="ios-grid-icon bg-white theme-card text-amber-500 shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-envelope-open-text"></i></div>
+                    <button onclick="showView('lifafa'); loadMyLifafas();" class="btn-animate flex flex-col items-center gap-2 group btn-elastic">
+                        <div class="ios-grid-icon bg-white theme-card shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-envelope-open-text"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Lifafa</span>
                     </button>
-                    <button onclick="showView('gift')" class="btn-animate flex flex-col items-center gap-2 group">
-                        <div class="ios-grid-icon bg-white theme-card text-pink-500 shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-gift"></i></div>
+                    <button onclick="showView('gift')" class="btn-animate flex flex-col items-center gap-2 group btn-elastic">
+                        <div class="ios-grid-icon bg-white theme-card shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-gift"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Gifts</span>
                     </button>
-                    <button onclick="showView('api')" class="btn-animate flex flex-col items-center gap-2 group">
-                        <div class="ios-grid-icon bg-white theme-card text-indigo-500 shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-code"></i></div>
+                    <button onclick="showView('api')" class="btn-animate flex flex-col items-center gap-2 group btn-elastic">
+                        <div class="ios-grid-icon bg-white theme-card shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-code"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">API</span>
                     </button>
-                    <button onclick="showView('statistics')" class="btn-animate flex flex-col items-center gap-2 group">
-                        <div class="ios-grid-icon bg-white theme-card text-teal-500 shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-chart-pie"></i></div>
+                    <button onclick="showView('statistics')" class="btn-animate flex flex-col items-center gap-2 group btn-elastic">
+                        <div class="ios-grid-icon bg-white theme-card shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-chart-pie"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Stats</span>
                     </button>
                     
-                    <button id="btn-premium-menu" onclick="showView('premium')" class="btn-animate flex flex-col items-center gap-2 group">
+                    <button id="btn-premium-menu" onclick="showView('premium')" class="btn-animate flex flex-col items-center gap-2 group btn-elastic">
                         <div class="ios-grid-icon accent-bg text-white shadow-md"><i class="fas fa-crown"></i></div>
                         <span class="text-[11px] font-bold text-yellow-600">Premium</span>
                     </button>
-                    <button id="btn-theme-menu" onclick="showView('themes')" class="hidden btn-animate flex flex-col items-center gap-2 group">
+                    <button id="btn-theme-menu" onclick="showView('themes')" class="hidden btn-animate flex flex-col items-center gap-2 group btn-elastic">
                         <div class="ios-grid-icon bg-white theme-card accent-text shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-palette"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Settings</span>
                     </button>
-                    <button id="btn-tags-menu" onclick="showView('tags')" class="hidden btn-animate flex flex-col items-center gap-2 group">
+                    <button id="btn-tags-menu" onclick="showView('tags')" class="hidden btn-animate flex flex-col items-center gap-2 group btn-elastic">
                         <div class="ios-grid-icon bg-white theme-card accent-text shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-tags"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Tags</span>
                     </button>
                     
-                    <button onclick="showView('official')" class="btn-animate flex flex-col items-center gap-2 group">
-                        <div class="ios-grid-icon bg-white theme-card text-cyan-500 shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-bullhorn"></i></div>
+                    <button onclick="showView('official')" class="btn-animate flex flex-col items-center gap-2 group btn-elastic">
+                        <div class="ios-grid-icon bg-white theme-card shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-bullhorn"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Posts</span>
                     </button>
-                    <button onclick="showView('keeper')" class="btn-animate flex flex-col items-center gap-2 group">
-                        <div class="ios-grid-icon bg-white theme-card text-slate-500 shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-vault"></i></div>
+                    <button onclick="showView('keeper')" class="btn-animate flex flex-col items-center gap-2 group btn-elastic">
+                        <div class="ios-grid-icon bg-white theme-card shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-vault"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Keeper</span>
                     </button>
-                    <button onclick="showView('help')" class="btn-animate flex flex-col items-center gap-2 group">
-                        <div class="ios-grid-icon bg-white theme-card text-orange-500 shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-headset"></i></div>
+                    <button onclick="showView('help')" class="btn-animate flex flex-col items-center gap-2 group btn-elastic">
+                        <div class="ios-grid-icon bg-white theme-card shadow-sm border border-gray-100 group-active:bg-gray-50"><i class="fas fa-headset"></i></div>
                         <span class="text-[11px] font-bold text-gray-500">Support</span>
                     </button>
                 </div>
@@ -360,7 +401,7 @@
             <div class="px-5 mt-2 pb-4">
                 <div class="flex justify-between items-end mb-4 px-1">
                     <h3 class="font-black text-[15px] tracking-wide text-gray-800 theme-text">Recent Activity 🕒</h3>
-                    <button onclick="showView('statistics')" class="text-[11px] font-bold accent-text bg-blue-50 px-3 py-1 rounded-full active:scale-95 transition-transform">View All</button>
+                    <button onclick="showView('statistics')" class="text-[11px] font-bold accent-text bg-blue-50 px-3 py-1 rounded-full active:scale-95 transition-transform btn-elastic">View All</button>
                 </div>
                 <div id="home-txn-list" class="theme-card rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col"></div>
             </div>
@@ -368,7 +409,7 @@
 
         <div id="view-statistics" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
-                <button onclick="showView('home')" class="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full transition-colors text-gray-600"><i class="fas fa-arrow-left"></i></button>
+                <button onclick="showView('home')" class="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full transition-colors text-gray-600 btn-elastic"><i class="fas fa-arrow-left"></i></button>
                 <h1 class="ml-4 text-[18px] font-black tracking-wide">Statistics 📊</h1>
             </header>
             <div class="p-5">
@@ -419,7 +460,7 @@
 
         <div id="view-send" class="view-section relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
+                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors btn-elastic"><i class="fas fa-arrow-left text-gray-700"></i></button>
                 <h1 class="ml-4 text-[18px] font-black tracking-wide">Send Money 💸</h1>
             </header>
             <div class="p-5">
@@ -430,7 +471,7 @@
                     <div class="relative mb-5">
                         <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">Send To</label>
                         <input type="text" id="send-num" required placeholder="Mobile or Custom ID" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-sm focus-accent font-bold theme-card transition-colors">
-                        <button type="button" onclick="showView('scan'); startScanner();" class="absolute right-3 top-9 w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-full accent-text flex items-center justify-center hover:scale-105 transition-transform"><i class="fas fa-qrcode"></i></button>
+                        <button type="button" onclick="showView('scan'); startScanner();" class="absolute right-3 top-9 w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-full accent-text flex items-center justify-center hover:scale-105 transition-transform btn-elastic"><i class="fas fa-qrcode"></i></button>
                     </div>
                     <div id="send-name" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-sm mb-6 font-bold text-gray-500 cursor-not-allowed transition-all min-h-[54px] flex items-center theme-card">Auto-fetching receiver...</div>
                     <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">Amount (₹)</label>
@@ -449,14 +490,14 @@
                     </div>
                     <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">Security PIN</label>
                     <input type="password" id="send-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center tracking-[0.5em] font-black text-xl mb-8 focus-accent theme-card transition-colors">
-                    <button type="submit" id="btn-send-submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-[0_8px_20px_var(--accent-glow)] text-lg">Send Securely</button>
+                    <button type="submit" id="btn-send-submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-[0_8px_20px_var(--accent-glow)] text-lg btn-elastic">Send Securely</button>
                 </form>
             </div>
         </div>
 
         <div id="view-add" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
+                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors btn-elastic"><i class="fas fa-arrow-left text-gray-700"></i></button>
                 <h1 class="ml-4 text-[18px] font-black tracking-wide">Add Money 💳</h1>
             </header>
             <div class="p-5">
@@ -465,7 +506,7 @@
                         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
                         <p class="text-[11px] font-bold uppercase opacity-70 mb-2 tracking-wider">Pay To Official UPI</p>
                         <h2 class="text-2xl font-black mb-5 tracking-wide font-mono" id="ui-upi-id">Loading...</h2>
-                        <button type="button" onclick="copyText(document.getElementById('ui-upi-id').innerText)" class="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full text-sm font-bold flex items-center justify-center gap-2 mx-auto active:scale-95 transition-transform border border-white/10"><i class="fas fa-copy"></i> Copy UPI ID</button>
+                        <button type="button" onclick="copyText(document.getElementById('ui-upi-id').innerText)" class="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full text-sm font-bold flex items-center justify-center gap-2 mx-auto active:scale-95 transition-transform border border-white/10 btn-elastic"><i class="fas fa-copy"></i> Copy UPI ID</button>
                     </div>
                 </div>
                 <form onsubmit="event.preventDefault(); processAdd()" class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100">
@@ -474,14 +515,14 @@
                     <input type="text" id="add-utr" required placeholder="E.g. 301234567890" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-sm mb-5 focus-accent font-bold theme-card tracking-widest text-center">
                     <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Amount Paid (₹)</label>
                     <input type="number" id="add-amt" required min="1" placeholder="₹0.00" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-xl font-black mb-8 focus-accent text-center theme-card">
-                    <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg text-lg">Send for Verification</button>
+                    <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg text-lg btn-elastic">Send for Verification</button>
                 </form>
             </div>
         </div>
 
         <div id="view-withdraw" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
+                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors btn-elastic"><i class="fas fa-arrow-left text-gray-700"></i></button>
                 <h1 class="ml-4 text-[18px] font-black tracking-wide">Payout Bank 🏦</h1>
             </header>
             <div class="p-5">
@@ -495,14 +536,14 @@
                     <input type="number" id="with-amt" required min="10" placeholder="Min ₹10" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-2xl font-black mb-5 focus-accent text-center theme-card">
                     <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Security PIN</label>
                     <input type="password" id="with-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center tracking-[0.5em] font-black text-xl mb-8 focus-accent theme-card">
-                    <button type="submit" class="btn-animate w-full bg-gray-900 text-white font-black py-4 rounded-full shadow-lg text-lg">Request Transfer</button>
+                    <button type="submit" class="btn-animate w-full bg-gray-900 text-white font-black py-4 rounded-full shadow-lg text-lg btn-elastic">Request Transfer</button>
                 </form>
             </div>
         </div>
 
         <div id="view-bulk" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
+                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors btn-elastic"><i class="fas fa-arrow-left text-gray-700"></i></button>
                 <h1 class="ml-4 text-[18px] font-black tracking-wide">Bulk Send 👥</h1>
             </header>
             <div class="p-5">
@@ -515,20 +556,20 @@
                     <input type="text" id="bulk-comment" placeholder="Optional Comment" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm mb-4 focus-accent theme-card text-center">
                     <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Security PIN</label>
                     <input type="password" id="bulk-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-center tracking-widest font-black mb-6 focus-accent theme-card">
-                    <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg">Send to All</button>
+                    <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg btn-elastic">Send to All</button>
                 </form>
             </div>
         </div>
 
         <div id="view-gift" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
+                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors btn-elastic"><i class="fas fa-arrow-left text-gray-700"></i></button>
                 <h1 class="ml-4 text-[18px] font-black tracking-wide">Gift Codes 🎁</h1>
             </header>
             <div class="p-5">
                 <div class="flex theme-card rounded-full p-1.5 gap-1 border border-gray-200 shadow-sm bg-gray-50 mb-6">
-                    <button onclick="switchTab('gift-create')" id="tab-gift-create" class="flex-1 py-3 text-sm font-bold rounded-full transition-all tab-btn active">Create</button>
-                    <button onclick="switchTab('gift-claim')" id="tab-gift-claim" class="flex-1 py-3 text-sm font-bold rounded-full transition-all tab-btn">Claim</button>
+                    <button onclick="switchTab('gift-create')" id="tab-gift-create" class="flex-1 py-3 text-sm font-bold rounded-full transition-all tab-btn active btn-elastic">Create</button>
+                    <button onclick="switchTab('gift-claim')" id="tab-gift-claim" class="flex-1 py-3 text-sm font-bold rounded-full transition-all tab-btn btn-elastic">Claim</button>
                 </div>
                 <div id="gift-create" class="tab-content active">
                     <form onsubmit="event.preventDefault(); processGiftCreate()" class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100">
@@ -538,14 +579,14 @@
                         <input type="number" id="gift-amt" required placeholder="10" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center font-bold mb-4 focus-accent theme-card">
                         <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase">Security PIN</label>
                         <input type="password" id="gift-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center tracking-widest font-black mb-6 focus-accent theme-card">
-                        <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg">Generate Code</button>
+                        <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg btn-elastic">Generate Code</button>
                     </form>
                 </div>
                 <div id="gift-claim" class="tab-content">
                     <form onsubmit="event.preventDefault(); processGiftClaim()" class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100 text-center">
                         <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Enter 5-Digit Code</label>
                         <input type="text" id="claim-code" required maxlength="5" placeholder="CODE" class="w-full bg-gray-50 border rounded-2xl px-4 py-6 text-center tracking-[0.3em] text-2xl font-black mb-6 focus-accent theme-card uppercase">
-                        <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg text-lg">Claim Reward</button>
+                        <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg text-lg btn-elastic">Claim Reward</button>
                     </form>
                 </div>
             </div>
@@ -553,33 +594,43 @@
 
         <div id="view-api" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
+                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors btn-elastic"><i class="fas fa-arrow-left text-gray-700"></i></button>
                 <h1 class="ml-4 text-[18px] font-black tracking-wide">Developer API 💻</h1>
             </header>
             <div class="p-5 space-y-5">
+                <!-- Custom Premium API Module -->
+                <div id="premium-api-key-box" class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100 text-center hidden">
+                    <p class="text-[11px] text-amber-500 font-bold mb-1 tracking-wider uppercase"><i class="fas fa-crown"></i> Premium Custom API Key</p>
+                    <p class="text-xs text-gray-400 font-semibold mb-4">Set a fully customized secret API Gateway Access Key.</p>
+                    <form onsubmit="event.preventDefault(); processSetCustomApiKey()" class="space-y-4">
+                        <input type="text" id="custom-api-key-input" placeholder="Enter Custom Key (e.g. MySecretGateway)" required class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm font-bold focus-accent theme-card text-center">
+                        <button type="submit" class="btn-animate w-full bg-amber-500 text-white font-black py-3 rounded-full shadow-md text-xs btn-elastic">Commit Custom Key</button>
+                    </form>
+                </div>
+
                 <div class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100">
                     <p class="text-[11px] text-gray-400 font-bold mb-3 tracking-wider uppercase">Wallet Transfer API</p>
-                    <p class="text-xs font-mono text-gray-300 break-all leading-relaxed mb-4 p-4 bg-slate-900 rounded-2xl shadow-inner" id="ui-api-url-full">
+                    <p class="text-xs font-mono text-gray-300 break-all leading-relaxed mb-4 p-4 bg-slate-900 rounded-2xl shadow-inner text-ellipsis overflow-hidden" id="ui-api-url-full">
                         https://lionpay.app/api?key=<span class="accent-text" id="ui-api-key-url">LP-PENDING</span>&paytm=<span class="text-green-400">{number}</span>&amount=<span class="text-green-400">{amount}</span>&comment=<span class="text-green-400">{comment}</span>
                     </p>
                 </div>
                 <div class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100">
                     <p class="text-[11px] text-gray-400 font-bold mb-3 tracking-wider uppercase">UPI Withdrawal API</p>
-                    <p class="text-xs font-mono text-gray-300 break-all leading-relaxed mb-4 p-4 bg-slate-900 rounded-2xl shadow-inner" id="ui-api-url-upi">
+                    <p class="text-xs font-mono text-gray-300 break-all leading-relaxed mb-4 p-4 bg-slate-900 rounded-2xl shadow-inner text-ellipsis overflow-hidden" id="ui-api-url-upi">
                         https://Lion-pay.vercel.app/Api/upi.php?token=<span class="accent-text" id="ui-api-key-upi">LP-PENDING</span>&upi_id=<span class="text-green-400">{upi_id}</span>&amount=<span class="text-green-400">{amount}</span>&comment=<span class="text-green-400">{comment}</span>
                     </p>
                 </div>
                 <div class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100 text-center">
                     <p class="text-[11px] accent-text font-bold mb-1 tracking-wider uppercase">Your Secret Key</p>
                     <p class="accent-text font-mono font-black tracking-widest text-xl mb-4" id="ui-api-key-display">LP-PENDING</p>
-                    <button onclick="regenerateApiKey()" class="btn-animate w-full border-2 accent-border accent-text font-bold py-3.5 rounded-full">Regenerate API Key</button>
+                    <button onclick="regenerateApiKey()" class="btn-animate w-full border-2 accent-border accent-text font-bold py-3.5 rounded-full btn-elastic">Regenerate API Key</button>
                 </div>
             </div>
         </div>
 
         <div id="view-official" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav border-b border-gray-100">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
+                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors btn-elastic"><i class="fas fa-arrow-left text-gray-700"></i></button>
                 <div class="w-8 h-8 ml-4 accent-bg text-white rounded-full flex items-center justify-center"><i class="fas fa-bullhorn text-xs"></i></div>
                 <h1 class="ml-2 text-[18px] font-bold tracking-wide">Official Posts</h1>
             </header>
@@ -590,7 +641,7 @@
 
         <div id="view-keeper" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
+                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors btn-elastic"><i class="fas fa-arrow-left text-gray-700"></i></button>
                 <h1 class="ml-4 text-[18px] font-black tracking-wide">Balance Keeper 🛡️</h1>
             </header>
             <div class="p-5">
@@ -606,21 +657,21 @@
                 </div>
                 <div class="theme-card rounded-[2rem] p-5 shadow-md border border-gray-100 mb-6">
                     <div class="flex theme-card rounded-full p-1.5 gap-1 border border-gray-200 shadow-sm bg-gray-50 mb-5">
-                        <button onclick="switchKeeperTab('keeper-lock')" id="btn-keeper-lock" class="flex-1 py-3 text-sm font-bold rounded-full transition-all keeper-tab-btn active bg-slate-800 text-white">Lock In</button>
-                        <button onclick="switchKeeperTab('keeper-with')" id="btn-keeper-with" class="flex-1 py-3 text-sm font-bold rounded-full transition-all keeper-tab-btn text-gray-500">Withdraw</button>
+                        <button onclick="switchKeeperTab('keeper-lock')" id="btn-keeper-lock" class="flex-1 py-3 text-sm font-bold rounded-full transition-all keeper-tab-btn active bg-slate-800 text-white btn-elastic">Lock In</button>
+                        <button onclick="switchKeeperTab('keeper-with')" id="btn-keeper-with" class="flex-1 py-3 text-sm font-bold rounded-full transition-all keeper-tab-btn text-gray-500 btn-elastic">Withdraw</button>
                     </div>
                     <div id="keeper-lock" class="keeper-tab-content active">
                         <form onsubmit="event.preventDefault(); processKeeperLock()">
                             <input type="number" id="kl-amt" required placeholder="Amount to Lock" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center font-bold theme-card mb-4">
                             <input type="password" id="kl-pin" required maxlength="4" placeholder="PIN" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center tracking-widest font-black mb-6 theme-card">
-                            <button type="submit" class="w-full bg-slate-800 text-white font-bold py-4 rounded-full shadow-lg">Lock Balance</button>
+                            <button type="submit" class="w-full bg-slate-800 text-white font-bold py-4 rounded-full shadow-lg btn-elastic">Lock Balance</button>
                         </form>
                     </div>
                     <div id="keeper-with" class="keeper-tab-content hidden">
                         <form onsubmit="event.preventDefault(); processKeeperWithdraw()">
                             <input type="number" id="kw-amt" required placeholder="Amount to Withdraw" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center font-bold theme-card mb-4">
                             <input type="password" id="kw-pin" required maxlength="4" placeholder="PIN" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center tracking-widest font-black mb-6 theme-card">
-                            <button type="submit" class="w-full bg-green-600 text-white font-bold py-4 rounded-full shadow-lg">Withdraw to Wallet</button>
+                            <button type="submit" class="w-full bg-green-600 text-white font-bold py-4 rounded-full shadow-lg btn-elastic">Withdraw to Wallet</button>
                         </form>
                     </div>
                 </div>
@@ -630,31 +681,31 @@
         <!-- THEME & VISUAL PREFS SETTINGS -->
         <div id="view-themes" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
+                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors btn-elastic"><i class="fas fa-arrow-left text-gray-700"></i></button>
                 <h1 class="ml-4 text-[18px] font-black tracking-wide">Settings & UI 🎨</h1>
             </header>
             <div class="p-5">
                 <h3 class="font-black text-sm accent-text mb-3">Color Palette</h3>
                 <div class="grid grid-cols-5 gap-3 mb-8" id="color-palette"></div>
                 <div class="space-y-4">
-                    <button onclick="setGlobalTheme('light')" class="w-full bg-gray-100 text-gray-800 font-bold py-4 rounded-2xl shadow-sm">Enable Light Mode</button>
-                    <button onclick="setGlobalTheme('dark')" class="w-full bg-gray-900 text-white font-bold py-4 rounded-2xl shadow-md">Enable Dark Mode</button>
+                    <button onclick="setGlobalTheme('light')" class="w-full bg-gray-100 text-gray-800 font-bold py-4 rounded-2xl shadow-sm btn-elastic">Enable Light Mode</button>
+                    <button onclick="setGlobalTheme('dark')" class="w-full bg-gray-900 text-white font-bold py-4 rounded-2xl shadow-md btn-elastic">Enable Dark Mode</button>
                     <div class="h-px bg-gray-200 my-4"></div>
-                    <label class="theme-card rounded-2xl p-4 flex items-center justify-between border border-gray-200 shadow-sm">
+                    <label class="theme-card rounded-2xl p-4 flex items-center justify-between border border-gray-200 shadow-sm cursor-pointer">
                         <span class="font-bold">Colorful Gradient Mode</span>
-                        <input type="checkbox" id="toggle-colorful-ui" onchange="toggleColorfulTheme()" class="w-6 h-6 rounded focus-accent">
+                        <input type="checkbox" id="toggle-colorful-ui" onchange="toggleColorfulTheme()" class="w-6 h-6 rounded focus-accent cursor-pointer">
                     </label>
-                    <label id="privacy-setting-row" class="theme-card rounded-2xl p-4 flex items-center justify-between border border-gray-200 shadow-sm hidden">
+                    <label id="privacy-setting-row" class="theme-card rounded-2xl p-4 flex items-center justify-between border border-gray-200 shadow-sm hidden cursor-pointer">
                         <span class="font-bold">Privacy UI (Hide Balance)</span>
-                        <input type="checkbox" id="toggle-privacy-ui" onchange="togglePrivacyMode()" class="w-6 h-6 rounded focus-accent">
+                        <input type="checkbox" id="toggle-privacy-ui" onchange="togglePrivacyMode()" class="w-6 h-6 rounded focus-accent cursor-pointer">
                     </label>
-                    <label class="theme-card rounded-2xl p-4 flex items-center justify-between border border-gray-200 shadow-sm">
+                    <label class="theme-card rounded-2xl p-4 flex items-center justify-between border border-gray-200 shadow-sm cursor-pointer">
                         <span class="font-bold">Neon Aesthetics Glow</span>
-                        <input type="checkbox" id="toggle-neon-theme" onchange="toggleNeonTheme()" class="w-6 h-6 rounded focus-accent">
+                        <input type="checkbox" id="toggle-neon-theme" onchange="toggleNeonTheme()" class="w-6 h-6 rounded focus-accent cursor-pointer">
                     </label>
-                    <label class="theme-card rounded-2xl p-4 flex items-center justify-between border border-gray-200 shadow-sm">
+                    <label class="theme-card rounded-2xl p-4 flex items-center justify-between border border-gray-200 shadow-sm cursor-pointer">
                         <span class="font-bold">Enhanced Visual Effects</span>
-                        <input type="checkbox" id="toggle-better-visuals" onchange="toggleBetterVisuals()" class="w-6 h-6 rounded focus-accent">
+                        <input type="checkbox" id="toggle-better-visuals" onchange="toggleBetterVisuals()" class="w-6 h-6 rounded focus-accent cursor-pointer">
                     </label>
                 </div>
             </div>
@@ -662,31 +713,43 @@
 
         <div id="view-tags" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
+                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors btn-elastic"><i class="fas fa-arrow-left text-gray-700"></i></button>
                 <h1 class="ml-4 text-[18px] font-black tracking-wide">Profile Tags 🏷️</h1>
             </header>
             <div class="p-5">
                 <div id="tags-container" class="mb-6"></div>
-                <p class="text-xs text-gray-500 font-bold text-center">Tags update automatically based on admin verification.</p>
+                
+                <!-- Interactive Tag Request Form -->
+                <div class="ios-card p-5 mt-6 theme-card border border-gray-100 shadow-sm rounded-3xl">
+                    <h3 class="font-black text-sm mb-2 flex items-center gap-1.5"><i class="fas fa-tags accent-text"></i> Request Custom Tag</h3>
+                    <p class="text-xs text-gray-400 font-semibold mb-4">Submit a tag string. Admin verification is required.</p>
+                    <form onsubmit="event.preventDefault(); submitTagRequest()" class="space-y-4">
+                        <input type="text" id="req-tag-input" placeholder="e.g. Trader King" max="15" required class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3.5 text-sm font-bold focus-accent theme-card text-center">
+                        <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg text-xs btn-elastic">Submit Tag Request</button>
+                    </form>
+                    <div id="tag-request-status-container" class="mt-4 p-4 rounded-2xl border text-xs font-semibold hidden text-center"></div>
+                </div>
+                
+                <p class="text-xs text-gray-500 font-bold text-center mt-6">Tags update automatically based on admin verification.</p>
             </div>
         </div>
 
         <div id="view-help" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
+                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors btn-elastic"><i class="fas fa-arrow-left text-gray-700"></i></button>
                 <h1 class="ml-4 text-[18px] font-black tracking-wide">Support 🎧</h1>
             </header>
             <div class="p-8 text-center mt-10">
                 <div class="w-24 h-24 accent-bg rounded-full text-white text-4xl flex items-center justify-center mx-auto mb-6 shadow-xl"><i class="fas fa-headset"></i></div>
                 <h2 class="text-2xl font-black mb-2">Need Help?</h2>
                 <p class="text-sm text-gray-500 mb-8">Click below to chat directly with our official support channel.</p>
-                <button id="help-support-link" onclick="window.open('https://t.me/lionpay', '_blank')" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg"><i class="fas fa-comments"></i> Chat with Admin</button>
+                <button id="help-support-link" onclick="window.open('https://t.me/lionpay', '_blank')" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg btn-elastic"><i class="fas fa-comments"></i> Chat with Admin</button>
             </div>
         </div>
 
         <div id="view-scan" class="view-section min-h-screen bg-black relative">
             <header class="flex items-center p-5 sticky top-0 z-[100] bg-transparent">
-                <button onclick="stopScanner(); showView('home')" class="w-10 h-10 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-arrow-left"></i></button>
+                <button onclick="stopScanner(); showView('home')" class="w-10 h-10 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center shadow-lg btn-elastic"><i class="fas fa-arrow-left"></i></button>
             </header>
             <div class="flex flex-col items-center justify-center px-4 pt-10 relative z-10" id="scanner-container">
                 <div id="scanner-box" class="relative w-72 h-72 rounded-[2rem] overflow-hidden border-[4px] accent-border shadow-[0_0_40px_var(--accent-glow)] bg-gray-900 transition-all duration-300">
@@ -706,8 +769,8 @@
                     <input type="number" id="scan-amt" required min="1" placeholder="Amount ₹" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-2xl font-black mb-5 text-center focus-accent theme-card">
                     <input type="text" id="scan-comment" placeholder="Optional Note" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-sm mb-5 focus-accent theme-card text-center">
                     <input type="password" id="scan-pin" required maxlength="4" placeholder="PIN" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-center tracking-widest font-black text-xl mb-6 focus-accent theme-card">
-                    <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg">Pay Now</button>
-                    <button type="button" onclick="resetScanner()" class="w-full mt-4 py-3 text-sm font-bold text-gray-400">Cancel & Scan Again</button>
+                    <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg btn-elastic">Pay Now</button>
+                    <button type="button" onclick="resetScanner()" class="w-full mt-4 py-3 text-sm font-bold text-gray-400 btn-elastic">Cancel & Scan Again</button>
                 </form>
             </div>
         </div>
@@ -715,13 +778,13 @@
         <!-- LIFAFA MANAGEMENT -->
         <div id="view-lifafa" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
+                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors btn-elastic"><i class="fas fa-arrow-left text-gray-700"></i></button>
                 <h1 class="ml-4 text-[18px] font-black tracking-wide">Lifafa Hub ✉️</h1>
             </header>
             <div class="p-5">
                 <div class="flex theme-card rounded-full p-1.5 gap-1 border border-gray-200 shadow-sm bg-gray-50 mb-6">
-                    <button onclick="switchLifafaTab('lifafa-create')" id="tab-lifafa-create-btn" class="flex-1 py-3 text-sm font-bold rounded-full transition-all tab-btn active bg-amber-500 text-white">Create</button>
-                    <button onclick="switchLifafaTab('lifafa-my')" id="tab-lifafa-my-btn" class="flex-1 py-3 text-sm font-bold rounded-full transition-all tab-btn text-gray-500">My Lifafa</button>
+                    <button onclick="switchLifafaTab('lifafa-create')" id="tab-lifafa-create-btn" class="flex-1 py-3 text-sm font-bold rounded-full transition-all tab-btn active bg-amber-500 text-white btn-elastic">Create</button>
+                    <button onclick="switchLifafaTab('lifafa-my')" id="tab-lifafa-my-btn" class="flex-1 py-3 text-sm font-bold rounded-full transition-all tab-btn text-gray-500 btn-elastic">My Lifafa</button>
                 </div>
 
                 <div id="lifafa-create-panel" class="lifafa-tab-content block">
@@ -774,7 +837,7 @@
                         <div class="mb-5">
                             <div class="flex justify-between items-center mb-2">
                                 <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wide">Verification Channels</label>
-                                <button type="button" onclick="addChannelInput()" class="text-xs font-black accent-text"><i class="fas fa-plus"></i> Add Channel</button>
+                                <button type="button" onclick="addChannelInput()" class="text-xs font-black accent-text btn-elastic"><i class="fas fa-plus"></i> Add Channel</button>
                             </div>
                             <div id="lifafa-channels-container" class="space-y-3">
                                 <input type="text" placeholder="E.g. @Lion_Pay" class="lifafa-channel-input w-full bg-gray-50 border rounded-2xl px-4 py-3 font-semibold focus-accent theme-card">
@@ -816,7 +879,7 @@
                         <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wide">Security PIN</label>
                         <input type="password" id="lifafa-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center tracking-widest font-black mb-6 focus-accent theme-card">
 
-                        <button type="submit" class="btn-animate w-full bg-amber-500 text-white font-black py-4 rounded-full shadow-lg text-lg">Create Lifafa</button>
+                        <button type="submit" class="btn-animate w-full bg-amber-500 text-white font-black py-4 rounded-full shadow-lg text-lg btn-elastic">Create Lifafa</button>
                     </form>
                 </div>
 
@@ -828,10 +891,10 @@
             </div>
         </div>
 
-        <!-- PUBLIC CLAIM WIZARD (MULTIPLAY MODES) -->
+        <!-- PUBLIC CLAIM WIZARD -->
         <div id="view-claim-lifafa" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 glass-nav border-b border-gray-100">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
+                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors btn-elastic"><i class="fas fa-arrow-left text-gray-700"></i></button>
                 <h1 class="ml-4 text-[18px] font-black tracking-wide">Claim Lifafa 🧧</h1>
             </header>
             <div class="p-5">
@@ -846,7 +909,7 @@
                         <h3 class="font-black text-lg text-center mb-4">Step 1: Verify Identity</h3>
                         <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wide">Your Registered Phone Number</label>
                         <input type="tel" id="claim-user-phone" required placeholder="Enter Phone Number" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center font-bold text-lg mb-6 focus-accent theme-card">
-                        <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg">Verify & Next</button>
+                        <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg btn-elastic">Verify & Next</button>
                     </form>
                 </div>
 
@@ -855,8 +918,8 @@
                         <h3 class="font-black text-lg text-center mb-1">Step 2: Join Channels</h3>
                         <p class="text-xs font-bold text-gray-400 text-center mb-6">Verify that you have joined all mandatory channels below.</p>
                         <div id="claim-channels-grid" class="grid grid-cols-2 gap-4 mb-6"></div>
-                        <button onclick="processClaimStep2()" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg mb-4">Verify Channels Joined</button>
-                        <button onclick="resetToStep(1)" class="w-full text-center text-xs font-bold text-gray-400">Back</button>
+                        <button onclick="processClaimStep2()" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-full shadow-lg mb-4 btn-elastic">Verify Channels Joined</button>
+                        <button onclick="resetToStep(1)" class="w-full text-center text-xs font-bold text-gray-400 btn-elastic">Back</button>
                     </div>
                 </div>
 
@@ -865,22 +928,21 @@
                         <h3 class="font-black text-lg mb-1">Step 3: Password Protected</h3>
                         <p class="text-xs font-bold text-gray-400 mb-6">Enter correct security password to claim balance.</p>
                         <input type="text" id="claim-password-input" required placeholder="Enter Password" class="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center font-bold text-lg mb-6 focus-accent theme-card uppercase">
-                        <button type="submit" class="btn-animate w-full bg-amber-500 text-white font-black py-4 rounded-full shadow-lg">Claim Now</button>
+                        <button type="submit" class="btn-animate w-full bg-amber-500 text-white font-black py-4 rounded-full shadow-lg btn-elastic">Claim Now</button>
                     </form>
                 </div>
 
-                <!-- GAMEPLAY SCREEN: COIN TOSS (50/50 Game) -->
+                <!-- GAMEPLAY SCREEN: COIN TOSS -->
                 <div id="claim-step-game-toss" class="step-container">
                     <div class="theme-card rounded-[2rem] p-6 shadow-md border border-gray-100 text-center">
                         <h3 class="font-black text-lg mb-1">Toss Challenge 🪙</h3>
                         <p class="text-xs font-bold text-gray-400 mb-6">Flip the coin. If it lands on the winning side chosen by creator, you claim the balance!</p>
                         
-                        <!-- Spinning Coin Graphic -->
                         <div class="relative w-36 h-36 mx-auto my-8 flex items-center justify-center">
                             <div id="coin-graphic" class="w-28 h-28 rounded-full border-4 border-yellow-500 bg-yellow-400 text-yellow-800 font-black text-3xl flex items-center justify-center shadow-lg">HEAD</div>
                         </div>
 
-                        <button id="btn-coin-toss-action" onclick="performCoinToss()" class="btn-animate w-full bg-amber-500 text-white font-black py-4 rounded-full shadow-lg text-lg">Toss Coin</button>
+                        <button id="btn-coin-toss-action" onclick="performCoinToss()" class="btn-animate w-full bg-amber-500 text-white font-black py-4 rounded-full shadow-lg text-lg btn-elastic">Toss Coin</button>
                     </div>
                 </div>
 
@@ -890,7 +952,6 @@
                         <h3 class="font-black text-lg mb-1">Scratch & Reveal 🧧</h3>
                         <p class="text-xs font-bold text-gray-400 mb-6">Swipe or drag across the card below to reveal and claim your random reward amount!</p>
                         
-                        <!-- Scratch Card Canvas Container -->
                         <div class="relative w-64 h-48 mx-auto border-4 border-dashed border-gray-300 rounded-3xl overflow-hidden bg-white mb-6">
                             <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
                                 <p class="text-xs font-bold text-gray-400 uppercase">Your Reveal Amount</p>
@@ -909,10 +970,10 @@
                     
                     <div id="referral-box-badluck" class="hidden mb-8 max-w-sm mx-auto">
                         <p class="text-xs text-gray-400 font-bold mb-3 uppercase">Campaign Enabled: Refer & Earn Reward Link</p>
-                        <button onclick="copyReferralLink()" class="btn-animate w-full bg-amber-500 text-white font-black py-4 rounded-full shadow-lg"><i class="fas fa-share-nodes"></i> Share & Earn Reward</button>
+                        <button onclick="copyReferralLink()" class="btn-animate w-full bg-amber-500 text-white font-black py-4 rounded-full shadow-lg btn-elastic"><i class="fas fa-share-nodes"></i> Share & Earn Reward</button>
                     </div>
 
-                    <button onclick="showView('home')" class="btn-animate w-full max-w-xs bg-gray-100 text-gray-800 font-black py-4 rounded-full shadow-md text-sm">Return Home</button>
+                    <button onclick="showView('home')" class="btn-animate w-full max-w-xs bg-gray-100 text-gray-800 font-black py-4 rounded-full shadow-md text-sm btn-elastic">Return Home</button>
                 </div>
 
                 <!-- STEP 4: Successful claim page -->
@@ -927,23 +988,22 @@
 
                     <div id="referral-box-success" class="hidden mb-8 max-w-sm mx-auto">
                         <p class="text-xs text-gray-400 font-bold mb-3 uppercase">Campaign Enabled: Refer & Earn Reward Link</p>
-                        <button onclick="copyReferralLink()" class="btn-animate w-full bg-amber-500 text-white font-black py-4 rounded-full shadow-lg"><i class="fas fa-share-nodes"></i> Share & Earn Reward</button>
+                        <button onclick="copyReferralLink()" class="btn-animate w-full bg-amber-500 text-white font-black py-4 rounded-full shadow-lg btn-elastic"><i class="fas fa-share-nodes"></i> Share & Earn Reward</button>
                     </div>
 
-                    <button onclick="showView('home')" class="btn-animate w-full max-w-xs accent-bg text-white font-black py-4 rounded-full shadow-lg">Go to Wallet Dashboard</button>
+                    <button onclick="showView('home')" class="btn-animate w-full max-w-xs accent-bg text-white font-black py-4 rounded-full shadow-lg btn-elastic">Go to Wallet Dashboard</button>
                 </div>
             </div>
         </div>
 
-        <!-- RE-DESIGNED PREMIUM SUBSCRIPTION PAGE -->
         <div id="view-premium" class="view-section min-h-screen theme-card relative pb-24">
             <header class="flex items-center p-5 sticky top-0 z-30 bg-transparent">
-                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-arrow-left text-gray-700"></i></button>
+                <button onclick="showView('home')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors text-gray-700 btn-elastic"><i class="fas fa-arrow-left text-gray-700"></i></button>
             </header>
             
             <div class="bg-gradient-to-b from-amber-400/20 to-transparent pt-4 pb-4 text-center px-6">
                 <div class="w-20 h-20 bg-gradient-to-br from-amber-400 to-yellow-500 text-white rounded-full flex items-center justify-center text-5xl mx-auto mb-4 shadow-[0_8px_25px_rgba(245,158,11,0.4)] animate-pulse">
-                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star text-white"></i>
                 </div>
                 <h2 class="text-3xl font-black tracking-tight mb-2 theme-text">Lion Premium</h2>
                 <p class="text-xs text-gray-500 font-bold max-w-xs mx-auto leading-relaxed">
@@ -1051,49 +1111,9 @@
                             <p class="text-[10px] text-gray-400 font-bold">Get a verified crown badge next to your profile.</p>
                         </div>
                     </div>
-
-                    <div class="flex items-start gap-3.5">
-                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-id-card"></i></div>
-                        <div>
-                            <h4 class="font-black text-xs text-gray-800 theme-text">Custom ID & Tag Discount</h4>
-                            <p class="text-[10px] text-gray-400 font-bold">Huge discounts on Custom IDs & unique name tags.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start gap-3.5">
-                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-wand-magic-sparkles"></i></div>
-                        <div>
-                            <h4 class="font-black text-xs text-gray-800 theme-text">Advanced Visual UI</h4>
-                            <p class="text-[10px] text-gray-400 font-bold">Animations, 3D glow effects, and a premium feel.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start gap-3.5">
-                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-headset"></i></div>
-                        <div>
-                            <h4 class="font-black text-xs text-gray-800 theme-text">Priority Customer Support</h4>
-                            <p class="text-[10px] text-gray-400 font-bold">Faster help and priority ticket routing by admins.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start gap-3.5">
-                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-ban"></i></div>
-                        <div>
-                            <h4 class="font-black text-xs text-gray-800 theme-text">No Service Fees</h4>
-                            <p class="text-[10px] text-gray-400 font-bold">Zero charges on server maintenance and deposits.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start gap-3.5">
-                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center shrink-0"><i class="fas fa-lightbulb"></i></div>
-                        <div>
-                            <h4 class="font-black text-xs text-gray-800 theme-text">Neon Theme</h4>
-                            <p class="text-[10px] text-gray-400 font-bold">Toggle neon glow aesthetics on custom app layouts.</p>
-                        </div>
-                    </div>
                 </div>
 
-                <button id="btn-premium-subscribe-now" onclick="processPremiumCheckout()" class="btn-animate w-full bg-amber-500 text-white font-black py-4 rounded-full shadow-[0_8px_20px_var(--accent-glow)] text-lg mb-6">
+                <button id="btn-premium-subscribe-now" onclick="processPremiumCheckout()" class="btn-animate w-full bg-amber-500 text-white font-black py-4 rounded-full shadow-[0_8px_20px_var(--accent-glow)] text-lg mb-6 btn-elastic">
                     Subscribe for ₹300.00 per year
                 </button>
             </div>
@@ -1106,10 +1126,10 @@
                 <p class="text-sm font-bold text-gray-400 mb-10">Secure Mobile Wallet</p>
                 <form onsubmit="event.preventDefault(); processLogin()" class="w-full max-w-sm">
                     <input type="tel" id="login-phone" required placeholder="Phone Number" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-lg mb-4 focus-accent font-bold transition-all text-center">
-                    <a href="https://t.me/Lion_Pay_Alert_Bot" target="_blank" class="block bg-blue-50 text-blue-500 font-bold text-xs py-3 px-4 rounded-full mb-4 text-center hover:bg-blue-100"><i class="fab fa-telegram"></i> Bot OTP Required First</a>
+                    <a href="https://t.me/Lion_Pay_Alert_Bot" target="_blank" class="block bg-blue-50 text-blue-500 font-bold text-xs py-3 px-4 rounded-full mb-4 text-center hover:bg-blue-100 btn-elastic"><i class="fab fa-telegram"></i> Bot OTP Required First</a>
                     <input type="password" id="login-pass" required placeholder="Password" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-lg mb-8 focus-accent font-bold tracking-widest text-center transition-all">
-                    <button type="submit" class="btn-animate w-full bg-gray-900 text-white font-black py-4 rounded-full shadow-xl mb-6 text-lg">Sign In</button>
-                    <div class="flex justify-between text-sm font-bold px-2"><button type="button" onclick="showAuthView('reset-pin')" class="text-gray-400 hover:text-gray-800">Forgot?</button><button type="button" onclick="showAuthView('signup')" class="text-blue-500">Create Account</button></div>
+                    <button type="submit" class="btn-animate w-full bg-gray-900 text-white font-black py-4 rounded-full shadow-xl mb-6 text-lg btn-elastic">Sign In</button>
+                    <div class="flex justify-between text-sm font-bold px-2"><button type="button" onclick="showAuthView('reset-pin')" class="text-gray-400 hover:text-gray-800 btn-elastic">Forgot?</button><button type="button" onclick="showAuthView('signup')" class="text-blue-500 btn-elastic">Create Account</button></div>
                 </form>
             </div>
             
@@ -1121,8 +1141,8 @@
                     <input type="password" id="reg-pass" required placeholder="Password" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 mb-3 font-bold text-center focus-accent">
                     <input type="password" id="reg-pin" required maxlength="4" pattern="\d{4}" placeholder="4-Digit PIN" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 mb-3 font-bold tracking-widest text-center focus-accent">
                     <input type="text" id="reg-telegram" required placeholder="Telegram User ID" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 mb-6 font-bold text-center focus-accent">
-                    <button type="submit" id="btn-signup-otp" class="btn-animate w-full bg-blue-500 text-white font-black py-4 rounded-full shadow-xl mb-6 text-lg">Send Telegram OTP</button>
-                    <button type="button" onclick="showAuthView('login')" class="w-full text-center text-gray-500 font-bold">Back to Login</button>
+                    <button type="submit" id="btn-signup-otp" class="btn-animate w-full bg-blue-500 text-white font-black py-4 rounded-full shadow-xl mb-6 text-lg btn-elastic">Send Telegram OTP</button>
+                    <button type="button" onclick="showAuthView('login')" class="w-full text-center text-gray-500 font-bold btn-elastic">Back to Login</button>
                 </form>
             </div>
             
@@ -1131,7 +1151,7 @@
                     <h2 class="text-2xl font-black mb-2 text-center">Verify OTP</h2>
                     <p class="text-center text-gray-500 mb-8 font-medium">Check telegram bot.</p>
                     <input type="text" id="otp-input" required maxlength="6" placeholder="------" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-5 text-3xl text-center mb-8 focus-accent font-black tracking-[0.5em]">
-                    <button type="submit" class="btn-animate w-full bg-gray-900 text-white font-black py-4 rounded-full shadow-xl mb-6 text-lg">Verify</button>
+                    <button type="submit" class="btn-animate w-full bg-gray-900 text-white font-black py-4 rounded-full shadow-xl mb-6 text-lg btn-elastic">Verify</button>
                 </form>
             </div>
             
@@ -1139,13 +1159,13 @@
                 <form onsubmit="event.preventDefault(); processResetPinStep1()" id="form-reset-1" class="w-full max-w-sm">
                     <h2 class="text-2xl font-black mb-8 text-center">Reset Info</h2>
                     <input type="tel" id="reset-phone" required placeholder="Registered Phone" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 mb-8 font-bold text-center focus-accent">
-                    <button type="submit" class="btn-animate w-full bg-gray-900 text-white font-black py-4 rounded-full shadow-xl mb-6 text-lg">Send OTP</button>
-                    <button type="button" onclick="showAuthView('login')" class="w-full text-center text-gray-500 font-bold">Cancel</button>
+                    <button type="submit" class="btn-animate w-full bg-gray-900 text-white font-black py-4 rounded-full shadow-xl mb-6 text-lg btn-elastic">Send OTP</button>
+                    <button type="button" onclick="showAuthView('login')" class="w-full text-center text-gray-500 font-bold btn-elastic">Cancel</button>
                 </form>
                 <form onsubmit="event.preventDefault(); processResetPinStep2()" id="form-reset-2" class="w-full max-w-sm hidden">
                     <input type="password" id="reset-new-pass" required placeholder="New Password" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 mb-4 font-bold text-center focus-accent">
                     <input type="password" id="reset-new-pin" required maxlength="4" placeholder="New PIN" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 mb-8 font-bold text-center focus-accent">
-                    <button type="submit" class="btn-animate w-full bg-green-500 text-white font-black py-4 rounded-full shadow-xl text-lg">Save Changes</button>
+                    <button type="submit" class="btn-animate w-full bg-green-500 text-white font-black py-4 rounded-full shadow-xl text-lg btn-elastic">Save Changes</button>
                 </form>
             </div>
         </div>
@@ -1154,13 +1174,13 @@
 
     <nav class="fixed bottom-0 left-0 w-full glass-nav z-40 pb-safe shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
         <div class="flex justify-between items-center px-6 py-2">
-            <a href="#" onclick="showView('home')" class="nav-item flex flex-col items-center gap-1 accent-text pt-2 pb-1 w-12"><i class="fas fa-home text-xl btn-animate"></i><span class="text-[9px] font-bold">Home</span></a>
-            <a href="#" onclick="showView('send')" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800 pt-2 pb-1 w-12"><i class="fas fa-paper-plane text-xl btn-animate"></i><span class="text-[9px] font-bold">Send</span></a>
-            <a href="#" onclick="showView('scan'); startScanner();" class="relative -top-5 group flex flex-col items-center">
-                <div class="w-14 h-14 accent-bg text-white rounded-full flex items-center justify-center shadow-[0_8px_20px_var(--accent-glow)] border-[3px] theme-card btn-animate"><i class="fas fa-qrcode text-2xl"></i></div>
+            <a href="#" onclick="showView('home')" class="nav-item flex flex-col items-center gap-1 accent-text pt-2 pb-1 w-12 btn-elastic"><i class="fas fa-home text-xl"></i><span class="text-[9px] font-bold">Home</span></a>
+            <a href="#" onclick="showView('send')" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800 pt-2 pb-1 w-12 btn-elastic"><i class="fas fa-paper-plane text-xl"></i><span class="text-[9px] font-bold">Send</span></a>
+            <a href="#" onclick="showView('scan'); startScanner();" class="relative -top-5 group flex flex-col items-center btn-elastic">
+                <div class="w-14 h-14 accent-bg text-white rounded-full flex items-center justify-center shadow-[0_8px_20px_var(--accent-glow)] border-[3px] theme-card"><i class="fas fa-qrcode text-2xl"></i></div>
             </a>
-            <a href="#" onclick="showView('statistics')" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800 pt-2 pb-1 w-12"><i class="fas fa-chart-pie text-xl btn-animate"></i><span class="text-[9px] font-bold">Stats</span></a>
-            <a href="#" onclick="showView('add')" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800 pt-2 pb-1 w-12"><i class="fas fa-wallet text-xl btn-animate"></i><span class="text-[9px] font-bold">Add</span></a>
+            <a href="#" onclick="showView('statistics')" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800 pt-2 pb-1 w-12 btn-elastic"><i class="fas fa-chart-pie text-xl"></i><span class="text-[9px] font-bold">Stats</span></a>
+            <a href="#" onclick="showView('add')" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800 pt-2 pb-1 w-12 btn-elastic"><i class="fas fa-wallet text-xl"></i><span class="text-[9px] font-bold">Add</span></a>
         </div>
     </nav>
 
@@ -1194,6 +1214,65 @@
             {name: "Lime", hex: "#84cc16"}, {name: "Hot Pink", hex: "#f43f5e"}, {name: "Midnight Blue", hex: "#1d4ed8"},
             {name: "Yellow Gold", hex: "#d97706"}
         ];
+
+        // --- SYNTHESIZED WEB AUDIO PLATFORM ---
+        const SoundEffects = {
+            ctx: null,
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+            play(type) {
+                try {
+                    if (currentUser && currentUser.premium) {
+                        this.init();
+                        if (this.ctx.state === 'suspended') {
+                            this.ctx.resume();
+                        }
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+
+                        if (type === 'click') {
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+                            osc.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.1);
+                            gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+                            gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+                            osc.start();
+                            osc.stop(this.ctx.currentTime + 0.1);
+                        } else if (type === 'credit') {
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(523.25, this.ctx.currentTime); // C5
+                            osc.frequency.setValueAtTime(659.25, this.ctx.currentTime + 0.08); // E5
+                            gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+                            gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+                            osc.start();
+                            osc.stop(this.ctx.currentTime + 0.25);
+                        } else if (type === 'debit') {
+                            osc.type = 'triangle';
+                            osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+                            osc.frequency.exponentialRampToValueAtTime(110, this.ctx.currentTime + 0.35);
+                            gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+                            gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+                            osc.start();
+                            osc.stop(this.ctx.currentTime + 0.4);
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Audio feedback omitted:", e);
+                }
+            }
+        };
+
+        // Enforce audio click listener triggers
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('button') || e.target.closest('a') || e.target.closest('.ios-grid-icon') || e.target.closest('[onclick]')) {
+                SoundEffects.play('click');
+            }
+        });
 
         let isActionOnCooldown = false;
         function checkCooldown() {
@@ -1291,6 +1370,39 @@
             currentUser.apiKey = newKey; updateApiKeyUI(); showToast("API Key Regenerated!");
         }
 
+        async function processSetCustomApiKey() {
+            const customKey = document.getElementById('custom-api-key-input').value.trim();
+            if(!customKey) return;
+            try {
+                await apiCall('SET_CUSTOM_API', { phone: currentUser.phone, newKey: customKey });
+                currentUser.apiKey = customKey;
+                updateApiKeyUI();
+                showToast("Custom API Key Applied!");
+                document.getElementById('custom-api-key-input').value = '';
+            } catch(e) {
+                alert(e.message);
+            }
+        }
+
+        // TAG REQUEST API SUBMISSION
+        async function submitTagRequest() {
+            const requestedTag = document.getElementById('req-tag-input').value.trim();
+            if (!requestedTag) return;
+            try {
+                await apiCall('SUBMIT_TAG_REQUEST', { phone: currentUser.phone, tag: requestedTag });
+                showToast("Tag Request Submitted!");
+                document.getElementById('req-tag-input').value = '';
+                
+                // Show status locally
+                const statusBox = document.getElementById('tag-request-status-container');
+                statusBox.classList.remove('hidden');
+                statusBox.className = "mt-4 p-4 rounded-2xl border text-xs font-semibold text-amber-600 bg-amber-50 border-amber-200 text-center";
+                statusBox.innerText = `Tag Request '${requestedTag}' is Pending Verification`;
+            } catch(e) {
+                alert(e.message);
+            }
+        }
+
         function showAuthView(view) { ['login', 'signup', 'otp', 'reset-pin'].forEach(v => document.getElementById('auth-' + v).classList.add('hidden')); document.getElementById('auth-' + view).classList.remove('hidden'); }
         
         function logoutUser() { 
@@ -1306,7 +1418,6 @@
             let cachedUser = localStorage.getItem('lionUserCache');
             let cachedTxns = localStorage.getItem('lionTxnCache');
 
-            // Retrieve Referral Info
             const urlParams = new URLSearchParams(window.location.search);
             const userReferPhone = urlParams.get('user');
             if (userReferPhone) {
@@ -1405,19 +1516,6 @@
             await apiCall('UPDATE_CREDS', { phone: resetPinPhone, password: newPass, pin: newPin }); showToast("Updated successfully!"); showAuthView('login');
         }
 
-        async function verifyOTP() {
-            let userOTP = document.getElementById('otp-input').value;
-            if(userOTP === pendingOTP) {
-                if(otpMode === 'signup') {
-                    let userPhone = pendingSignupUser.phone; let dbUser = { ...pendingSignupUser }; delete dbUser.phone;
-                    await apiCall('REGISTER', { phone: userPhone, userObj: dbUser }); 
-                    localStorage.setItem('lionSession', userPhone); 
-                    localStorage.setItem('lionUserCache', JSON.stringify(pendingSignupUser));
-                    currentUser = pendingSignupUser; document.getElementById('auth-wrapper').classList.add('hidden'); initApp(); showToast("Account Created!");
-                } else if (otpMode === 'reset_pin') { document.getElementById('form-reset-1').classList.add('hidden'); document.getElementById('form-reset-2').classList.remove('hidden'); showAuthView('reset-pin'); }
-            } else { showToast("Invalid OTP!"); }
-        }
-
         function createTxnObj(type, title, amount, status, icon, color, name, number) { return { id: generateTxnId(), type, title, amount, status, date: new Date().toLocaleString(), timestamp: Date.now(), icon, color, name, number, senderName: currentUser.name, senderId: type==='out'?currentUser.phone:(number!=='N/A'?number:'SYSTEM'), receiverId: type==='in'?currentUser.phone:(number!=='N/A'?number:'SYSTEM') }; }
 
         let isSyncing = false;
@@ -1439,12 +1537,51 @@
                     currentUser.phone = savedPhone;
                     localStorage.setItem('lionUserCache', JSON.stringify(currentUser)); 
 
+                    const lastBalance = currentBalance;
                     currentBalance = data.user.balance || 0; keeperBalance = data.user.keeperBalance || 0;
+                    
+                    // Award and deduct sound integration
+                    if (currentBalance > lastBalance && lastBalance !== 0) {
+                        SoundEffects.play('credit');
+                    } else if (currentBalance < lastBalance && lastBalance !== 0) {
+                        SoundEffects.play('debit');
+                    }
+
                     if(data.user.apiKey && data.user.apiKey !== currentUser.apiKey) { currentUser.apiKey = data.user.apiKey; updateApiKeyUI(); }
                     applyPremiumUI(); updateDPUI();
+
+                    // Render Local Tag status from payload
+                    if (currentUser.tagRequest) {
+                        const statusBox = document.getElementById('tag-request-status-container');
+                        if (statusBox) {
+                            statusBox.classList.remove('hidden');
+                            const req = currentUser.tagRequest;
+                            if (req.status === 'Pending') {
+                                statusBox.className = "mt-4 p-4 rounded-2xl border text-xs font-semibold text-amber-600 bg-amber-50 border-amber-200 text-center";
+                                statusBox.innerText = `Requested Tag '${req.requestedTag}' is Pending Admin Approval`;
+                            } else if (req.status === 'Approved') {
+                                statusBox.className = "mt-4 p-4 rounded-2xl border text-xs font-semibold text-green-600 bg-green-50 border-green-200 text-center";
+                                statusBox.innerText = `Custom Tag Approved!`;
+                            } else {
+                                statusBox.className = "mt-4 p-4 rounded-2xl border text-xs font-semibold text-red-600 bg-red-50 border-red-200 text-center";
+                                statusBox.innerText = `Tag Request Rejected by Admin`;
+                            }
+                        }
+                    }
                 }
                 if(data.settings) {
                     globalSettings = data.settings;
+                    
+                    // Admin dynamic linkages
+                    let upiIdEl = document.getElementById('ui-upi-id');
+                    if (upiIdEl && globalSettings.upiId) {
+                        upiIdEl.innerText = globalSettings.upiId;
+                    }
+                    
+                    let supportLinkEl = document.getElementById('help-support-link');
+                    if (supportLinkEl && globalSettings.supportUser) {
+                        supportLinkEl.setAttribute('onclick', `window.open('${globalSettings.supportUser}', '_blank')`);
+                    }
                 }
                 if(data.txns) {
                     transactions = data.txns;
@@ -1469,9 +1606,75 @@
             isSyncing = false;
         }
 
-        function hexToRgba(hex, alpha) {
-            let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
-            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        // --- INTERACTIVE RECEIPT MODAL TRIGGERS ---
+        function openReceipt(txnId) {
+            const txn = transactions.find(t => t.id === txnId);
+            if (!txn) return;
+
+            document.getElementById('receipt-sender').innerText = txn.senderName || txn.senderId || 'System';
+            
+            let rName = txn.name || txn.receiverId || 'User';
+            if (txn.title && txn.title.includes('Bulk')) {
+                rName = txn.number || 'Bulk Recipients';
+            }
+            document.getElementById('receipt-receiver').innerText = rName;
+            
+            document.getElementById('receipt-amount').innerText = `₹${parseFloat(txn.amount).toFixed(2)}`;
+            document.getElementById('receipt-date').innerText = txn.date;
+            document.getElementById('receipt-id').innerText = txn.id;
+
+            // Extra rows if code is present
+            const extraRow = document.getElementById('receipt-extra-row');
+            const extraLabel = document.getElementById('receipt-extra-label');
+            const extraVal = document.getElementById('receipt-extra-val');
+            
+            if (txn.title && txn.title.includes('Gift')) {
+                extraRow.classList.remove('hidden');
+                extraLabel.innerText = "GIFT CODE:";
+                extraVal.innerText = txn.status.replace("Code: ", "");
+            } else if (txn.title && txn.title.includes('Lifafa') && txn.receiverId !== 'SYSTEM') {
+                extraRow.classList.remove('hidden');
+                extraLabel.innerText = "LIFAFA LINK:";
+                extraVal.innerText = window.location.origin + "?id=" + txn.receiverId;
+            } else {
+                extraRow.classList.add('hidden');
+            }
+
+            // Comments Row
+            const commentRow = document.getElementById('receipt-comment-row');
+            const commentVal = document.getElementById('receipt-comment');
+            if (txn.comment) {
+                commentRow.classList.remove('hidden');
+                commentVal.innerText = txn.comment;
+            } else {
+                commentRow.classList.add('hidden');
+            }
+
+            const modal = document.getElementById('receiptModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                document.getElementById('receiptModalContent').classList.remove('scale-95');
+            }, 50);
+        }
+
+        function closeReceiptModal() {
+            const modal = document.getElementById('receiptModal');
+            modal.classList.add('opacity-0');
+            document.getElementById('receiptModalContent').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function copyReceiptDetails() {
+            const s = document.getElementById('receipt-sender').innerText;
+            const r = document.getElementById('receipt-receiver').innerText;
+            const a = document.getElementById('receipt-amount').innerText;
+            const d = document.getElementById('receipt-date').innerText;
+            const id = document.getElementById('receipt-id').innerText;
+            const text = `Lion Pay Receipt\nSender: ${s}\nReceiver: ${r}\nAmount: ${a}\nDate: ${d}\nTxn ID: ${id}`;
+            copyText(text);
         }
 
         function applyPremiumUI() {
@@ -1487,6 +1690,7 @@
             
             document.documentElement.style.setProperty('--accent-main', currentAccent);
             document.documentElement.style.setProperty('--accent-glow', hexToRgba(currentAccent, 0.4));
+            document.documentElement.style.setProperty('--accent-bg-ultra-light', hexToRgba(currentAccent, 0.04));
             document.documentElement.style.setProperty('--premium-grad-1', hexToRgba(currentAccent, 0.15));
             document.documentElement.style.setProperty('--premium-grad-2', hexToRgba(currentAccent, 0.05));
             localStorage.setItem('lp_color', currentAccent);
@@ -1499,6 +1703,7 @@
                 document.getElementById('premium-lifafa-box').classList.remove('hidden');
                 document.getElementById('privacy-setting-row').classList.remove('hidden');
                 document.getElementById('btn-balance-privacy').classList.remove('hidden');
+                document.getElementById('premium-api-key-box').classList.remove('hidden');
                 
                 let tagToShow = currentUser.customUserTag || currentUser.tag || 'Premium';
                 document.getElementById('ui-verified-badge').innerHTML = `<i class="fas fa-crown text-yellow-400"></i> ${tagToShow}`;
@@ -1540,6 +1745,7 @@
                 document.getElementById('premium-lifafa-box').classList.add('hidden');
                 document.getElementById('privacy-setting-row').classList.add('hidden');
                 document.getElementById('btn-balance-privacy').classList.add('hidden');
+                document.getElementById('premium-api-key-box').classList.add('hidden');
                 
                 document.getElementById('ui-verified-badge').innerHTML = `<i class="fas fa-shield-alt"></i> Verified`;
                 document.documentElement.classList.remove('premium-mode');
@@ -1557,7 +1763,6 @@
                 localStorage.setItem('lp_theme', 'light');
             }
             
-            // Sync toggles settings UI state
             let tglNeon = document.getElementById('toggle-neon-theme');
             if (tglNeon) tglNeon.checked = localStorage.getItem('lp_neon') === 'true';
             
@@ -1742,13 +1947,24 @@
                         if (s === 'pending') { statusColor = 'text-amber-500'; amountClass = 'text-amber-500'; } 
                         else if (s === 'rejected') { statusColor = 'text-red-500'; amountClass = 'text-red-500'; } 
                         else { if (txn.type === 'in') { statusColor = 'text-green-500'; amountClass = 'text-green-500'; sign = '+'; } else { statusColor = 'text-green-500'; amountClass = 'text-red-500'; sign = '-'; } }
-                        listEl.innerHTML += `<div class="flex justify-between items-center p-4 border-b border-gray-100 hover:bg-gray-50 theme-card transition-colors"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-full theme-card accent-text flex items-center justify-center text-lg border border-gray-200 shadow-sm"><i class="fas ${txn.icon}"></i></div><div><p class="text-sm font-bold text-gray-800 theme-text truncate max-w-[150px]">${txn.title}</p><p class="text-[10px] ${statusColor} font-bold mt-0.5 uppercase tracking-wider">${txn.status}</p></div></div><p class="font-black ${amountClass}">${sign}₹${parseFloat(txn.amount).toFixed(2)}</p></div>`;
+                        listEl.innerHTML += `
+                            <div onclick="openReceipt('${txn.id}')" class="flex justify-between items-center p-4 border-b border-gray-100 hover:bg-gray-50/50 theme-card transition-colors cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-11 h-11 rounded-full theme-card accent-text flex items-center justify-center text-lg border border-gray-200 shadow-sm">
+                                        <i class="fas ${txn.icon}"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-gray-800 theme-text truncate max-w-[150px]">${txn.title}</p>
+                                        <p class="text-[10px] ${statusColor} font-bold mt-0.5 uppercase tracking-wider">${txn.status}</p>
+                                    </div>
+                                </div>
+                                <p class="font-black ${amountClass}">${sign}₹${parseFloat(txn.amount).toFixed(2)}</p>
+                            </div>`;
                     });
                 }
             }
         }
 
-        // STATS LOGIC
         function renderStatistics() {
             let filterStatus = document.getElementById('stat-filter-status') ? document.getElementById('stat-filter-status').value : 'ALL';
             let filterType = document.getElementById('stat-filter-type') ? document.getElementById('stat-filter-type').value : 'ALL';
@@ -1792,7 +2008,21 @@
                 else if (s === 'rejected') { statusColor = 'text-red-500'; amountClass = 'text-red-500'; } 
                 else { if (txn.type === 'in') { statusColor = 'text-green-500'; amountClass = 'text-green-500'; sign = '+'; } else { statusColor = 'text-green-500'; amountClass = 'text-red-500'; sign = '-'; } }
                 
-                listEl.innerHTML += `<div class="flex justify-between items-center p-5 border-b border-gray-100 hover:bg-gray-50 theme-card transition-colors"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-gray-50 text-gray-600 flex items-center justify-center text-lg border border-gray-200 shadow-sm"><i class="fas ${txn.icon}"></i></div><div><p class="text-[14px] font-black text-gray-800 theme-text max-w-[150px] truncate">${txn.title}</p><p class="text-[10px] ${statusColor} font-bold mt-0.5 uppercase tracking-wider">${txn.status} • ${txn.date.split(',')[0]}</p></div></div><div class="text-right"><p class="font-black text-lg ${amountClass} tracking-tight">${sign}₹${parseFloat(txn.amount).toFixed(2)}</p></div></div>`;
+                listEl.innerHTML += `
+                    <div onclick="openReceipt('${txn.id}')" class="flex justify-between items-center p-5 border-b border-gray-100 hover:bg-gray-50/50 theme-card transition-colors cursor-pointer">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-gray-50 text-gray-600 flex items-center justify-center text-lg border border-gray-200 shadow-sm">
+                                <i class="fas ${txn.icon}"></i>
+                            </div>
+                            <div>
+                                <p class="text-[14px] font-black text-gray-800 theme-text max-w-[150px] truncate">${txn.title}</p>
+                                <p class="text-[10px] ${statusColor} font-bold mt-0.5 uppercase tracking-wider">${txn.status} • ${txn.date.split(',')[0]}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-black text-lg ${amountClass} tracking-tight">${sign}₹${parseFloat(txn.amount).toFixed(2)}</p>
+                        </div>
+                    </div>`;
             });
         }
 
@@ -1966,7 +2196,6 @@
             } catch(e) { showToast(e.message); }
         }
 
-        // KEEPER SYSTEMS
         function switchKeeperTab(tabId) {
             document.querySelectorAll('.keeper-tab-btn').forEach(btn => btn.className = "flex-1 py-3 text-sm font-bold rounded-full transition-all keeper-tab-btn text-gray-500 bg-transparent");
             document.querySelectorAll('.keeper-tab-content').forEach(c => c.classList.add('hidden'));
@@ -2010,7 +2239,6 @@
             } catch(e) { showToast(e.message); }
         }
 
-        // PREMIUM MEMBERSHIP STORE
         async function buyPremiumSubscription(duration, cost) {
             if(currentBalance < cost) return alert("Insufficient balance! Please add money to your wallet.");
             if(!confirm(`Buy premium access for ₹${cost}?`)) return;
@@ -2025,7 +2253,6 @@
             } catch(e) { alert(e.message); }
         }
 
-        // LIFAFA CREATION UTILS
         function switchLifafaTab(tabId) {
             document.querySelectorAll('.lifafa-tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('#view-lifafa .tab-btn').forEach(b => {
@@ -2102,10 +2329,9 @@
                 minAmt = parseFloat(document.getElementById('lifafa-min-amt').value) || 0;
                 maxAmt = parseFloat(document.getElementById('lifafa-max-amt').value) || 0;
                 if (maxAmt < minAmt) return showToast("Max range must be greater than Min!");
-                perUserAmt = maxAmt; // Deducts based on maximum possible reward
+                perUserAmt = maxAmt; 
             }
 
-            // Referral parameters security check
             if (perUserAmt === 0 && (type === 'Standard' || type === 'Toss')) {
                 if (!isReferCampaign || referAmt < 1) {
                     return showToast("Refer reward must be at least ₹1 if claim balance is zero.");
@@ -2117,7 +2343,6 @@
                 }
             }
 
-            // Cost formula parsing
             const claimBudget = perUserAmt * users;
             const referBudget = referAmt * users;
             const totalCost = claimBudget + referBudget;
@@ -2149,7 +2374,6 @@
                     isPremiumOnly: isPremOnly,
                     pin: pin,
                     txn: txn,
-                    // Scratch & Toss fields
                     minAmount: minAmt,
                     maxAmount: maxAmt,
                     winningSide: winningSide,
@@ -2160,7 +2384,6 @@
                 alert(`🧧 Lifafa successfully created!\n\nLink: ${shareLink}\n\nShare this with users.`);
                 currentBalance -= totalCost;
                 
-                // Form Resets
                 document.getElementById('lifafa-per-user').value = '';
                 document.getElementById('lifafa-total-users').value = '';
                 document.getElementById('lifafa-claim-password').value = '';
@@ -2224,9 +2447,9 @@
                             </div>
 
                             <div class="grid grid-cols-3 gap-2">
-                                <button onclick="copyText('${link}')" class="bg-gray-100 text-gray-800 font-bold text-xs py-3 rounded-full hover:bg-gray-200 transition-colors flex items-center justify-center gap-1"><i class="fas fa-copy"></i> Copy Link</button>
-                                <button onclick="toggleLifafaStatus('${l.id}', '${l.status}')" class="${stopClass} text-white font-bold text-xs py-3 rounded-full flex items-center justify-center gap-1">${stopLabel}</button>
-                                <button onclick="deleteLifafaCampaign('${l.id}')" class="bg-red-500 text-white font-bold text-xs py-3 rounded-full flex items-center justify-center gap-1"><i class="fas fa-trash"></i> Delete</button>
+                                <button onclick="copyText('${link}')" class="bg-gray-100 text-gray-800 font-bold text-xs py-3 rounded-full hover:bg-gray-200 transition-colors flex items-center justify-center gap-1 btn-elastic"><i class="fas fa-copy"></i> Copy Link</button>
+                                <button onclick="toggleLifafaStatus('${l.id}', '${l.status}')" class="${stopClass} text-white font-bold text-xs py-3 rounded-full flex items-center justify-center gap-1 btn-elastic">${stopLabel}</button>
+                                <button onclick="deleteLifafaCampaign('${l.id}')" class="bg-red-500 text-white font-bold text-xs py-3 rounded-full flex items-center justify-center gap-1 btn-elastic"><i class="fas fa-trash"></i> Delete</button>
                             </div>
                         </div>
                     `;
@@ -2238,10 +2461,10 @@
             const nextStatus = currentStatus === 'STOPPED' ? 'ACTIVE' : 'STOPPED';
             if (!confirm(`Are you sure you want to change status to ${nextStatus}?`)) return;
             try {
-                await apiCall('UPDATE_PREFS', { phone: currentUser.phone }); // Dummy trigger to establish connection
+                await apiCall('UPDATE_PREFS', { phone: currentUser.phone }); 
                 const updates = {};
                 updates[`lifafas/${id}/status`] = nextStatus;
-                await apiCall('UPDATE_PRIVACY', { phone: currentUser.phone, privacyMode: currentUser.privacyMode }); // Trigger sync update
+                await apiCall('UPDATE_PRIVACY', { phone: currentUser.phone, privacyMode: currentUser.privacyMode }); 
                 alert(`Status successfully updated to ${nextStatus}!`);
                 loadMyLifafas();
             } catch(e) { showToast(e.message); }
@@ -2252,7 +2475,6 @@
             try {
                 const lifafa = await apiCall('GET_LIFAFA_INFO', { code: id });
                 if (lifafa.claimedUsers >= lifafa.totalUsers) {
-                    // Fully claimed already, delete directly
                     const updates = {};
                     updates[`lifafas/${id}`] = null;
                     await apiCall('UPDATE_PRIVACY', { phone: currentUser.phone, privacyMode: currentUser.privacyMode });
@@ -2282,7 +2504,6 @@
             } catch(e) { alert(e.message); }
         }
 
-        // PUBLIC CLAIM ENGINE WITH GAMEPLAY SCENARIOS
         async function initiateLifafaClaimFlow(code) {
             activeClaimTargetId = code;
             activeClaimingUser = null;
@@ -2306,14 +2527,12 @@
                 const lInfo = await apiCall('GET_LIFAFA_INFO', { code: activeClaimTargetId });
                 loadedTargetLifafaData = lInfo;
                 
-                // Status gates
                 if (lInfo.status === 'STOPPED') {
                     alert("This Lifafa campaign is currently stopped by the creator.");
                     showView('home');
                     return;
                 }
 
-                // If user has already claimed, jump immediately to the Refer-and-Earn screen (if enabled)
                 if (lInfo.claimers && lInfo.claimers[phone]) {
                     if (lInfo.referAmount && lInfo.referAmount > 0) {
                         document.getElementById('claim-win-amount').innerText = parseFloat(lInfo.amount || 0).toFixed(2);
@@ -2343,7 +2562,7 @@
                         grid.innerHTML += `
                             <div class="theme-card p-4 rounded-2xl border border-gray-100 text-center flex flex-col justify-between">
                                 <p class="font-bold text-xs truncate mb-2">${ch}</p>
-                                <a href="${link}" target="_blank" class="bg-blue-500 text-white font-black text-[10px] py-2 rounded-full inline-block uppercase">Join Channel</a>
+                                <a href="${link}" target="_blank" class="bg-blue-500 text-white font-black text-[10px] py-2 rounded-full inline-block uppercase btn-elastic">Join Channel</a>
                             </div>
                         `;
                     });
@@ -2398,7 +2617,6 @@
             }
         }
 
-        // TOSS GAMEPLAY INTERACTION
         function performCoinToss() {
             const coin = document.getElementById('coin-graphic');
             const btn = document.getElementById('btn-coin-toss-action');
@@ -2416,11 +2634,9 @@
                     btn.disabled = false;
                     btn.innerText = "Toss Coin";
                     
-                    // Match creator winningSide
                     if (tossResult === loadedTargetLifafaData.winningSide) {
                         claimLifafaFunds(loadedTargetLifafaData.amount);
                     } else {
-                        // Toss claim failed
                         if (loadedTargetLifafaData.referAmount && loadedTargetLifafaData.referAmount > 0) {
                             document.getElementById('referral-box-badluck').classList.remove('hidden');
                         }
@@ -2430,7 +2646,6 @@
             }, 2000);
         }
 
-        // SCRATCH CARD INTERACTION
         function initScratchGameplay() {
             resetToStep('game-scratch');
             const canvas = document.getElementById('scratch-canvas');
@@ -2440,7 +2655,6 @@
             canvas.width = wrap.offsetWidth;
             canvas.height = wrap.offsetHeight;
 
-            // Fill canvas with gray scratch cover
             ctx.fillStyle = '#b0b0b0';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#555555';
@@ -2450,7 +2664,6 @@
 
             let isDrawing = false;
             let scratchedPixels = 0;
-            const totalPixels = canvas.width * canvas.height;
 
             function scratch(e) {
                 if(!isDrawing) return;
@@ -2466,13 +2679,11 @@
                 ctx.arc(x, y, 20, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Roughly calculate percent scratched
                 scratchedPixels++;
-                if (scratchedPixels > 70) { // Quick swiping check threshold
+                if (scratchedPixels > 70) { 
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     isDrawing = false;
                     
-                    // Determine random win inside range
                     const min = parseFloat(loadedTargetLifafaData.minAmount || 0);
                     const max = parseFloat(loadedTargetLifafaData.maxAmount || 0);
                     const finalReward = min + (Math.random() * (max - min));
@@ -2492,14 +2703,12 @@
             canvas.addEventListener('touchmove', scratch);
         }
 
-        // SUBMIT CLAIM ENDPOINT
         async function claimLifafaFunds(finalCalculatedAmt) {
             showToast("Processing Secure Claim...");
             const txnId = generateTxnId();
             const txn = createTxnObj('in', `Lifafa Claims Verification`, finalCalculatedAmt, `Pending Verification`, 'fa-envelope-open-text', 'green', 'Lifafa System', activeClaimTargetId);
             txn.id = txnId;
 
-            // Optional claim password parameter extraction
             const password = document.getElementById('claim-password-input').value.trim();
 
             try {
@@ -2512,7 +2721,6 @@
                     amount: finalCalculatedAmt
                 });
 
-                // Award referral payout if validated referer found
                 if (refererPhone && refererPhone !== activeClaimingUser.phone && loadedTargetLifafaData.referAmount > 0) {
                     const refTxn = createTxnObj('in', `Lifafa Refer Reward`, loadedTargetLifafaData.referAmount, `Success`, 'fa-share-nodes', 'green', 'Refer Payout', activeClaimTargetId);
                     await apiCall('EXECUTE_TXN', {
@@ -2523,7 +2731,6 @@
                     });
                 }
 
-                // Render dynamic details
                 document.getElementById('claim-win-amount').innerText = parseFloat(finalCalculatedAmt).toFixed(2);
                 
                 if (loadedTargetLifafaData.referAmount && loadedTargetLifafaData.referAmount > 0) {
@@ -2544,11 +2751,16 @@
             }
         }
 
-        // REFER AND EARN CAMPAIGN SYSTEM
         function copyReferralLink() {
             const cleanUrl = window.location.origin + "?id=" + activeClaimTargetId + "&user=" + activeClaimingUser.phone;
             copyText(cleanUrl);
-            showToast("Referral URL Copied to clipboard!");
+            showToast("Referral URL Copied!");
+        }
+
+        function resetToStep(step) {
+            document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+            const container = document.getElementById('claim-step-' + step);
+            if(container) container.classList.add('active');
         }
 
         window.onload = checkAuth;
