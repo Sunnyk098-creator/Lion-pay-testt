@@ -16,6 +16,7 @@ const db = getDatabase(app);
 const botToken = "7980852115:AAF_Tf6WL-mGm_IMkt4QP3Yu8LKZoc6JSUg";
 const botUserId = "7980852115";
 
+// Helper function to format channel usernames
 function formatChannelId(channel) {
     let clean = channel.trim();
     if (!clean.startsWith('@') && !clean.startsWith('-')) {
@@ -24,6 +25,7 @@ function formatChannelId(channel) {
     return clean;
 }
 
+// Helper: Check if Telegram Bot is Admin in a specific channel
 async function verifyBotAdminInChannel(channel) {
     const chatId = formatChannelId(channel);
     try {
@@ -38,6 +40,7 @@ async function verifyBotAdminInChannel(channel) {
     }
 }
 
+// Helper: Check if a Telegram User is in a specific channel
 async function verifyUserInChannel(channel, tgUserId) {
     const chatId = formatChannelId(channel);
     try {
@@ -167,7 +170,6 @@ export default async function handler(req, res) {
             if(data.accentColor !== undefined) updates[`users/${data.phone}/accentColor`] = data.accentColor;
             if(data.customUserTag !== undefined) updates[`users/${data.phone}/customUserTag`] = data.customUserTag;
             if(data.colorfulMode !== undefined) updates[`users/${data.phone}/colorfulMode`] = data.colorfulMode;
-            if(data.soundEnabled !== undefined) updates[`users/${data.phone}/soundEnabled`] = data.soundEnabled;
             await update(ref(db), updates);
             return res.json({ data: "Success" });
         }
@@ -194,12 +196,6 @@ export default async function handler(req, res) {
             return res.json({ data: "Success" });
         }
 
-        if (action === 'REQUEST_TAG') {
-            const { phone, tag, uid, username } = data;
-            await update(ref(db, `tag_requests/${phone}`), { tag, uid, username, status: 'Pending', date: Date.now() });
-            return res.json({ data: "Success" });
-        }
-
         if (action === 'UPDATE_PRIVACY') {
             const uSnap = await get(ref(db, `users/${data.phone}`));
             if (!uSnap.exists()) throw new Error("User not found!");
@@ -223,31 +219,32 @@ export default async function handler(req, res) {
             if (!data.phone) throw new Error("Phone number missing for Sync");
             const safeRoundId = data.gameRoundId || 'NONE';
             
-            // Safe fetches to prevent complete crash if a node has permission issues
             const [uSnap, cSnap, tSnap, gSnap, pSnap] = await Promise.all([ 
-                get(ref(db, `users/${data.phone}`)).catch(() => null), 
-                get(ref(db, "settings")).catch(() => null), 
-                get(ref(db, "transactions")).catch(() => null), 
-                get(ref(db, `game_rounds/${safeRoundId}`)).catch(() => null),
-                get(ref(db, "posts")).catch(() => null)
+                get(ref(db, `users/${data.phone}`)), 
+                get(ref(db, "settings")), 
+                get(ref(db, "transactions")), 
+                get(ref(db, `game_rounds/${safeRoundId}`)),
+                get(ref(db, "posts"))
             ]);
             
-            let userData = (uSnap && uSnap.exists()) ? uSnap.val() : {};
-            let settingsData = (cSnap && cSnap.exists()) ? cSnap.val() : {};
+            let userData = uSnap.val() || {};
             
             if (userData.premium && userData.premiumExpiry) {
                 if (Date.now() > Number(userData.premiumExpiry)) {
                     let newKey = 'LP-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase();
-                    userData = { ...userData, premium: false, premiumExpiry: null, theme: null, tag: null, advancedUI: false, accentColor: null, customUserTag: null, privacyMode: false, apiKey: newKey, soundEnabled: false };
-                    await update(ref(db, `users/${data.phone}`), userData);
+                    userData = { ...userData, premium: false, premiumExpiry: null, theme: null, tag: null, advancedUI: false, accentColor: null, customUserTag: null, privacyMode: false, apiKey: newKey };
+                    await update(ref(db, `users/${data.phone}`), { 
+                        premium: false, premiumExpiry: null, theme: null, tag: null, advancedUI: false, accentColor: null, customUserTag: null, privacyMode: false, apiKey: newKey 
+                    });
                 }
             } else if (!userData.premium && userData.privacyMode) {
+                // Safeguard: Reset privacy options if premium is inactive
                 userData.privacyMode = false;
                 await update(ref(db, `users/${data.phone}`), { privacyMode: false });
             }
 
             let txns = [];
-            if(tSnap && tSnap.exists()) {
+            if(tSnap.exists()) {
                 tSnap.forEach(c => {
                     let t = c.val();
                     if(t.senderId === data.phone || t.receiverId === data.phone) {
@@ -268,7 +265,7 @@ export default async function handler(req, res) {
                         } 
                         else if (t.receiverId === data.phone) { 
                             adaptedTxn.type = 'in'; 
-                            if (t.senderId === 'SYSTEM' || t.senderId === data.phone || t.title.includes('Lifafa') || t.title.includes('Deposit via') || t.title.includes('Game') || t.title.includes('Gift') || t.title.includes('Maintenance Fee') || t.title.includes('Refer Reward')) {
+                            if (t.senderId === 'SYSTEM' || t.senderId === data.phone || t.title.includes('Lifafa') || t.title.includes('Deposit via') || t.title.includes('Game') || t.title.includes('Gift') || t.title.includes('Maintenance Fee')) {
                                 adaptedTxn.title = t.title;
                             } else {
                                 adaptedTxn.title = t.isApi ? `API Payment Received from ${sName}` : `Received from ${sName}`; 
@@ -283,9 +280,24 @@ export default async function handler(req, res) {
             txns.sort((a, b) => b.timestamp - a.timestamp);
 
             let postsArr = [];
-            if (pSnap && pSnap.exists()) { pSnap.forEach(p => { postsArr.push(p.val()); }); }
+            if (pSnap.exists()) { pSnap.forEach(p => { postsArr.push(p.val()); }); }
 
-            return res.json({ data: { user: userData, settings: settingsData, txns: txns, gameRound: (gSnap && gSnap.exists()) ? gSnap.val() : { totalRed: 0, totalGreen: 0 }, posts: postsArr }});
+            get(ref(db, 'game_rounds')).then(allGamesSnap => {
+                if (allGamesSnap.exists()) {
+                    let rounds = [];
+                    allGamesSnap.forEach(child => { rounds.push(child.key); });
+                    if (rounds.length > 5) {
+                        rounds.sort(); 
+                        let updates = {};
+                        for(let i = 0; i < 3; i++) {
+                            if (rounds[i]) updates[`game_rounds/${rounds[i]}`] = null;
+                        }
+                        update(ref(db), updates).catch(()=>{});
+                    }
+                }
+            }).catch(()=>{});
+
+            return res.json({ data: { user: userData, settings: cSnap.val() || {}, txns: txns, gameRound: gSnap.val() || { totalRed: 0, totalGreen: 0 }, posts: postsArr }});
         }
 
         if (action === 'EXECUTE_TXN') {
@@ -307,6 +319,7 @@ export default async function handler(req, res) {
             let senderName = uSnap.val().name || "User";
             let statusLabel = isPremium ? "(Premium)" : "(Normal)";
 
+            // Ghost Send feature validation
             if (data.mode === 'GHOST_SEND' && !isPremium) {
                 throw new Error("Ghost Send is restricted to Premium accounts.");
             }
@@ -348,18 +361,21 @@ export default async function handler(req, res) {
             }
             await update(ref(db), updates); 
             
+            // Telegram Notification
             if (data.mode === 'WITHDRAW') {
                 try {
-                    const cSnap = await get(ref(db, "settings"));
-                    const adminChatId = cSnap.exists() && cSnap.val().adminChatId ? cSnap.val().adminChatId : "6038965890";
+                    const botTokenLocal = "7980852115:AAF_Tf6WL-mGm_IMkt4QP3Yu8LKZoc6JSUg";
+                    const chatIds = ["6038965890", "8522410574"];
                     const upiId = data.txn ? data.txn.number : 'N/A';
-                    const msg = `Withdrawal Request\n\nName: ${senderName}\nNumber: ${data.sender}\nAmount: ₹${amt}\nUPI ID: ${upiId}`;
+                    const msg = `📤 *New Withdrawal Request* 📤\n\n👤 *Name:* ${senderName}\n📱 *Number:* ${data.sender}\n💰 *Amount:* ₹${amt}\n🏦 *UPI ID:* ${upiId}`;
 
-                    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ chat_id: adminChatId, text: msg })
-                    }).catch(e => { });
+                    for (const chatId of chatIds) {
+                        fetch(`https://api.telegram.org/bot${botTokenLocal}/sendMessage`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ chat_id: chatId, text: msg, parse_mode: 'Markdown' })
+                        }).catch(e => { });
+                    }
                 } catch (e) { }
             }
 
@@ -424,6 +440,7 @@ export default async function handler(req, res) {
             if (sBal < totalDeduct) throw new Error("Insufficient Balance to create Lifafa!");
             if (data.pin !== uSnap.val().pin) throw new Error("Incorrect Security PIN!");
 
+            // Check if there are channels to verify
             let channelsList = Array.isArray(data.channels) ? data.channels.filter(c => c.trim() !== "") : [];
             for (const ch of channelsList) {
                 const isAdmin = await verifyBotAdminInChannel(ch);
@@ -452,10 +469,6 @@ export default async function handler(req, res) {
                     channels: channelsList, 
                     password: (data.password && data.password.trim() !== "") ? data.password.trim() : "",
                     isPremiumOnly: data.isPremiumOnly === true,
-                    referAmount: data.referAmount || 0,
-                    minAmount: data.minAmount || 0,
-                    maxAmount: data.maxAmount || 0,
-                    winningSide: data.winningSide || '',
                     claimers: {}
                 }, 
                 [`transactions/${data.txn.id}`]: data.txn 
@@ -481,11 +494,7 @@ export default async function handler(req, res) {
                     channels: info.channels || [], 
                     hasPassword: (info.password && info.password.trim() !== ""), 
                     isPremiumOnly: info.isPremiumOnly === true,
-                    status: info.status,
-                    referAmount: info.referAmount || 0,
-                    minAmount: info.minAmount || 0,
-                    maxAmount: info.maxAmount || 0,
-                    winningSide: info.winningSide || ''
+                    status: info.status
                 } 
             });
         }
@@ -541,14 +550,16 @@ export default async function handler(req, res) {
                 }
             }
 
+            // Backend membership validation check
             const channels = lifafa.channels || [];
             for (const ch of channels) {
                 const joined = await verifyUserInChannel(ch, tgUserId);
                 if (!joined) throw new Error(`You must join ${ch} to claim this Lifafa.`);
             }
 
-            let claimedAmt = Number(data.amount) || Number(lifafa.amount);
+            let claimedAmt = Number(lifafa.amount);
             
+            // Atomic transaction to secure claims
             const result = await runTransaction(lifafaRef, (currentData) => {
                 if (currentData === null) return null;
                 if (currentData.claimedUsers >= currentData.totalUsers) return; 
@@ -566,6 +577,7 @@ export default async function handler(req, res) {
 
             if (!result.committed) throw new Error("Failed to process claim. Try again.");
 
+            // Add balance and record transaction
             let currentBal = Number(user.balance) || 0;
             const updates = {};
             updates[`users/${phone}/balance`] = currentBal + claimedAmt;
@@ -626,6 +638,26 @@ export default async function handler(req, res) {
             const updates = { [`users/${data.phone}/balance`]: uBal + resultAmount, [`transactions/${data.txn.id}`]: { ...data.txn, amount: resultAmount } };
             if (result.snapshot.val().remainingUsers <= 0) updates[`giftcodes/${data.code}`] = null; 
             await update(ref(db), updates); return res.json({ data: resultAmount });
+        }
+
+        if (action === 'GAME_BET') {
+            let amt = Number(data.amount) || 0;
+            if (amt <= 0) throw new Error("Amount must be greater than zero!");
+
+            const uSnap = await get(ref(db, `users/${data.phone}`));
+            let uBal = Number(uSnap.val().balance) || 0;
+            if (!uSnap.exists() || uBal < amt) throw new Error("Insufficient Balance! Server sync failed.");
+
+            const grSnap = await get(ref(db, `game_rounds/${data.roundId}`));
+            let redTot = Number(grSnap.exists() ? grSnap.val().totalRed || 0 : 0);
+            let greenTot = Number(grSnap.exists() ? grSnap.val().totalGreen || 0 : 0);
+
+            const updates = { [`users/${data.phone}/balance`]: uBal - amt };
+            if(data.color === 'red') updates[`game_rounds/${data.roundId}/totalRed`] = redTot + amt; 
+            else updates[`game_rounds/${data.roundId}/totalGreen`] = greenTot + amt;
+            
+            if(data.txn) updates[`transactions/${data.txn.id}`] = data.txn;
+            await update(ref(db), updates); return res.json({ data: "Success" });
         }
 
         return res.status(400).json({ error: "Unknown Action" });
