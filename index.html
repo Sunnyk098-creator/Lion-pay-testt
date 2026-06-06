@@ -196,11 +196,21 @@
         html.colorful-mode .col-help div { background-color: #475569 !important; color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(71,85,105,0.4) !important; }
 
         .privacy-blur { filter: blur(8px); user-select: none; transition: filter 0.3s ease; }
+
+        /* ROCKET SUCCESS ANIMATIONS CSS */
+        @keyframes flyRocket {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+            20% { transform: translateY(50vh) scale(1.2); opacity: 1; }
+            80% { transform: translateY(-50vh) scale(1.5); opacity: 1; }
+            100% { transform: translateY(-150vh) scale(0.5); opacity: 0; }
+        }
+        .animate-rocket-fly {
+            animation: flyRocket 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
     </style>
 </head>
 <body class="font-sans pb-20 text-contrast transition-all duration-500">
 
-    <!-- Brand Loading Splash Screen (Centered Alignment & Solid White Background Fix) -->
     <div id="splash-screen" class="fixed inset-0 bg-white z-[99999] flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="flex flex-col items-center justify-center text-center">
             <div class="w-24 h-24 bg-amber-50 text-yellow-500 rounded-full flex items-center justify-center text-5xl mb-6 shadow-xl border border-yellow-100 animate-bounce relative">
@@ -212,30 +222,53 @@
         </div>
     </div>
 
+    <div id="rocket-overlay" class="fixed inset-0 z-[9999] bg-white dark:bg-slate-900 hidden flex items-center justify-center transition-opacity">
+        <i id="rocket-icon" class="fas fa-rocket text-7xl text-blue-500 drop-shadow-2xl"></i>
+    </div>
+
+    <div id="success-card-overlay" class="fixed inset-0 z-[9998] bg-white dark:bg-slate-900 hidden flex flex-col items-center justify-center p-6 text-center overflow-y-auto pt-20">
+        <div class="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-5xl mb-6 shadow-inner border border-green-200 animate-[slideDown_0.5s_ease-out]">
+            <i class="fas fa-check"></i>
+        </div>
+        <h2 class="text-3xl font-black text-gray-800 dark:text-white mb-8 tracking-wide">SUCCESS</h2>
+        
+        <div class="theme-card rounded-3xl p-6 shadow-2xl w-full max-w-sm border border-gray-100 relative overflow-hidden animate-[slideUpFade_0.5s_ease-out_0.2s] opacity-0" style="animation-fill-mode: forwards;">
+            <div id="success-card-content">
+                </div>
+        </div>
+        
+        <button onclick="closeSuccessOverlay()" class="mt-8 btn-animate accent-bg text-white font-black py-4 px-16 rounded-xl shadow-lg tracking-widest uppercase animate-[slideUpFade_0.5s_ease-out_0.4s] opacity-0" style="animation-fill-mode: forwards;">DONE</button>
+    </div>
+
     <div id="public-lifafa-wrapper" class="fixed inset-0 theme-card z-[1000] hidden flex-col items-center justify-center p-6 text-center overflow-y-auto">
         <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-3xl mx-auto flex items-center justify-center text-4xl mb-6 shadow-inner border border-amber-100"><i class="fas fa-envelope-open-text"></i></div>
         <h1 class="text-3xl font-black italic tracking-tight mb-2">LIFAFA <span class="text-amber-500">CLAIM</span></h1>
         <p class="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-8">Claim your free reward</p>
-
-        <div id="lifafa-step-1" class="hidden w-full max-w-sm theme-card rounded-3xl p-6 shadow-sm border border-gray-100 mb-4">
-            <label class="block text-xs font-bold text-gray-400 mb-4 tracking-wide uppercase">Step 1: Join Channel</label>
-            <p id="lifafa-join-error" class="hidden text-xs text-red-500 font-bold mb-3 bg-red-50 py-2 rounded-lg border border-red-100">First join the channel!</p>
-            <a id="lifafa-channel-btn" href="#" target="_blank" onclick="window.isChannelClicked = true; document.getElementById('lifafa-join-error').classList.add('hidden');" class="block w-full bg-blue-50 text-blue-500 font-black py-4 rounded-xl shadow-sm border border-blue-100 hover:bg-blue-100 transition-colors mb-3"><i class="fab fa-telegram-plane mr-2"></i> JOIN CHANNEL</a>
-            <button type="button" onclick="verifyLifafaJoin()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl transition-colors shadow-md">Verify & Continue</button>
+        
+        <div id="lif-public-step-1" class="w-full max-w-sm theme-card rounded-3xl p-6 shadow-sm border border-gray-100 text-left">
+            <label class="block text-xs font-bold text-gray-400 mb-2 tracking-wide uppercase">Your Number / ID</label>
+            <input type="text" id="public-lif-phone" placeholder="Enter Registered Phone" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 text-sm mb-5 focus-accent theme-card font-bold">
+            <button type="button" onclick="verifyLifafaUser()" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-xl shadow-lg transition-colors tracking-wide">NEXT</button>
+            <div class="text-center mt-4"><button type="button" onclick="window.location.href='/'" class="text-gray-400 hover:text-amber-600 text-xs font-bold transition-colors">Go to Home</button></div>
         </div>
 
-        <form id="form-public-lifafa" onsubmit="event.preventDefault(); processPublicLifafaClaim()" class="w-full max-w-sm theme-card rounded-3xl p-6 shadow-sm border border-gray-100 text-left">
-            <input type="hidden" id="public-lif-id">
-            <div id="lifafa-code-box" class="hidden">
-                <label class="block text-xs font-bold text-gray-400 mb-2 tracking-wide">UNIQUE CODE / PASSWORD</label>
-                <input type="text" id="public-lif-code" placeholder="Enter Code" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 text-sm mb-5 focus-accent text-contrast font-mono shadow-inner uppercase text-center font-black tracking-widest theme-card">
+        <div id="lif-public-step-2" class="hidden w-full max-w-sm theme-card rounded-3xl p-6 shadow-sm border border-gray-100 text-left">
+            <label class="block text-xs font-bold text-gray-400 mb-4 tracking-wide uppercase">Join Required Channels</label>
+            <div id="public-channels-grid" class="grid grid-cols-2 gap-3 mb-6">
+                </div>
+            <button type="button" onclick="verifyLifafaChannelsJoined()" class="btn-animate w-full bg-green-500 text-white font-black py-4 rounded-xl shadow-lg transition-colors tracking-wide">VERIFY & CONTINUE</button>
+            <div class="text-center mt-4"><button type="button" onclick="resetPublicLifafa()" class="text-gray-400 hover:text-amber-600 text-xs font-bold transition-colors">Back</button></div>
+        </div>
+
+        <div id="lif-public-step-3" class="hidden w-full max-w-sm theme-card rounded-3xl p-6 shadow-sm border border-gray-100 text-left">
+            <div id="public-lif-password-box" class="hidden mb-5">
+                <label class="block text-xs font-bold text-gray-400 mb-2 tracking-wide uppercase">Password Required</label>
+                <input type="text" id="public-lif-password" placeholder="Enter Password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 text-center tracking-widest text-lg focus-accent theme-card font-black">
             </div>
-            <button type="submit" id="btn-public-lifafa" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-xl shadow-lg transition-colors text-lg tracking-wide"><i class="fas fa-gift"></i> CLAIM NOW</button>
-            <div class="text-center mt-4"><button type="button" onclick="window.location.href='/'" class="text-gray-400 hover:text-amber-600 text-xs font-bold transition-colors">Go to Home</button></div>
-        </form>
+            <button type="button" onclick="executePublicLifafaClaim()" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-xl shadow-lg transition-colors tracking-wide text-lg"><i class="fas fa-gift"></i> CLAIM NOW</button>
+        </div>
     </div>
 
-    <!-- Official message popup (Dismisses automatically after 3 seconds) -->
     <div id="new-message-popup" class="fixed top-6 left-1/2 transform -translate-x-1/2 w-11/12 max-w-sm bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl p-4 shadow-2xl z-[400] hidden flex-row items-center gap-4 cursor-pointer hover:scale-[1.02] transition-all duration-300 animate-[slideDown_0.5s_ease-out]" onclick="handleMessageNotificationClick()">
         <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0 shadow-inner"><i class="fas fa-bell text-xl animate-pulse"></i></div>
         <div class="flex-1">
@@ -279,7 +312,6 @@
         <i class="fas fa-info-circle accent-text"></i> <span id="toastMsg" class="font-medium">Message</span>
     </div>
 
-    <!-- Receipt Modal fixing colors inside light/dark mode with dynamic backdrops & screenshot preview -->
     <div id="txnModal" class="fixed inset-0 bg-black bg-opacity-70 z-[250] hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 font-bold">
         <div id="txnModalContent" class="rounded-3xl p-6 transform scale-90 transition-transform duration-300 max-w-sm w-full mx-4 shadow-2xl relative">
             <button onclick="closeTxnModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors"><i class="fas fa-times text-xl"></i></button>
@@ -298,7 +330,6 @@
                 <div class="flex justify-between items-center"><span class="opacity-60 font-medium font-bold">Date & Time</span><span id="txnModalDate" class="font-bold text-xs">...</span></div>
             </div>
 
-            <!-- Optional verification screenshot viewer -->
             <div id="txnModalScreenshotContainer" class="hidden mt-4 pt-4 border-t border-black/10 dark:border-white/10 text-center animate-pulse">
                 <p class="text-[10px] font-black text-gray-400 mb-2 uppercase tracking-widest">Payment Screenshot</p>
                 <div class="relative w-full max-h-48 overflow-y-auto rounded-xl border border-gray-200">
@@ -378,11 +409,9 @@
             </header>
 
             <div class="p-4">
-                <!-- Premium Yellow Card Style Balance Card (No Chip) -->
                 <div id="home-main-card" class="rounded-3xl p-6 shadow-2xl relative overflow-hidden transform hover:scale-[1.02] transition-all duration-300 text-white border border-white/10 flex flex-col justify-between min-h-[220px]">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.06),transparent_60%)] pointer-events-none"></div>
                     
-                    <!-- Card Header -->
                     <div class="flex justify-between items-start relative z-10 w-full mb-2">
                         <div class="flex flex-col">
                             <span class="text-[10px] font-black tracking-[0.25em] text-white/95 font-black">LION PAY</span>
@@ -391,12 +420,10 @@
                         <span id="ui-verified-badge" class="bg-white/10 backdrop-blur-md text-white text-[9px] font-bold px-3 py-1 rounded-full flex items-center gap-1 border border-white/20 shadow-sm font-bold"><i class="fas fa-shield-alt animate-pulse"></i> Verified</span>
                     </div>
 
-                    <!-- Cleaned Contactless Wave Graphic -->
                     <div class="flex items-center gap-4 relative z-10 my-3 animate-pulse">
                         <i class="fas fa-wifi text-base text-white/40 rotate-90"></i>
                     </div>
 
-                    <!-- Balance Portion -->
                     <div class="relative z-10 mb-2">
                         <p class="text-[9px] text-white/90 uppercase tracking-widest font-bold mb-0.5">Available Balance</p>
                         <div class="flex items-baseline gap-0.5">
@@ -408,7 +435,6 @@
                         </div>
                     </div>
 
-                    <!-- Footer Info (Pencil icon relocated to Wallet ID section) -->
                     <div class="flex justify-between items-end relative z-10 pt-2 border-t border-white/5 w-full">
                         <div class="flex flex-col">
                             <span class="text-[8px] uppercase tracking-wider text-white/90 mb-0.5">Card Holder</span>
@@ -425,7 +451,6 @@
                 </div>
             </div>
 
-            <!-- Dashboard Circular Buttons Layout with robust class-based colorful theme tags -->
             <div class="theme-card rounded-t-3xl pt-6 px-4 pb-6 shadow-sm mt-2">
                 <div class="grid grid-cols-4 gap-y-6 gap-x-2" id="grid-container-actions">
                     <button onclick="showView('send')" class="col-send btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-paper-plane"></i></div><span class="text-[10px] font-bold text-gray-600">Send</span></button>
@@ -460,7 +485,6 @@
 
         <div id="view-premium" class="view-section bg-gradient-to-br from-[#3b82f6] via-[#8b5cf6] to-[#d946ef] min-h-screen text-white relative pb-32">
             <header class="flex items-center p-4 sticky top-0 z-30 bg-transparent">
-                <!-- Restored dynamic high-contrast back arrow -->
                 <button onclick="showView('home')" class="w-10 h-10 flex items-center justify-center text-slate-800 dark:text-white hover:bg-white/20 rounded-full transition-colors backdrop-blur-sm"><i class="fas fa-arrow-left"></i></button>
             </header>
 
@@ -509,13 +533,11 @@
                     <div class="flex-1"><h4 class="font-black text-[14px]">Privacy Mode</h4><p class="text-[11px] text-gray-500 leading-tight font-medium mt-0.5">Hide balance & hide specific transactions from home.</p></div>
                 </div>
 
-                <!-- ADDED NEON THEME ROW AS A HIGH-VALUE VALUE ADD -->
                 <div class="flex items-center gap-4 p-3 border-b border-gray-50 dark:border-gray-800">
                     <div class="w-10 h-10 rounded-xl theme-card accent-text flex items-center justify-center shrink-0 text-lg shadow-sm border border-gray-200"><i class="fas fa-lightbulb"></i></div>
                     <div class="flex-1"><h4 class="font-black text-[14px]">Neon Glowing Theme</h4><p class="text-[11px] text-gray-500 leading-tight font-medium mt-0.5">Unlock a spectacular pitch black background with glowing cyber elements.</p></div>
                 </div>
 
-                <!-- ADDED PREMIUM ONLY GIFTCODES BENEFIT ROW -->
                 <div class="flex items-center gap-4 p-3 border-b border-gray-50 dark:border-gray-800">
                     <div class="w-10 h-10 rounded-xl theme-card accent-text flex items-center justify-center shrink-0 text-lg shadow-sm border border-gray-200"><i class="fas fa-unlock"></i></div>
                     <div class="flex-1"><h4 class="font-black text-[14px]">Premium Exclusive Gift Codes</h4><p class="text-[11px] text-gray-500 leading-tight font-medium mt-0.5">Generate customized promotional codes redeemable exclusively by premium users.</p></div>
@@ -565,7 +587,6 @@
         
         <div id="view-themes" class="view-section">
             <header class="flex items-center p-4 theme-card shadow-sm sticky top-0 z-30">
-                <!-- Restored dynamic high-contrast back arrow -->
                 <button onclick="showView('home')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-800 dark:text-white"><i class="fas fa-arrow-left"></i></button>
                 <h1 class="ml-4 text-[16px] font-black tracking-wide text-contrast">SETTINGS & THEMES</h1>
             </header>
@@ -594,7 +615,6 @@
                     </label>
                 </div>
 
-                <!-- ADDED NEON THEME SWITCH CONTROLLER FOR PREMIUM MEMBERS -->
                 <div id="neon-theme-box" class="p-4 theme-card rounded-2xl flex items-center justify-between shadow-sm border border-gray-100 hidden">
                     <div>
                         <h3 class="font-black text-sm text-contrast"><i class="fas fa-lightbulb accent-text mr-1"></i> Neon Glowing Mode</h3>
@@ -643,7 +663,6 @@
         
         <div id="view-tags" class="view-section font-bold">
             <header class="flex items-center p-4 theme-card shadow-sm sticky top-0 z-30">
-                <!-- Restored dynamic high-contrast back arrow -->
                 <button onclick="showView('home')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-800 dark:text-white"><i class="fas fa-arrow-left"></i></button>
                 <h1 class="ml-4 text-[16px] font-black tracking-wide text-contrast">PROFILE TAG</h1>
             </header>
@@ -651,7 +670,6 @@
             <h3 class="font-black text-sm accent-text mb-3 px-4 mt-6 font-black">Your Active Tag (Premium)</h3>
             <div class="p-4 pt-0" id="tags-container"></div>
 
-            <!-- Custom Tag request Module -->
             <div class="p-4 mt-4 font-medium">
                 <div class="theme-card rounded-3xl p-5 border border-gray-100 shadow-sm">
                     <h3 class="font-black text-sm text-contrast mb-2"><i class="fas fa-paper-plane accent-text"></i> Request Custom Tag</h3>
@@ -666,7 +684,6 @@
 
         <div id="view-send" class="view-section">
             <header class="flex items-center p-4 theme-card shadow-sm sticky top-0 z-30">
-                <!-- Restored dynamic high-contrast back arrow -->
                 <button onclick="showView('home')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-800 dark:text-white transition-colors"><i class="fas fa-arrow-left"></i></button>
                 <h1 class="ml-4 text-[16px] font-black tracking-wide text-contrast">SEND MONEY</h1>
             </header>
@@ -711,7 +728,6 @@
 
         <div id="view-add" class="view-section">
             <header class="flex items-center p-4 theme-card shadow-sm sticky top-0 z-30">
-                <!-- Restored dynamic high-contrast back arrow -->
                 <button onclick="showView('home')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-800 dark:text-white"><i class="fas fa-arrow-left"></i></button>
                 <h1 class="ml-4 text-[16px] font-black tracking-wide text-contrast">ADD MONEY</h1>
             </header>
@@ -730,7 +746,6 @@
                     <label class="block text-xs font-bold text-gray-400 mb-2">AMOUNT PAID (₹)</label>
                     <input type="number" id="add-amt" required min="1" placeholder="Enter amount" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus-accent font-black theme-card font-black">
                     
-                    <!-- REQUIRED SCREENSHOT UPLOAD FORM BLOCK -->
                     <label class="block text-xs font-bold text-gray-400 mb-2">UPLOAD PAYMENT SCREENSHOT</label>
                     <input type="file" id="add-screenshot-input" class="hidden" accept="image/*" onchange="handleScreenshotUpload(event)">
                     <button type="button" id="btn-upload-screenshot" onclick="document.getElementById('add-screenshot-input').click()" class="w-full mb-4 py-3 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border accent-border accent-text bg-transparent hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors font-black">
@@ -747,7 +762,6 @@
 
         <div id="view-bulk" class="view-section">
             <header class="flex items-center p-4 theme-card shadow-sm sticky top-0 z-30">
-                <!-- Restored dynamic high-contrast back arrow -->
                 <button onclick="showView('home')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-800 dark:text-white"><i class="fas fa-arrow-left"></i></button>
                 <h1 class="ml-4 text-[16px] font-black tracking-wide text-contrast">BULK SEND</h1>
             </header>
@@ -774,7 +788,6 @@
 
         <div id="view-withdraw" class="view-section">
             <header class="flex items-center p-4 theme-card shadow-sm sticky top-0 z-30">
-                <!-- Restored dynamic high-contrast back arrow -->
                 <button onclick="showView('home')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-800 dark:text-white"><i class="fas fa-arrow-left"></i></button>
                 <h1 class="ml-4 text-[16px] font-black tracking-wide text-contrast">WITHDRAW</h1>
             </header>
@@ -795,28 +808,39 @@
 
         <div id="view-lifafa" class="view-section">
             <header class="flex items-center p-4 theme-card shadow-sm sticky top-0 z-30">
-                <!-- Restored dynamic high-contrast back arrow -->
                 <button onclick="showView('home')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-800 dark:text-white"><i class="fas fa-arrow-left"></i></button>
                 <h1 class="ml-4 text-[16px] font-black tracking-wide text-contrast">✉️ LIFAFA SYSTEM</h1>
             </header>
             <div class="px-4 mt-4 mb-4">
                 <div class="flex theme-card rounded-xl p-1 gap-1 border border-gray-100 shadow-sm font-bold">
                     <button onclick="switchLifafaTab('lifafa-create')" id="tab-lifafa-create" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all tab-btn active accent-bg text-white">CREATE</button>
-                    <button onclick="switchLifafaTab('lifafa-claim')" id="tab-lifafa-claim" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all tab-btn text-gray-500 hover:bg-gray-50">CLAIM</button>
+                    <button onclick="switchLifafaTab('lifafa-my'); loadMyLifafas();" id="tab-lifafa-my" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all tab-btn text-gray-500 hover:bg-gray-50">MY LIFAFA</button>
                 </div>
             </div>
 
             <div id="lifafa-create" class="tab-content active px-4 pb-10">
-                <div class="theme-card rounded-2xl p-6 text-center shadow-sm border border-gray-100 mb-6 font-bold">
-                    <p class="text-[10px] font-bold uppercase opacity-90 mb-1 tracking-wider text-gray-400 font-bold">AVAILABLE BALANCE</p>
-                    <div class="text-4xl font-black tracking-tight accent-text">₹<span class="global-balance blur-none transition-all">0.00</span></div>
+                <div class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 p-3 rounded-xl mb-6 text-xs font-bold border border-blue-100 dark:border-blue-800">
+                    <i class="fas fa-info-circle mr-1"></i> Make @Lion_Pay_Alert_Bot an admin in your channel before adding it here.
                 </div>
+                
                 <form onsubmit="event.preventDefault(); processLifafaCreate()" class="theme-card rounded-2xl p-5 shadow-sm border border-gray-100 font-medium">
+                    <div id="lifafa-channels-container">
+                        <label class="block text-xs font-bold text-gray-400 mb-2">TELEGRAM CHANNEL LINK (OPTIONAL)</label>
+                        <div class="flex gap-2 mb-2">
+                            <input type="text" class="lif-channel-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus-accent font-black theme-card" placeholder="@channel_username or https://t.me/...">
+                        </div>
+                    </div>
+                    <button type="button" onclick="addLifafaChannel()" class="text-xs text-blue-500 font-bold mb-5 flex items-center gap-1 hover:underline"><i class="fas fa-plus"></i> Add Channel</button>
+
                     <label class="block text-xs font-bold text-gray-400 mb-2">NUMBER OF USERS</label>
                     <input type="number" id="lif-users" required min="1" placeholder="e.g. 5" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-black theme-card font-bold">
+                    
                     <label class="block text-xs font-bold text-gray-400 mb-2">AMOUNT PER USER (₹)</label>
                     <input type="number" id="lif-amt" required min="1" placeholder="e.g. 10" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-black theme-card font-bold">
                     
+                    <label class="block text-xs font-bold text-gray-400 mb-2">PASSWORD (OPTIONAL)</label>
+                    <input type="text" id="lif-password" placeholder="Set a password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-black theme-card">
+
                     <div id="premium-lifafa-box" class="hidden mb-5 theme-card rounded-xl p-3 border border-yellow-200 bg-yellow-50 flex items-center justify-between font-bold">
                         <div>
                             <p class="text-xs font-bold text-yellow-700"><i class="fas fa-crown"></i> Premium Only</p>
@@ -834,19 +858,14 @@
                 </form>
             </div>
 
-            <div id="lifafa-claim" class="tab-content px-4">
-                <form onsubmit="event.preventDefault(); processLifafaClaim()" class="theme-card rounded-2xl p-6 shadow-sm border border-gray-100 text-center font-bold">
-                    <div class="w-20 h-20 theme-card accent-text border border-gray-100 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner"><i class="fas fa-envelope"></i></div>
-                    <label class="block text-xs font-bold text-gray-400 mb-3 tracking-widest uppercase">Enter Lifafa Code</label>
-                    <input type="text" id="lif-claim-code" required placeholder="Paste Code Here" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-5 text-center tracking-widest uppercase text-lg font-black mb-8 focus:outline-none focus-accent transition-colors shadow-inner theme-card font-black">
-                    <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-xl shadow-lg text-lg font-black">OPEN LIFAFA</button>
-                </form>
+            <div id="lifafa-my" class="tab-content px-4">
+                <div id="my-lifafas-list" class="space-y-4 pb-10">
+                    </div>
             </div>
         </div>
 
         <div id="view-gift" class="view-section">
             <header class="flex items-center p-4 theme-card shadow-sm sticky top-0 z-30">
-                <!-- Restored dynamic high-contrast back arrow -->
                 <button onclick="showView('home')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-800 dark:text-white"><i class="fas fa-arrow-left"></i></button>
                 <h1 class="ml-4 text-[16px] font-black tracking-wide text-contrast">🎁 GIFT CODE</h1>
             </header>
@@ -868,7 +887,6 @@
                     <label class="block text-xs font-bold text-gray-400 mb-2">AMOUNT PER USER (₹)</label>
                     <input type="number" id="gift-amt" required min="1" placeholder="e.g. 10" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-black theme-card font-bold">
                     
-                    <!-- ADDED DYNAMIC PREMIUM ONLY TOGGLE OPTION FOR GIFT CODES -->
                     <div id="premium-gift-box" class="mb-5 theme-card rounded-xl p-3 border border-yellow-200 bg-yellow-50 flex items-center justify-between font-bold">
                         <div>
                             <p class="text-xs font-bold text-yellow-700"><i class="fas fa-crown"></i> Premium Only</p>
@@ -898,7 +916,6 @@
 
         <div id="view-api" class="view-section">
             <header class="flex items-center p-4 theme-card shadow-sm sticky top-0 z-30">
-                <!-- Restored dynamic high-contrast back arrow -->
                 <button onclick="showView('home')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-800 dark:text-white"><i class="fas fa-arrow-left"></i></button>
                 <h1 class="ml-4 text-[16px] font-black tracking-wide text-contrast">API SETTINGS</h1>
             </header>
@@ -950,7 +967,6 @@
 
         <div id="view-txn" class="view-section min-h-screen relative overflow-hidden theme-card">
             <header class="flex items-center p-4 sticky top-0 z-30">
-                <!-- Restored dynamic high-contrast back arrow -->
                 <button onclick="showView('home')" class="w-10 h-10 rounded-full shadow-md flex items-center justify-center text-slate-800 dark:text-white border border-gray-100"><i class="fas fa-arrow-left"></i></button>
             </header>
             <div class="p-6 pt-12 text-center relative z-10 font-bold">
@@ -967,7 +983,6 @@
 
         <div id="view-official" class="view-section min-h-screen theme-card">
             <header class="flex items-center p-4 theme-card shadow-sm sticky top-0 z-30 border-b border-gray-100">
-                <!-- Restored dynamic high-contrast back arrow -->
                 <button onclick="showView('home')" class="w-8 h-8 flex items-center justify-center text-slate-800 dark:text-white rounded-full"><i class="fas fa-arrow-left"></i></button>
                 <div class="w-8 h-8 ml-4 accent-bg text-white rounded-full flex items-center justify-center"><i class="fas fa-bullhorn text-xs"></i></div>
                 <h1 class="ml-2 text-[16px] font-bold tracking-wide text-contrast">Official Post</h1>
@@ -977,7 +992,6 @@
 
         <div id="view-keeper" class="view-section min-h-screen theme-card font-bold">
             <header class="flex items-center p-4 theme-card shadow-sm sticky top-0 z-30">
-                <!-- Restored dynamic high-contrast back arrow -->
                 <button onclick="showView('home')" class="w-8 h-8 flex items-center justify-center text-slate-800 dark:text-white rounded-full"><i class="fas fa-arrow-left"></i></button>
                 <div class="w-6 h-6 ml-4 accent-bg text-white rounded-full flex items-center justify-center italic font-bold text-xs"><i class="fas fa-shield-alt text-[10px]"></i></div>
                 <h1 class="ml-2 text-[16px] font-bold tracking-wide text-contrast">Balance Keeper</h1>
@@ -1020,15 +1034,12 @@
             </div>
         </div>
 
-        <!-- Wallet Statistics (Stats replacing Game) -->
         <div id="view-game" class="view-section min-h-screen theme-card font-bold">
             <header class="flex items-center p-4 shadow-sm sticky top-0 z-30 theme-card">
-                <!-- Restored dynamic high-contrast back arrow -->
                 <button onclick="showView('home')" class="w-8 h-8 flex items-center justify-center text-slate-800 dark:text-white rounded-full"><i class="fas fa-arrow-left"></i></button>
                 <h1 class="ml-4 text-[16px] font-black tracking-wide text-contrast"><i class="fas fa-chart-line text-sm mr-1.5 accent-text"></i> WALLET STATISTICS</h1>
             </header>
             <div class="p-4">
-                <!-- 2x2 statistics grid -->
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-28 bg-gradient-to-br from-green-500/10 to-transparent">
                         <div class="text-[10px] font-black tracking-wider text-gray-400">TOTAL CREDIT</div>
@@ -1048,7 +1059,6 @@
                     </div>
                 </div>
 
-                <!-- Transaction filters inside stats -->
                 <div class="theme-card rounded-3xl p-5 border border-gray-100 shadow-sm mb-6">
                     <div class="flex justify-between items-center mb-3">
                         <h4 class="text-xs font-black tracking-wider text-gray-400 uppercase font-bold">Search & Filter</h4>
@@ -1088,29 +1098,23 @@
                 <div class="mb-4 text-left px-1 font-bold">
                     <h3 class="font-black text-xs tracking-wider text-gray-400 uppercase">Filtered History</h3>
                 </div>
-                <!-- Dynamic Filtered list -->
                 <div id="stats-txn-list" class="theme-card rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col mb-16 font-semibold"></div>
             </div>
         </div>
 
-        <!-- Dynamic User Profile Dashboard showing Security PIN -->
         <div id="view-myprofile" class="view-section min-h-screen theme-card font-bold">
             <header class="flex items-center p-4 sticky top-0 z-30 border-b border-gray-100 theme-card">
-                <!-- Restored dynamic high-contrast back arrow -->
                 <button onclick="showView('home')" class="w-8 h-8 hover:bg-gray-100 text-slate-800 dark:text-white rounded-full flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left text-gray-700 dark:text-white"></i></button>
                 <h1 class="ml-4 text-[16px] font-black tracking-wide text-contrast"><i class="fas fa-user-circle mr-1.5 text-sm accent-text"></i> MY PROFILE</h1>
             </header>
             <div class="p-6 flex flex-col items-center">
-                <!-- Base64 DP clickable display picture (With Premium Crown rendering) -->
                 <div class="relative group cursor-pointer" onclick="document.getElementById('profile-dp-input').click()">
-                    <!-- Golden Crown rendering above DP for Premium users -->
                     <i id="profile-dashboard-crown" class="fas fa-crown text-yellow-500 absolute -top-5 left-1/2 transform -translate-x-1/2 text-2xl drop-shadow-md hidden z-10 animate-bounce"></i>
                     
                     <div class="w-28 h-28 rounded-full overflow-hidden border-4 border-amber-400 shadow-xl relative bg-gray-100 flex items-center justify-center">
                         <img id="profile-dashboard-dp" src="" class="w-full h-full object-cover hidden" alt="Profile Picture">
                         <span id="profile-dashboard-initial" class="text-4xl font-black accent-text uppercase font-black">U</span>
                         
-                        <!-- Hover mask to change image -->
                         <div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                             <i class="fas fa-camera text-white text-lg mb-1"></i>
                             <span class="text-white text-[9px] font-bold uppercase tracking-wider font-black font-black">Upload DP</span>
@@ -1119,11 +1123,9 @@
                 </div>
                 <input type="file" id="profile-dp-input" class="hidden" accept="image/*" onchange="processLocalDpUpload(event)">
                 
-                <!-- Display Name (Verified Blue Tick rendered dynamically) -->
                 <h2 id="profile-display-name" class="font-black text-xl mt-4 mb-1 text-contrast flex items-center gap-1 font-black">User Name</h2>
                 <span id="profile-display-premium" class="text-[10px] uppercase font-black tracking-widest text-amber-500 bg-amber-50 px-3 py-1 rounded-full border border-amber-100">Standard Member</span>
 
-                <!-- Profile Attributes list -->
                 <div class="w-full max-w-sm mt-8 space-y-3 text-left font-medium">
                     <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center">
                         <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Display Name</span>
@@ -1153,21 +1155,30 @@
             </div>
         </div>
 
-        <!-- Scanner View Layout fixes -->
         <div id="view-scan" class="view-section min-h-screen bg-black relative">
             <header class="flex items-center p-4 sticky top-0 z-[100] bg-transparent pointer-events-none">
                 <button onclick="stopScanner(); showView('home')" class="w-10 h-10 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center pointer-events-auto shadow-lg"><i class="fas fa-arrow-left"></i></button>
             </header>
-            <div class="flex flex-col items-center justify-center px-4 pt-16 relative z-10" id="scanner-container">
+            <div class="flex flex-col items-center justify-center px-4 pt-8 relative z-10" id="scanner-container">
                 <div id="scanner-box" class="relative w-72 h-72 rounded-[2rem] overflow-hidden border-[4px] accent-border shadow-[0_0_40px_var(--accent-glow)] bg-gray-900 transition-all duration-300">
-                    <!-- Adjusted container wrapper for Html5Qrcode initialization stream -->
                     <div id="reader" class="w-full h-full"></div>
                     <div class="absolute inset-0 pointer-events-none z-10 scanner-corners">
                         <div class="absolute left-0 w-full h-1 animate-scanline"></div>
                     </div>
                 </div>
-                <p class="text-white/90 text-2xl font-black tracking-[0.2em] mt-12 drop-shadow-md relative z-10 font-bold">SCAN TO PAY</p>
+                
+                <div class="flex justify-center gap-6 mt-10 relative z-10 pointer-events-auto">
+                    <button onclick="document.getElementById('qr-upload').click()" class="w-14 h-14 bg-gray-800/80 backdrop-blur-md text-white rounded-full flex items-center justify-center text-xl shadow-lg border border-gray-700 hover:bg-gray-700 hover:scale-105 transition-all"><i class="fas fa-image"></i></button>
+                    <input type="file" id="qr-upload" class="hidden" accept="image/*" onchange="handleQRUpload(event)">
+                    
+                    <button onclick="toggleQRZoom()" class="w-14 h-14 bg-gray-800/80 backdrop-blur-md text-white rounded-full flex items-center justify-center text-lg font-black shadow-lg border border-gray-700 hover:bg-gray-700 hover:scale-105 transition-all" id="btn-qr-zoom">1x</button>
+                    
+                    <button onclick="toggleQRTorch()" class="w-14 h-14 bg-gray-800/80 backdrop-blur-md text-white rounded-full flex items-center justify-center text-xl shadow-lg border border-gray-700 hover:bg-gray-700 hover:scale-105 transition-all" id="btn-qr-torch"><i class="fas fa-bolt"></i></button>
+                </div>
+
+                <p class="text-white/90 text-xl font-black tracking-[0.2em] mt-8 drop-shadow-md relative z-10 font-bold">SCAN TO PAY</p>
             </div>
+
             <div id="scan-result" class="hidden px-4 pb-8 pt-4 theme-card min-h-screen mt-4 rounded-t-3xl relative z-20 font-bold">
                 <div class="text-center mb-6">
                     <h2 class="text-2xl font-black" id="scan-res-name">User Name</h2>
@@ -1238,20 +1249,25 @@
         let isBalanceVisible = false;
         
         let html5QrcodeScanner = null;
-
-        // Screenshot base64 attachment buffer variable
         let uploadedScreenshotBase64 = null;
+
+        // Scanner configuration state
+        let currentQRZoom = 1;
+        let isQRTorchOn = false;
+
+        // Active public Lifafa info
+        let activeLifafaCode = null;
+        let activeLifafaInfo = null;
+        let activeLifafaUserPhone = null;
 
         const TAGS_LIST = ["Member", "Looter", "Bot Maker", "Admin", "Developer", "Trader", "VIP", "King", "Pro", "Legend"];
         
-        // Dynamic Accent Colors (Added 10 New Options)
         const ACCENT_COLORS = [
             {name: "Amber", hex: "#f59e0b"}, {name: "Red", hex: "#ef4444"}, {name: "Pink", hex: "#ec4899"}, {name: "Rose", hex: "#f43f5e"}, 
             {name: "Purple", hex: "#a855f7"}, {name: "Fuchsia", hex: "#d946ef"}, {name: "Indigo", hex: "#6366f1"}, {name: "Blue", hex: "#3b82f6"},
             {name: "Sky", hex: "#0ea5e9"}, {name: "Cyan", hex: "#06b6d4"}, {name: "Teal", hex: "#14b8a6"}, {name: "Emerald", hex: "#10b981"},
             {name: "Green", hex: "#22c55e"}, {name: "Lime", hex: "#84cc16"}, {name: "Yellow", hex: "#eab308"}, {name: "Orange", hex: "#f97316"},
             {name: "Deep Orange", hex: "#ea580c"}, {name: "Red Orange", hex: "#ff3d00"}, {name: "Brown", hex: "#78716c"}, {name: "Slate", hex: "#64748b"},
-            // 10 new dynamic options added
             {name: "Sky Blue", hex: "#0284c7"}, {name: "Muted Lavender", hex: "#818cf8"},
             {name: "Plum", hex: "#6b21a8"}, {name: "Wine", hex: "#991b1b"},
             {name: "Olive", hex: "#65a30d"}, {name: "Ocean Teal", hex: "#0f766e"},
@@ -1275,9 +1291,7 @@
 
         function playSound(type) {
             if(!currentUser || !currentUser.premium) return;
-            // sound effect toggled state verification block
             if(localStorage.getItem('lp_sound') === 'false') return;
-
             try { 
                 if(type === 'click') sndClick.play();
                 else if(type === 'credit') sndCredit.play();
@@ -1301,8 +1315,8 @@
                 let res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, data }) });
                 const responseText = await res.text();
                 let result;
-                try { result = JSON.parse(responseText); } catch (e) { throw new Error("API Not Found (404)."); }
-                if(!res.ok || result.error) throw new Error(result.error || "Server error");
+                try { result = JSON.parse(responseText); } catch (e) { throw new Error("API Not Found or Invalid DB (404)."); }
+                if(!res.ok || result.error) throw new Error(result.error || "Server/Database error");
                 return result.data;
             } catch(err) { showToast(err.message); throw err; }
         }
@@ -1392,13 +1406,11 @@
             } catch(e) {}
         }
 
-        // Granting 3-Days Free Premium dynamically to newly registered accounts
         async function processSignupStep1() {
             let name = document.getElementById('reg-name').value; let phone = document.getElementById('reg-phone').value; let pass = document.getElementById('reg-pass').value; let pin = document.getElementById('reg-pin').value; let telegram = document.getElementById('reg-telegram').value;
             try {
                 let exists = await apiCall('CHECK_USER', { phone }); if(exists) return showToast("Phone number already registered!");
                 
-                // Initialize payload values with premium set to true + 3 Days Expiration milliseconds buffer
                 pendingSignupUser = { 
                     name, 
                     password: pass, 
@@ -1534,7 +1546,6 @@
             showToast("Sound effects " + (isEnabled ? "Enabled" : "Disabled"));
         }
 
-        // Toggle Premium-only Neon Theme configuration
         function toggleNeonMode() {
             let isEnabled = document.getElementById('toggle-neon-ui').checked;
             localStorage.setItem('lp_neon', isEnabled ? 'true' : 'false');
@@ -1565,7 +1576,6 @@
             document.documentElement.style.setProperty('--premium-grad-2', hexToRgba(currentAccent, 0.05));
             localStorage.setItem('lp_color', currentAccent);
 
-            // Dynamic card background color (Yellow for standard, customized for premium)
             const mainCard = document.getElementById('home-main-card');
             if (mainCard) {
                 if (isPrem) {
@@ -1612,7 +1622,6 @@
                     let tgl = document.getElementById('toggle-colorful-ui'); if(tgl) tgl.checked = false;
                 }
 
-                // Sync Neon mode choice
                 let isNeonEnabled = localStorage.getItem('lp_neon') === 'true';
                 let neonTgl = document.getElementById('toggle-neon-ui');
                 if (neonTgl) neonTgl.checked = isNeonEnabled;
@@ -1667,7 +1676,6 @@
                 localStorage.setItem('lp_theme', 'light');
             }
             
-            // Sync user sound toggler choices
             let soundTgl = document.getElementById('toggle-sound-ui');
             if (soundTgl) {
                 soundTgl.checked = localStorage.getItem('lp_sound') !== 'false';
@@ -1781,7 +1789,6 @@
             try { await apiCall('SET_CUSTOM_ID', { phone: currentUser.phone, customId: cid }); playSound('success'); showToast("Custom ID Set!"); closeCustomIdModal(); syncData(); } catch(e) {}
         }
 
-        // Live verified recipient info loader supporting verified tick, custom avatars, and tag displays
         let sendResolvedPhone = null; let debounceTimer;
         let sNumEl = document.getElementById('send-num');
         if(sNumEl) {
@@ -1862,13 +1869,11 @@
             const pInitial = document.getElementById('profile-dashboard-initial');
             const pCrown = document.getElementById('profile-dashboard-crown');
 
-            // Render Premium crown dynamically
             if (pCrown) {
                 if (currentUser.premium) pCrown.classList.remove('hidden');
                 else pCrown.classList.add('hidden');
             }
 
-            // Display Name (Verified Blue Tick rendered dynamically)
             if (pName) {
                 pName.innerHTML = currentUser.name + (currentUser.premium ? ` <i class="fas fa-check-circle text-blue-500 text-base" title="Verified Member"></i>` : '');
             }
@@ -1906,7 +1911,6 @@
                 }
             }
 
-            // Realtime DP base64 loader
             if (currentUser.dp) {
                 if (pImg) { pImg.src = currentUser.dp; pImg.classList.remove('hidden'); }
                 if (pInitial) pInitial.classList.add('hidden');
@@ -1961,7 +1965,6 @@
             reader.readAsDataURL(file);
         }
 
-        // Processing Local Screenshot Gallery selection inside Add Funds View
         function handleScreenshotUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1975,7 +1978,6 @@
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
                     
-                    // Downscaling screenshot cleanly to save database space overheads
                     const maxDim = 320;
                     let width = img.width;
                     let height = img.height;
@@ -1991,7 +1993,6 @@
                     
                     uploadedScreenshotBase64 = canvas.toDataURL('image/jpeg', 0.6);
                     
-                    // Toggle dynamic status layout of file upload action button
                     const btn = document.getElementById('btn-upload-screenshot');
                     if (btn) {
                         btn.innerHTML = `<i class="fas fa-exchange-alt"></i> Change Screenshot`;
@@ -2010,7 +2011,6 @@
             reader.readAsDataURL(file);
         }
 
-        // Custom tags Telegram pipeline request
         async function submitCustomTagRequest() {
             let reqTag = document.getElementById('custom-tag-request-input').value.trim().toUpperCase();
             if(!reqTag) return showToast("Please enter a custom tag!");
@@ -2034,7 +2034,6 @@
             window.open(link, '_blank');
         }
 
-        // 1.5-second dynamic fade out controller
         async function handleSplashScreen() {
             return new Promise(resolve => {
                 setTimeout(() => {
@@ -2069,8 +2068,78 @@
             const lifafaCode = urlParams.get('lifafa');
             if(lifafaCode) { setTimeout(() => showPublicLifafa(lifafaCode), 1000); window.history.replaceState({}, document.title, "/"); }
         }
-        
-        // Dynamic tax calculation engine for SEND payments
+
+        // ============================================
+        // UNIVERSAL SUCCESS ANIMATION RENDERER
+        // ============================================
+        function showActionSuccess(data) {
+            return new Promise(resolve => {
+                const rocketOverlay = document.getElementById('rocket-overlay');
+                const rocketIcon = document.getElementById('rocket-icon');
+                const cardOverlay = document.getElementById('success-card-overlay');
+                const cardContent = document.getElementById('success-card-content');
+                
+                rocketOverlay.classList.remove('hidden');
+                
+                // Trigger fly animation
+                requestAnimationFrame(() => {
+                    rocketIcon.classList.add('animate-rocket-fly');
+                });
+
+                setTimeout(() => {
+                    rocketOverlay.classList.add('hidden');
+                    rocketIcon.classList.remove('animate-rocket-fly');
+                    
+                    // Render dynamic content card based on type
+                    let cardHtml = '';
+                    if (data.type === 'transfer' || data.type === 'bulk') {
+                        let dpSrc = data.dp || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(data.name)}`;
+                        cardHtml = `
+                            <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase mb-4">Payment Sent</p>
+                            <div class="w-16 h-16 rounded-full mx-auto border-4 border-amber-400 mb-3 overflow-hidden shadow-inner">
+                                <img src="${dpSrc}" class="w-full h-full object-cover">
+                            </div>
+                            <h3 class="text-xl font-black text-gray-800 dark:text-white">${data.name}</h3>
+                            <p class="text-xs font-mono font-bold text-gray-500 mb-6">${data.detail}</p>
+                            <div class="border-t border-gray-100 dark:border-gray-800 pt-4">
+                                <p class="text-3xl font-black text-green-500 tracking-tight">₹${parseFloat(data.amount).toFixed(2)}</p>
+                            </div>
+                        `;
+                    } else if (data.type === 'gift' || data.type === 'lifafa') {
+                        cardHtml = `
+                            <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase mb-4">${data.type} Created</p>
+                            <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full mx-auto flex items-center justify-center text-3xl mb-3 shadow-inner">
+                                <i class="fas fa-gift"></i>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 mb-6">
+                                <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded-xl">
+                                    <p class="text-[9px] text-gray-400 uppercase font-black">Users</p>
+                                    <p class="font-black text-gray-800 dark:text-white">${data.users}</p>
+                                </div>
+                                <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded-xl">
+                                    <p class="text-[9px] text-gray-400 uppercase font-black">Per User</p>
+                                    <p class="font-black text-green-500 tracking-tight">₹${parseFloat(data.amount).toFixed(2)}</p>
+                                </div>
+                            </div>
+                            <div class="border-t border-gray-100 dark:border-gray-800 pt-4">
+                                <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">Share Code/Link</p>
+                                <p class="text-xl font-mono font-black tracking-widest text-blue-600 dark:text-blue-400">${data.code}</p>
+                            </div>
+                        `;
+                    }
+                    
+                    cardContent.innerHTML = cardHtml;
+                    cardOverlay.classList.remove('hidden');
+                    resolve();
+                }, 1000); // Wait for rocket animation to finish
+            });
+        }
+
+        function closeSuccessOverlay() {
+            document.getElementById('success-card-overlay').classList.add('hidden');
+            showView('home');
+        }
+
         async function processSend() {
             if(!checkCooldown()) return;
             let pin = document.getElementById('send-pin').value; if(!checkSecurityPin(pin)) return;
@@ -2085,80 +2154,105 @@
             let txnMode = isGhost ? 'GHOST_SEND' : 'SEND';
 
             try {
-                // Fetch dynamic global tax configuration
-                let settingsRes = await fetch(`https://lion-pay-a9557-default-rtdb.firebaseio.com/settings.json`);
-                let settingsData = await settingsRes.json();
-                let taxPercent = settingsData ? (Number(settingsData.payToUserTax) || Number(settingsData.taxPercent) || 0) : 0;
-                
-                let taxAmount = amt * (taxPercent / 100);
-                let amountToReceiver = amt - taxAmount;
-
                 let receiver = await apiCall('CHECK_USER', { phone: sendResolvedPhone }); 
                 if (!receiver) return showToast("Receiver not found!");
                 let name = receiver.name || 'Unknown User'; 
 
-                // Secondary tax fee debit call executed seamlessly in background if taxPercent > 0
-                if (taxAmount > 0) {
-                    let taxTxn = createTxnObj('out', 'Payment Transfer Tax Fee (' + taxPercent + '%)', taxAmount, 'Success', 'fa-percent', 'red', 'Tax System', 'N/A');
-                    await apiCall('EXECUTE_TXN', { mode: 'WITHDRAW', sender: currentUser.phone, amount: taxAmount, txn: taxTxn });
-                }
-
-                let txn = createTxnObj('out', (isGhost ? 'Ghost Sent to ' : 'Sent to ') + name, amountToReceiver, 'Success', isGhost ? 'fa-ghost' : 'fa-paper-plane', 'yellow', name, sendResolvedPhone);
+                let txn = createTxnObj('out', (isGhost ? 'Ghost Sent to ' : 'Sent to ') + name, amt, 'Success', isGhost ? 'fa-ghost' : 'fa-paper-plane', 'yellow', name, sendResolvedPhone);
                 txn.comment = comment;
 
-                await apiCall('EXECUTE_TXN', { mode: txnMode, sender: currentUser.phone, receiver: sendResolvedPhone, amount: amountToReceiver, txn });
+                await apiCall('EXECUTE_TXN', { mode: txnMode, sender: currentUser.phone, receiver: sendResolvedPhone, amount: amt, txn });
                 
                 playSound('debit');
-                sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'out', 'Payment Sent to ' + name, amountToReceiver, `TXN: ${txn.id}${isGhost ? ' (Ghost Transfer)' : ''}`)); 
-                if(receiver.tgUserId && !isGhost) sendTelegramMsg(receiver.tgUserId, formatTgMsg(receiver.premium, 'in', 'Received from ' + currentUser.name, amountToReceiver, `TXN: ${txn.id}`));
+                sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'out', 'Payment Sent to ' + name, amt, `TXN: ${txn.id}${isGhost ? ' (Ghost Transfer)' : ''}`)); 
+                if(receiver.tgUserId && !isGhost) sendTelegramMsg(receiver.tgUserId, formatTgMsg(receiver.premium, 'in', 'Received from ' + currentUser.name, amt, `TXN: ${txn.id}`));
                 
-                document.getElementById('form-send').reset(); showToast("Sent Successfully!"); currentBalance -= amt; updateUI(); setTimeout(() => showView('home'), 800);
+                document.getElementById('form-send').reset(); 
+                currentBalance -= amt; updateUI(); 
+
+                // Trigger Rocket Success UI
+                showActionSuccess({
+                    type: 'transfer',
+                    dp: receiver.dp,
+                    name: name,
+                    detail: sendResolvedPhone,
+                    amount: amt
+                });
             } catch(e) {
                 showToast("Payment processing failed.");
             }
         }
 
-        // Required Both UTR and screenshot upload validation fix with dynamic tax calculations
+        async function processScanPay() {
+            if(!checkCooldown()) return;
+            let pin = document.getElementById('scan-pin').value; if(!checkSecurityPin(pin)) return;
+            let receiverNum = document.getElementById('scan-res-phone').innerText;
+            if (!receiverNum) return showToast("Invalid Receiver!");
+            if (receiverNum === currentUser.phone) return showToast("Cannot send to yourself!");
+            let amt = parseFloat(document.getElementById('scan-amt').value); 
+            let comment = document.getElementById('scan-comment').value.trim();
+            if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
+            if(amt > currentBalance) return showToast("Insufficient Balance!");
+
+            try {
+                let receiver = await apiCall('CHECK_USER', { phone: receiverNum }); 
+                if (!receiver) return showToast("Receiver not found!");
+                let name = receiver.name || 'Unknown User'; 
+
+                let txn = createTxnObj('out', 'Scanned & Sent to ' + name, amt, 'Success', 'fa-qrcode', 'blue', name, receiverNum);
+                txn.comment = comment;
+
+                await apiCall('EXECUTE_TXN', { mode: 'SEND', sender: currentUser.phone, receiver: receiverNum, amount: amt, txn });
+                
+                playSound('debit');
+                sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'out', 'Scanned Payment Sent to ' + name, amt, `TXN: ${txn.id}`)); 
+                if(receiver.tgUserId) sendTelegramMsg(receiver.tgUserId, formatTgMsg(receiver.premium, 'in', 'Received Scan Payment from ' + currentUser.name, amt, `TXN: ${txn.id}`));
+                
+                document.getElementById('scan-amt').value = ''; document.getElementById('scan-pin').value = ''; document.getElementById('scan-comment').value = '';
+                currentBalance -= amt; updateUI(); 
+
+                // Rocket animation payload
+                document.getElementById('scan-result').classList.add('hidden');
+                showActionSuccess({
+                    type: 'transfer',
+                    dp: receiver.dp,
+                    name: name,
+                    detail: receiverNum,
+                    amount: amt
+                });
+            } catch(e) {
+                showToast("Payment processing failed.");
+            }
+        }
+
         async function processAdd() {
             if(!checkCooldown()) return;
             let utr = document.getElementById('add-utr').value.trim(); 
             let amt = parseFloat(document.getElementById('add-amt').value);
             if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
-            
-            // Require both UTR/ID and screenshot upload to prevent unauthorized requests
             if (!utr) return showToast("UTR number is required!");
             if (!uploadedScreenshotBase64) return showToast("Please upload a payment screenshot!");
             
             try {
-                // Fetch dynamic global deposit tax configuration
-                let settingsRes = await fetch(`https://lion-pay-a9557-default-rtdb.firebaseio.com/settings.json`);
-                let settingsData = await settingsRes.json();
-                let taxPercent = settingsData ? (Number(settingsData.addFundTax) || 0) : 0;
-                
-                // Submit only the amount after tax to the admin for verification
-                let amountAfterTax = amt * (1 - taxPercent / 100);
-
-                let txn = createTxnObj('in', 'Deposit via UTR', amountAfterTax, 'Pending', 'fa-clock', 'yellow', 'Self Deposit', utr);
-                // Dynamic storage payload directly on transaction object securely
+                let txn = createTxnObj('in', 'Deposit via UTR', amt, 'Pending', 'fa-clock', 'yellow', 'Self Deposit', utr);
                 txn.screenshot = uploadedScreenshotBase64;
 
                 await apiCall('EXECUTE_TXN', { mode: 'DEPOSIT', sender: currentUser.phone, txn });
                 
                 let adminChatId = globalSettings.adminChatId || null; 
-                let depositMsg = `🔔 <b>DEPOSIT REQ</b>\nUser: ${currentUser.name}\nAmount: ₹${amountAfterTax} (After ${taxPercent}% Tax)\nUTR: ${utr}\nTXN: ${txn.id}`;
+                let depositMsg = `🔔 <b>DEPOSIT REQ</b>\nUser: ${currentUser.name}\nAmount: ₹${amt}\nUTR: ${utr}\nTXN: ${txn.id}`;
                 if (adminChatId) sendTelegramMsg(adminChatId, depositMsg);
-                else sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'in', 'Deposit Pending', amountAfterTax, `UTR: ${utr}`));
+                else sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'in', 'Deposit Pending', amt, `UTR: ${utr}`));
                 
                 playSound('success');
                 
-                // Reset upload form layouts
                 document.getElementById('add-utr').value = ''; 
                 document.getElementById('add-amt').value = ''; 
                 uploadedScreenshotBase64 = null;
                 const btn = document.getElementById('btn-upload-screenshot');
                 if (btn) {
                     btn.innerHTML = `<i class="fas fa-image"></i> Upload Screenshot`;
-                    btn.className = "w-full mb-4 py-3 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border accent-border accent-text bg-transparent hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors";
+                    btn.className = "w-full mb-4 py-3 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border accent-border accent-text bg-transparent hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors font-black";
                 }
                 document.getElementById('screenshot-preview-container').classList.add('hidden');
                 
@@ -2169,7 +2263,6 @@
             }
         }
 
-        // Dynamic tax calculation engine for BULK payments
         async function processBulk() {
             if(!checkCooldown()) return;
             let pin = document.getElementById('bulk-pin').value; if(!checkSecurityPin(pin)) return;
@@ -2197,34 +2290,26 @@
             if(totalAmt > currentBalance) return showToast(`Need ₹${totalAmt} for ${resolvedReceivers.length} users.`);
             
             try {
-                // Fetch dynamic global tax configuration
-                let settingsRes = await fetch(`https://lion-pay-a9557-default-rtdb.firebaseio.com/settings.json`);
-                let settingsData = await settingsRes.json();
-                let taxPercent = settingsData ? (Number(settingsData.payToUserTax) || Number(settingsData.taxPercent) || 0) : 0;
-                
-                let taxAmountPerUser = amt * (taxPercent / 100);
-                let totalTaxAmount = resolvedReceivers.length * taxAmountPerUser;
-                let amountToReceivers = amt - taxAmountPerUser;
-
-                // Secondary tax fee debit call executed seamlessly in background if totalTaxAmount > 0
-                if (totalTaxAmount > 0) {
-                    let taxTxn = createTxnObj('out', 'Bulk Transfer Tax Fee (' + taxPercent + '%)', totalTaxAmount, 'Success', 'fa-percent', 'red', 'Tax System', 'N/A');
-                    await apiCall('EXECUTE_TXN', { mode: 'WITHDRAW', sender: currentUser.phone, amount: totalTaxAmount, txn: taxTxn });
-                }
-
-                await apiCall('BULK_PAY', { sender: currentUser.phone, receivers: resolvedReceivers, amount: amountToReceivers, comment: comment, date: formatDateTime() });
+                await apiCall('BULK_PAY', { sender: currentUser.phone, receivers: resolvedReceivers, amount: amt, comment: comment, date: formatDateTime() });
                 
                 playSound('debit');
-                sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'out', `Bulk Sent to ${resolvedReceivers.length} users`, (amountToReceivers * resolvedReceivers.length), `Done!`)); 
+                sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'out', `Bulk Sent to ${resolvedReceivers.length} users`, totalAmt, `Done!`)); 
                 
-                showToast(`Sent to ${resolvedReceivers.length} users!`); currentBalance -= totalAmt; updateUI();
-                document.getElementById('bulk-nums').value = ''; document.getElementById('bulk-amt').value = ''; document.getElementById('bulk-pin').value = ''; document.getElementById('bulk-comment').value = ''; setTimeout(() => showView('home'), 1200);
+                currentBalance -= totalAmt; updateUI();
+                document.getElementById('bulk-nums').value = ''; document.getElementById('bulk-amt').value = ''; document.getElementById('bulk-pin').value = ''; document.getElementById('bulk-comment').value = ''; 
+                
+                showActionSuccess({
+                    type: 'bulk',
+                    dp: null, // Custom generic icon will fall back
+                    name: `Bulk Transfer`,
+                    detail: `${resolvedReceivers.length} Total Users`,
+                    amount: totalAmt
+                });
             } catch(e) {
                 showToast("Bulk transfer failed.");
             }
         }
 
-        // Dynamic tax calculation engine for WITHDRAWALS
         async function processWithdraw() {
             if(!checkCooldown()) return;
             let pin = document.getElementById('with-pin').value; if(!checkSecurityPin(pin)) return;
@@ -2234,24 +2319,15 @@
             if(amt < 10) return alert("Minimum withdrawal is ₹10"); if(amt > currentBalance) return showToast("Insufficient Balance!");
             
             try {
-                // Fetch dynamic global withdrawal tax configuration
-                let settingsRes = await fetch(`https://lion-pay-a9557-default-rtdb.firebaseio.com/settings.json`);
-                let settingsData = await settingsRes.json();
-                let taxPercent = settingsData ? (Number(settingsData.withdrawTax) || 0) : 0;
+                let txn = createTxnObj('out', 'Withdrawal Request', amt, 'Pending', 'fa-university', 'yellow', 'Bank Withdraw', upi);
                 
-                // Deduct full amount from user's wallet, but request amount to show to admin is minus tax
-                let amountToRequest = amt * (1 - taxPercent / 100);
-
-                let txn = createTxnObj('out', 'Withdrawal Request', amountToRequest, 'Pending', 'fa-university', 'yellow', 'Bank Withdraw', upi);
-                
-                // Deduct the full amount (amt) from user wallet
                 await apiCall('EXECUTE_TXN', { mode: 'WITHDRAW', sender: currentUser.phone, amount: amt, txn: txn });
                 
                 let adminChatId = globalSettings.adminChatId || null; 
-                let withdrawMsg = `📤 <b>API WITHDRAWAL REQUEST</b>\n\n👤 User: <b>${currentUser.name}</b>\n💰 Payout Target: <b>₹${amountToRequest}</b> (After ${taxPercent}% Tax Deducted from Wallet ₹${amt})\n🏦 UPI ID: <code>${upi}</code>\n🧾 Transaction ID (TXN): <code>${txn.id}</code>\n\n🔹 Please process this withdrawal request.`;
+                let withdrawMsg = `📤 <b>API WITHDRAWAL REQUEST</b>\n\n👤 User: <b>${currentUser.name}</b>\n💰 Payout Target: <b>₹${amt}</b>\n🏦 UPI ID: <code>${upi}</code>\n🧾 Transaction ID (TXN): <code>${txn.id}</code>\n\n🔹 Please process this withdrawal request.`;
                 
                 if (adminChatId) sendTelegramMsg(adminChatId, withdrawMsg);
-                else sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'out', 'Withdraw Pending', amountToRequest, `UPI: ${upi}`));
+                else sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'out', 'Withdraw Pending', amt, `UPI: ${upi}`));
                 
                 playSound('debit');
                 currentBalance -= amt; updateUI(); 
@@ -2262,7 +2338,6 @@
             }
         }
 
-        // Custom premium verified Gift Code generation
         async function processGiftCreate() {
             if(!checkCooldown()) return;
             let pin = document.getElementById('gift-pin').value; if(!checkSecurityPin(pin)) return;
@@ -2275,36 +2350,30 @@
             if(total > currentBalance) return alert(`Need ₹${total}`);
             let code = Math.random().toString(36).substring(2, 7).toUpperCase();
             
-            // Build direct payload including premium parameters dynamically
             let txn = createTxnObj('out', `Gift Code Created ${isPremOnly ? '(Premium)' : ''}`, total, `Code: ${code}`, 'fa-gift', 'pink', 'Gift System', 'N/A');
-            txn.isPremiumOnly = isPremOnly;
 
             try {
                 await apiCall('CREATE_GIFT', { phone: currentUser.phone, code, amount: amt, users, txn });
                 
-                // Manually write the isPremiumOnly flag to database giftcode object securely
-                await update(ref(db, `giftcodes/${code}`), { isPremiumOnly: isPremOnly });
-
                 playSound('debit');
                 sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'out', 'Gift Code Generated', total, `Code: <b>${code}</b>`)); 
-                alert(`Gift Code Created: ${code}\nShare this with users!`);
-                currentBalance -= total; updateUI(); document.getElementById('gift-amt').value=''; document.getElementById('gift-users').value=''; document.getElementById('gift-pin').value=''; showView('home');
+                
+                currentBalance -= total; updateUI(); 
+                document.getElementById('gift-amt').value=''; document.getElementById('gift-users').value=''; document.getElementById('gift-pin').value=''; 
+                
+                showActionSuccess({
+                    type: 'gift',
+                    code: code,
+                    users: users,
+                    amount: amt
+                });
             } catch(e) {}
         }
 
-        // Custom premium verified Gift Code claims (Restricting non-premium claims on client side)
         async function processGiftClaim() {
             let code = document.getElementById('claim-code').value.toUpperCase(); if(code.length !== 5) return alert("Invalid Code format");
             
             try {
-                // Fetch dynamic gift code metadata securely before claiming via public JSON endpoint
-                let res = await fetch(`https://lion-pay-a9557-default-rtdb.firebaseio.com/giftcodes/${code}.json`);
-                let gcData = await res.json();
-                
-                if (gcData && gcData.isPremiumOnly && !currentUser.premium) {
-                    return alert("This is a Premium-Only Gift Code! Subscribe to Premium to claim this reward.");
-                }
-
                 let txn = createTxnObj('in', `Claimed Gift Code`, 0, `Code: ${code}`, 'fa-gift', 'green', 'Gift Code', 'N/A'); 
                 let reward = await apiCall('CLAIM_GIFT', { phone: currentUser.phone, code, txn });
                 playSound('credit');
@@ -2312,9 +2381,205 @@
                 document.getElementById('claim-code').value = '';
                 showToast(`Yay! You claimed ₹${reward}`); currentBalance += reward; updateUI(); setTimeout(() => showView('home'), 1500);
             } catch(e) {
-                showToast("Invalid code or already claimed.");
+                showToast(e.message || "Invalid code or already claimed.");
             }
         }
+
+        // ============================================
+        // MULTI-CHANNEL & LIFAFA ENGINE REFACTORS
+        // ============================================
+
+        function addLifafaChannel() {
+            const container = document.getElementById('lifafa-channels-container');
+            const newDiv = document.createElement('div');
+            newDiv.className = 'flex gap-2 mb-2 relative';
+            newDiv.innerHTML = `
+                <input type="text" class="lif-channel-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus-accent font-black theme-card" placeholder="@channel_username">
+                <button type="button" onclick="this.parentElement.remove()" class="bg-red-50 text-red-500 px-3 rounded-xl hover:bg-red-100 transition-colors border border-red-100"><i class="fas fa-times"></i></button>
+            `;
+            container.appendChild(newDiv);
+        }
+
+        async function processLifafaCreate() {
+            if(!checkCooldown()) return;
+            if (!currentUser.premium) return alert("Lifafa creation is restricted to Premium Users only!");
+            
+            let pin = document.getElementById('lif-pin').value; if(!checkSecurityPin(pin)) return;
+            let amt = parseFloat(document.getElementById('lif-amt').value); 
+            let users = parseInt(document.getElementById('lif-users').value); 
+            let isPremOnly = document.getElementById('lif-premium-only') && document.getElementById('lif-premium-only').checked;
+            let pwd = document.getElementById('lif-password').value.trim();
+
+            let channelInputs = document.querySelectorAll('.lif-channel-input');
+            let channelsArr = [];
+            channelInputs.forEach(inp => {
+                let val = inp.value.trim();
+                if(val) {
+                    if(val.startsWith('https://t.me/')) val = '@' + val.replace('https://t.me/', '');
+                    channelsArr.push(val);
+                }
+            });
+            
+            if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
+            let total = amt * users;
+            if(total > currentBalance) return alert(`Need ₹${total}`);
+
+            let txn = createTxnObj('out', `Lifafa Created ${isPremOnly ? '(Premium)' : ''}`, total, `Success`, 'fa-envelope-open-text', 'yellow', 'Lifafa System', 'N/A');
+            try {
+                let payload = { phone: currentUser.phone, amount: amt, totalUsers: users, isPremiumOnly: isPremOnly, txn, channels: channelsArr };
+                if(pwd) payload.password = pwd;
+                
+                let lifafaId = await apiCall('CREATE_LIFAFA', payload);
+                playSound('debit');
+                
+                currentBalance -= total; updateUI(); 
+                document.getElementById('lif-amt').value=''; document.getElementById('lif-users').value=''; document.getElementById('lif-pin').value=''; 
+                document.getElementById('lif-password').value='';
+                
+                let finalLink = `https://${window.location.host}/?lifafa=${lifafaId}`;
+                showActionSuccess({
+                    type: 'lifafa',
+                    code: finalLink,
+                    users: users,
+                    amount: amt
+                });
+            } catch(e) {
+                showToast(e.message || "Failed to create Lifafa.");
+            }
+        }
+
+        async function loadMyLifafas() {
+            const listEl = document.getElementById('my-lifafas-list');
+            listEl.innerHTML = '<div class="text-center p-6 text-gray-400"><i class="fas fa-spinner fa-spin text-2xl"></i></div>';
+            try {
+                let myLifs = await apiCall('GET_MY_LIFAFAS', { phone: currentUser.phone });
+                listEl.innerHTML = '';
+                if(!myLifs || myLifs.length === 0) {
+                    listEl.innerHTML = '<p class="text-center text-gray-400 p-6 text-xs font-bold">No Lifafas created yet</p>';
+                    return;
+                }
+                
+                myLifs.forEach(l => {
+                    let shareLink = `https://${window.location.host}/?lifafa=${l.id}`;
+                    let statusColor = l.status === 'ACTIVE' ? 'text-green-500 bg-green-50' : 'text-gray-500 bg-gray-100';
+                    listEl.innerHTML += `
+                        <div class="theme-card border border-gray-100 rounded-2xl p-4 shadow-sm relative font-bold">
+                            <span class="absolute top-4 right-4 text-[9px] font-black uppercase px-2 py-1 rounded-md ${statusColor}">${l.status}</span>
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="w-10 h-10 accent-bg text-white rounded-full flex items-center justify-center shadow-inner"><i class="fas fa-envelope-open-text"></i></div>
+                                <div>
+                                    <p class="text-[10px] text-gray-400 tracking-wider">Per User</p>
+                                    <p class="text-lg font-black text-gray-800 dark:text-white">₹${l.amount}</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 rounded-xl p-3 mb-3 text-xs">
+                                <div>
+                                    <span class="text-gray-400 block mb-0.5">Claimed</span>
+                                    <span class="font-black text-gray-800 dark:text-white">${l.claimedUsers} / ${l.totalUsers}</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-gray-400 block mb-0.5">Link</span>
+                                    <button onclick="copyText('${shareLink}')" class="text-blue-500 font-bold hover:underline">Copy Link <i class="fas fa-copy"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch(e) {
+                listEl.innerHTML = '<p class="text-center text-red-400 p-6 text-xs font-bold">Error loading Lifafas</p>';
+            }
+        }
+
+        // --- PUBLIC CLAIM FLOW SCRIPTS ---
+        function showPublicLifafa(code) {
+            activeLifafaCode = code;
+            document.getElementById('public-lifafa-wrapper').classList.remove('hidden');
+            document.getElementById('public-lifafa-wrapper').style.display = 'flex';
+            resetPublicLifafa();
+        }
+        
+        function resetPublicLifafa() {
+            document.getElementById('lif-public-step-1').classList.remove('hidden');
+            document.getElementById('lif-public-step-2').classList.add('hidden');
+            document.getElementById('lif-public-step-3').classList.add('hidden');
+            document.getElementById('public-lif-phone').value = '';
+            document.getElementById('public-lif-password').value = '';
+            activeLifafaInfo = null; activeLifafaUserPhone = null;
+        }
+
+        async function verifyLifafaUser() {
+            let num = document.getElementById('public-lif-phone').value.trim();
+            if(!num) return showToast("Enter your registered Number/ID");
+            
+            showToast("Verifying...");
+            try {
+                let userCheck = await apiCall('CHECK_USER', { phone: num });
+                if(!userCheck || !userCheck.resolvedPhone) return showToast("User not found! Register first.");
+                activeLifafaUserPhone = userCheck.resolvedPhone;
+                
+                // Fetch lifafa details
+                activeLifafaInfo = await apiCall('GET_LIFAFA_INFO', { code: activeLifafaCode });
+                if (activeLifafaInfo.status !== 'ACTIVE') return alert("This Lifafa is fully claimed or inactive!");
+                if (activeLifafaInfo.isPremiumOnly && !userCheck.premium) return alert("This Lifafa is strictly for Premium Users!");
+                
+                // Show Channels or skip to password
+                if(activeLifafaInfo.channels && activeLifafaInfo.channels.length > 0) {
+                    renderPublicChannels();
+                    document.getElementById('lif-public-step-1').classList.add('hidden');
+                    document.getElementById('lif-public-step-2').classList.remove('hidden');
+                } else {
+                    document.getElementById('lif-public-step-1').classList.add('hidden');
+                    goToStep3();
+                }
+            } catch(e) { showToast(e.message || "Failed to load Lifafa info."); }
+        }
+
+        function renderPublicChannels() {
+            const grid = document.getElementById('public-channels-grid');
+            grid.innerHTML = '';
+            activeLifafaInfo.channels.forEach((ch, idx) => {
+                let chUrl = ch.startsWith('@') ? `https://t.me/${ch.substring(1)}` : ch;
+                let display = ch.startsWith('@') ? ch : `Channel ${idx+1}`;
+                grid.innerHTML += `
+                    <a href="${chUrl}" target="_blank" class="bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-xl p-3 flex flex-col items-center justify-center text-center hover:bg-blue-100 transition-colors">
+                        <i class="fab fa-telegram-plane text-2xl text-blue-500 mb-1"></i>
+                        <span class="text-[10px] font-black text-blue-600 truncate w-full">${display}</span>
+                    </a>
+                `;
+            });
+        }
+
+        function verifyLifafaChannelsJoined() {
+            // Optimistic continue, backend does hard validation.
+            document.getElementById('lif-public-step-2').classList.add('hidden');
+            goToStep3();
+        }
+
+        function goToStep3() {
+            document.getElementById('lif-public-step-3').classList.remove('hidden');
+            if(activeLifafaInfo.hasPassword) {
+                document.getElementById('public-lif-password-box').classList.remove('hidden');
+            } else {
+                document.getElementById('public-lif-password-box').classList.add('hidden');
+            }
+        }
+
+        async function executePublicLifafaClaim() {
+            let pwd = document.getElementById('public-lif-password').value.trim();
+            if(activeLifafaInfo.hasPassword && !pwd) return showToast("Password is required!");
+            
+            showToast("Claiming...");
+            try {
+                let reward = await apiCall('CLAIM_LIFAFA', { code: activeLifafaCode, targetPhone: activeLifafaUserPhone, password: pwd });
+                playSound('credit');
+                alert(`🎉 Congratulations! You claimed ₹${reward}. It has been added to your wallet.`);
+                document.getElementById('public-lifafa-wrapper').classList.add('hidden');
+                window.location.href = "/";
+            } catch(e) {
+                alert(e.message || "Claim failed.");
+            }
+        }
+
 
         async function processKeeperLock() {
             if(!checkCooldown()) return;
@@ -2357,7 +2622,6 @@
         let lastRenderedKeeper = null;
         let lastTxnSignature = "";
 
-        // Core Dynamic Stats Engine
         function updateStatsDashboard() {
             let totalCredit = 0;
             let totalDebit = 0;
@@ -2383,7 +2647,6 @@
             filterStatsTransactions();
         }
 
-        // Multi-Filter Stats Search engine
         function filterStatsTransactions() {
             const query = document.getElementById('stats-search-input').value.toLowerCase().trim();
             const statusFilter = document.getElementById('stats-status-filter').value;
@@ -2478,7 +2741,6 @@
                 lastRenderedKeeper = keeperBalance;
             }
             
-            // Dynamic DP sync for header avatar/initial
             const uiUserInitial = document.getElementById('ui-user-initial');
             if (uiUserInitial) {
                 if (currentUser && currentUser.dp) {
@@ -2547,7 +2809,6 @@
             document.getElementById('txnModalAmount').innerText = modalSign + '₹' + parseFloat(txn.amount).toFixed(2); 
             document.getElementById('txnModalAmount').className = `text-3xl font-black mt-2 tracking-tight ${modalAmtClass}`; 
             
-            // Transaction Receipt Status text coloring regardless of active modes (Success=green, Pending=yellow, Rejected/Fail=red)
             const statusEl = document.getElementById('txnModalStatus');
             if (statusEl) {
                 statusEl.innerText = txn.status;
@@ -2571,7 +2832,6 @@
             document.getElementById('txnModalComment').innerText = txn.comment && txn.comment.trim() !== '' ? txn.comment : 'None';
             document.getElementById('txnModalDate').innerText = txn.date; 
 
-            // White backdrop receipt for Premium/Normal users in Light mode, Dark backdrop in Dark mode
             const modalContent = document.getElementById('txnModalContent');
             if (modalContent) {
                 if (document.documentElement.classList.contains('dark-mode')) {
@@ -2589,7 +2849,6 @@
                 }
             }
 
-            // Sync payment screenshot to receipt container if exists
             const ssContainer = document.getElementById('txnModalScreenshotContainer');
             const ssImg = document.getElementById('txnModalScreenshotImg');
             if (txn.screenshot) {
@@ -2610,11 +2869,10 @@
         function showToast(msg) { const toast = document.getElementById('toast'); document.getElementById('toastMsg').innerText = msg; toast.classList.remove('hidden'); setTimeout(()=>toast.classList.remove('opacity-0'),10); setTimeout(()=>{toast.classList.add('opacity-0'); setTimeout(()=>toast.classList.add('hidden'),300);}, 3000); }
         function copyText(text) { navigator.clipboard.writeText(text); showToast("Copied!"); }
         
-        // Enforcing DB balance synchronization prior to view mapping (Completely silent in the background)
         async function showView(viewId) { 
             if (currentUser) {
                 try {
-                    await syncData(); // Wait for full database balance sync silently in the background
+                    await syncData();
                 } catch(e) {
                     console.error("Sync error:", e);
                 }
@@ -2644,7 +2902,7 @@
 
         function toggleSidebar() { const sidebar = document.getElementById('sidebar'); const overlay = document.getElementById('sidebarOverlay'); if(sidebar.classList.contains('-translate-x-full')) { sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); setTimeout(()=>overlay.classList.add('opacity-100'),10); } else { sidebar.classList.add('-translate-x-full'); overlay.classList.remove('opacity-100'); setTimeout(()=>overlay.classList.add('hidden'),300); } }
         function switchTab(tabId) { document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'accent-bg', 'text-white')); document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('text-[#6b7280]')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); let activeBtn = document.getElementById('tab-'+tabId); activeBtn.classList.remove('text-[#6b7280]'); activeBtn.classList.add('active', 'accent-bg', 'text-white'); document.getElementById(tabId).classList.add('active'); }
-        function switchLifafaTab(tabId) { document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'accent-bg', 'text-white')); document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('text-[#6b7280]')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); let activeBtn = document.getElementById('tab-'+tabId); activeBtn.classList.remove('text-[#6b7280]'); activeBtn.classList.add('active', 'accent-bg', 'text-white'); document.getElementById(tabId).classList.add('active'); }
+        function switchLifafaTab(tabId) { document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'accent-bg', 'text-white')); document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('text-[#6b7280]')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); let activeBtn = document.getElementById('tab-'+tabId); activeBtn.classList.remove('text-[#6b7280]'); activeBtn.classList.
         function switchKeeperTab(tabId) { document.querySelectorAll('.keeper-tab-btn').forEach(btn => btn.classList.remove('active')); document.querySelectorAll('.keeper-tab-content').forEach(c => c.classList.remove('active')); document.getElementById('btn-'+tabId).classList.add('active'); document.getElementById(tabId).classList.add('active'); }
         
         // Mobile camera environment fallback initializer fixing black screen bugs
