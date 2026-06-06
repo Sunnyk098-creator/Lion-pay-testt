@@ -2929,6 +2929,7 @@
         }
 
         function stopScanner() { if(html5QrcodeScanner) { html5QrcodeScanner.stop().then(()=>html5QrcodeScanner.clear()).catch(()=>{}); } }
+        
         function handleQRResult(text) {
             playSound('success');
             stopScanner(); let parsedName = "Unknown", parsedNumber = text;
@@ -2937,35 +2938,90 @@
             document.getElementById('scan-res-name').innerText = parsedName; document.getElementById('scan-res-phone').innerText = parsedNumber;
             document.getElementById('scan-amt').value = ''; document.getElementById('scan-pin').value = ''; document.getElementById('scan-comment').value = '';
         }
+        
         function resetScanner() { startScanner(); }
 
-        // Restricted Lifafa Creation strictly to premium subscribers
-        async function processLifafaCreate() {
-            if(!checkCooldown()) return;
-            if (!currentUser.premium) {
-                return alert("Lifafa creation is restricted to Premium Users only!");
-            }
-            let pin = document.getElementById('lif-pin').value; if(!checkSecurityPin(pin)) return;
-            let amt = parseFloat(document.getElementById('lif-amt').value); 
-            let users = parseInt(document.getElementById('lif-users').value); 
-            let isPremOnly = document.getElementById('lif-premium-only') && document.getElementById('lif-premium-only').checked;
-            
-            if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
-            let total = amt * users;
-            if(total > currentBalance) return alert(`Need ₹${total}`);
+        // ============================================
+        // ADVANCED SCANNER TOOLS: GALLERY, ZOOM, TORCH
+        // ============================================
 
-            let txn = createTxnObj('out', `Lifafa Created ${isPremOnly ? '(Premium)' : ''}`, total, `Success`, 'fa-envelope-open-text', 'yellow', 'Lifafa System', 'N/A');
-            try {
-                let lifafaId = await apiCall('CREATE_LIFAFA', { phone: currentUser.phone, amount: amt, totalUsers: users, isPremiumOnly: isPremOnly, txn });
-                playSound('debit');
-                alert(`Lifafa Created Successfully!\nShare this Link: https://${window.location.host}/?lifafa=${lifafaId}`);
-                currentBalance -= total; updateUI(); 
-                document.getElementById('lif-amt').value=''; document.getElementById('lif-users').value=''; document.getElementById('lif-pin').value=''; 
-                showView('home');
-            } catch(e) {}
+        // 1. Upload from Gallery
+        function handleQRUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            showToast("Scanning image...");
+            
+            // html5Qrcode allows scanning local image files securely without uploading to DB
+            const html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.scanFile(file, true)
+            .then(decodedText => {
+                handleQRResult(decodedText);
+                document.getElementById('qr-upload').value = ''; // reset input
+            })
+            .catch(err => {
+                showToast("Invalid QR Code or unable to read.");
+                document.getElementById('qr-upload').value = ''; // reset input
+            });
         }
 
-        // Processing splash display screen fading logic
+        // 2. Dynamic Zoom Control (1x to 5x)
+        function toggleQRZoom() {
+            if(!html5QrcodeScanner || html5QrcodeScanner.getState() !== 2) return showToast("Start scanner first!");
+            
+            // Get underlying video track capabilities
+            const videoTrack = html5QrcodeScanner.getRunningTrackCameraCapabilities();
+            if(videoTrack && videoTrack.zoomFeature().isSupported()) {
+                currentQRZoom++;
+                if(currentQRZoom > 5) currentQRZoom = 1;
+                
+                html5QrcodeScanner.applyVideoConstraints({ zoom: currentQRZoom }).then(() => {
+                    document.getElementById('btn-qr-zoom').innerText = currentQRZoom + 'x';
+                }).catch(err => {
+                    showToast("Zoom limit reached or not supported.");
+                });
+            } else {
+                showToast("Zoom feature not supported on this device.");
+            }
+        }
+
+        // 3. Torch/Flashlight Control
+        function toggleQRTorch() {
+            if(!html5QrcodeScanner || html5QrcodeScanner.getState() !== 2) return showToast("Start scanner first!");
+            
+            const videoTrack = html5QrcodeScanner.getRunningTrackCameraCapabilities();
+            if(videoTrack && videoTrack.torchFeature().isSupported()) {
+                isQRTorchOn = !isQRTorchOn;
+                html5QrcodeScanner.applyVideoConstraints({ torch: isQRTorchOn }).then(() => {
+                    const btn = document.getElementById('btn-qr-torch');
+                    if(isQRTorchOn) {
+                        btn.classList.replace('text-white', 'text-yellow-400');
+                    } else {
+                        btn.classList.replace('text-yellow-400', 'text-white');
+                    }
+                }).catch(err => {
+                    showToast("Torch feature not supported.");
+                });
+            } else {
+                showToast("Torch feature not supported on this device.");
+            }
+        }
+
+        // Search Transaction globally
+        function searchTxn() {
+            let tid = document.getElementById('search-txn-id').value.trim().toUpperCase();
+            if(!tid) return showToast("Enter Transaction ID");
+            
+            let txn = transactions.find(t => t.id === tid);
+            if(txn) {
+                openTxnModal(txn.id);
+                document.getElementById('search-txn-id').value = '';
+            } else {
+                showToast("Transaction not found in your history.");
+            }
+        }
+
+        // Processing splash display screen fading logic on startup
         window.onload = async () => {
             await handleSplashScreen();
             await checkAuth();
