@@ -36,10 +36,16 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     try {
+        // Collect parameters from both query (GET) and body (POST) to ensure API works everywhere
         const data = { ...req.query, ...(req.body || {}) };
 
+        // REDIRECT IF DIRECT ACCESS WITHOUT ANY API PARAMETERS
+        if (req.method === 'GET' && Object.keys(data).length === 0) {
+            return res.redirect(302, 'https://lion-pay.vercel.app');
+        }
+
         // ==========================================
-        // NEW API 1: TELEGRAM USERID BALANCE
+        // API 1: TELEGRAM USERID BALANCE
         // ==========================================
         if (data.tguserid) {
             const tgId = String(data.tguserid).trim();
@@ -64,7 +70,7 @@ export default async function handler(req, res) {
         }
 
         // ==========================================
-        // NEW API 2: LEADERBOARD TOP 3 USERS
+        // API 2: LEADERBOARD TOP 3 USERS
         // ==========================================
         if (data.leaderboard !== undefined) {
             const usersSnap = await get(ref(db, "users"));
@@ -81,7 +87,6 @@ export default async function handler(req, res) {
                     }
                 });
             }
-            // Sort by highest balance
             usersList.sort((a, b) => b.balance - a.balance);
             const top3 = usersList.slice(0, 3);
             
@@ -89,7 +94,7 @@ export default async function handler(req, res) {
         }
 
         // ==========================================
-        // NEW API 3: TRANSACTION DETAILS
+        // API 3: TRANSACTION DETAILS
         // ==========================================
         if (data.transaction) {
             const txnId = String(data.transaction).trim();
@@ -158,13 +163,11 @@ export default async function handler(req, res) {
 
             await update(ref(db), updates);
 
-            // Notify Admin
             const settingsSnap = await get(ref(db, "settings"));
             let globalAdminChatId = settingsSnap.exists() ? settingsSnap.val().adminChatId : null;
             let withdrawMsg = `📤 <b>API WITHDRAWAL REQUEST</b> 💼✨\n\n👤 API Owner: <b>${adminData.name || adminPhone}</b>\n💰 Amount: ₹${withdrawAmount}\n🏦 UPI ID: <code>${upi_id}</code>\n💬 Comment: ${safeComment || 'None'}\n🧾 Txn ID: <code>${txnId}</code>\n\n🔹 Please process this API request.`;
             if (globalAdminChatId) sendTelegramMsg(globalAdminChatId, withdrawMsg);
 
-            // Notify User
             if (adminData.tgUserId) {
                 let userMsg = adminData.premium 
                     ? `🚀 <b>PREMIUM API ALERT</b> 🚀\n💎 UPI Withdrawal Requested! 🔥\n🏦 UPI: <b>${upi_id}</b>\n💰 Amount: ₹${withdrawAmount}\n💬 Comment: ${safeComment || 'None'}\n🧾 Txn ID: <code>${txnId}</code>`
