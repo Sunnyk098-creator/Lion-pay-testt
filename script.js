@@ -73,9 +73,16 @@ async function apiCall(action, data = {}) {
     } catch(err) { showToast(err.message); throw err; }
 }
 
-async function sendTelegramMsg(chatId, text) {
+// Bot Alerts Logic integrated here (isTxnAlert param controls the override)
+async function sendTelegramMsg(chatId, text, isTxnAlert = true) {
     try {
         if(!chatId) return false;
+        
+        // Disable sending if it's a generic transaction alert and the user toggled it OFF.
+        if (isTxnAlert && currentUser && currentUser.botAlerts === false) {
+            return true; // Pretend it succeeded
+        }
+
         let res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'HTML' }) }); 
         return (await res.json()).ok;
     } catch (e) { return false; }
@@ -167,14 +174,15 @@ async function processSignupStep1() {
         
         pendingSignupUser = { 
             name, password: pass, pin, tgUserId: telegram, isBanned: false, balance: 0, keeperBalance: 0, 
-            apiKey: generateApiKey(), premium: true, premiumExpiry: Date.now() + (3 * 24 * 60 * 60 * 1000), advancedUI: true
+            apiKey: generateApiKey(), premium: true, premiumExpiry: Date.now() + (3 * 24 * 60 * 60 * 1000), advancedUI: true, botAlerts: true
         }; 
         pendingSignupUser.phone = phone; 
         pendingOTP = Math.floor(100000 + Math.random() * 900000).toString(); 
         otpMode = 'signup';
         
         let btn = document.getElementById('btn-signup-otp'); btn.innerText = "SENDING..."; btn.disabled = true;
-        let success = await sendTelegramMsg(telegram, `🔐 Your OTP Code\n📲 OTP: <b>${pendingOTP}</b>`); btn.innerText = "SEND OTP TO TELEGRAM"; btn.disabled = false;
+        // False prevents overriding by botAlert settings during OTP
+        let success = await sendTelegramMsg(telegram, `🔐 Your OTP Code\n📲 OTP: <b>${pendingOTP}</b>`, false); btn.innerText = "SEND OTP TO TELEGRAM"; btn.disabled = false;
         if(success) { showToast("OTP Sent to Telegram!"); showAuthView('otp'); } else { alert("Could not send OTP. Start the bot first!"); }
     } catch(e) {}
 }
@@ -184,7 +192,7 @@ async function processResetPinStep1() {
     try {
         let user = await apiCall('CHECK_USER', { phone: resetPinPhone }); if(!user) return showToast("User not found!");
         pendingOTP = Math.floor(100000 + Math.random() * 900000).toString(); otpMode = 'reset_pin';
-        let success = await sendTelegramMsg(user.tgUserId, `🔐 Your OTP Code\n📲 OTP: <b>${pendingOTP}</b>`);
+        let success = await sendTelegramMsg(user.tgUserId, `🔐 Your OTP Code\n📲 OTP: <b>${pendingOTP}</b>`, false);
         if(success) { showToast("OTP Sent to Telegram!"); showAuthView('otp'); } else { alert("Failed to send OTP."); }
     } catch(e) {}
 }
@@ -277,6 +285,7 @@ async function syncData() {
             if (document.getElementById('view-official').classList.contains('active')) { renderOfficialPosts(); }
         }
         updateUI();
+        updateStatsDashboard(); // Ensures the Profile stat grid also updates live
     } catch(e) {}
 }
 
@@ -622,6 +631,52 @@ function markPostsAsRead() {
 
 function handleMessageNotificationClick() { markPostsAsRead(); showView('official'); }
 
+// --- Profile Update Handlers ---
+async function editProfileName() {
+    let newName = prompt("Enter new Name:", currentUser.name);
+    if (newName && newName.trim() !== "" && newName !== currentUser.name) {
+        try {
+            await apiCall('UPDATE_PROFILE', { phone: currentUser.phone, name: newName.trim() });
+            currentUser.name = newName.trim();
+            updateProfileDashboardUI();
+            updateUI();
+            showToast("Name Updated Successfully!");
+        } catch(e) {
+            showToast("Failed to update name.");
+        }
+    }
+}
+
+function openBotAlertModal() {
+    document.getElementById('toggle-bot-alert-check').checked = currentUser.botAlerts !== false; 
+    document.getElementById('bot-alert-tg-id').value = currentUser.tgUserId || '';
+    document.getElementById('botAlertModal').classList.remove('hidden');
+    setTimeout(() => document.getElementById('botAlertModal').classList.remove('opacity-0'), 10);
+}
+
+function closeBotAlertModal() {
+    document.getElementById('botAlertModal').classList.add('opacity-0');
+    setTimeout(() => document.getElementById('botAlertModal').classList.add('hidden'), 300);
+}
+
+async function saveBotAlertSettings() {
+    let isEnabled = document.getElementById('toggle-bot-alert-check').checked;
+    let newTgId = document.getElementById('bot-alert-tg-id').value.trim();
+    if (newTgId && !/^\d+$/.test(newTgId)) {
+        return showToast("Telegram User ID must be NUMERIC only (no @).");
+    }
+    try {
+        await apiCall('UPDATE_PROFILE', { phone: currentUser.phone, botAlerts: isEnabled, tgUserId: newTgId });
+        currentUser.botAlerts = isEnabled;
+        currentUser.tgUserId = newTgId;
+        updateProfileDashboardUI();
+        closeBotAlertModal();
+        showToast("Bot Alert Settings Saved!");
+    } catch(e) {
+        showToast("Failed to save settings.");
+    }
+}
+
 function updateProfileDashboardUI() {
     if(!currentUser) return;
     
@@ -670,7 +725,7 @@ function updateProfileDashboardUI() {
 
     if (pLblTg) {
         if (currentUser.tgUserId) {
-            pLblTg.innerText = `@${currentUser.tgUserId}`;
+            pLblTg.innerText = currentUser.tgUserId;
             pLblTg.className = "font-bold text-sm text-blue-500 font-mono";
         } else {
             pLblTg.innerText = "Not Linked";
@@ -787,7 +842,7 @@ async function submitCustomTagRequest() {
     let msg = `🏷️ <b>NEW CUSTOM TAG REQUEST</b>\n\n👤 Name: <b>${currentUser?.name}</b>\n📲 Number: <code>${currentUser?.phone}</code>\nDesired Tag: <b>${reqTag}</b>\n\n<i>Admin approval required inside realtime database console!</i>`;
     
     showToast("Submitting Request...");
-    let success = await sendTelegramMsg(adminChatId, msg);
+    let success = await sendTelegramMsg(adminChatId, msg, false);
     if(success) {
         showToast("Request submitted for approval!");
         document.getElementById('custom-tag-request-input').value = '';
@@ -879,7 +934,7 @@ function showActionSuccess(data) {
             resultOverlay.classList.remove('hidden');
             resultOverlay.style.display = 'flex';
             resolve();
-        }, 2000); // 2 SECOND ROCKET DURATION
+        }, 2000); 
     });
 }
 
@@ -888,7 +943,7 @@ function showActionError(data) {
         const resultOverlay = document.getElementById('txn-result-overlay');
         
         document.getElementById('txn-result-icon-bg').className = "w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4 shadow-inner animate-[slideDown_0.5s_ease-out] bg-red-100 text-red-500 border border-red-200";
-        document.getElementById('txn-result-icon').className = "fas fa-times";
+        document.getElementById('txn-result-icon').className = "fas fa-times animate-shake";
         document.getElementById('txn-result-title').innerText = 'Payment Failed';
         document.getElementById('txn-result-title').className = "text-xl font-bold text-red-600 dark:text-red-400 mb-2 tracking-wide animate-[slideUpFade_0.5s_ease-out_0.1s] opacity-0";
         document.getElementById('txn-result-amount').innerText = parseFloat(data.amount || 0).toFixed(2);
@@ -1018,7 +1073,7 @@ async function processAdd() {
         
         let adminChatId = globalSettings.adminChatId || null; 
         let depositMsg = `🔔 <b>DEPOSIT REQ</b>\nUser: ${currentUser?.name}\nAmount: ₹${amt}\nUTR: ${utr}\nTXN: ${txn.id}`;
-        if (adminChatId) sendTelegramMsg(adminChatId, depositMsg);
+        if (adminChatId) sendTelegramMsg(adminChatId, depositMsg, false);
         
         playSound('success');
         
@@ -1110,7 +1165,7 @@ async function processWithdraw() {
         let adminChatId = globalSettings.adminChatId || null; 
         let withdrawMsg = `📤 <b>API WITHDRAWAL REQUEST</b>\n\n👤 User: <b>${currentUser?.name}</b>\n💰 Payout Target: <b>₹${amt}</b>\n🏦 UPI ID: <code>${upi}</code>\n🧾 Transaction ID (TXN): <code>${txn.id}</code>\n\n🔹 Please process this withdrawal request.`;
         
-        if (adminChatId) sendTelegramMsg(adminChatId, withdrawMsg);
+        if (adminChatId) sendTelegramMsg(adminChatId, withdrawMsg, false);
         
         playSound('debit');
         currentBalance -= amt; updateUI(); 
@@ -1213,7 +1268,7 @@ async function processLifafaCreate() {
         showActionSuccess({
             type: 'lifafa',
             name: "Lifafa Deployed",
-            detail: `Share Link: ${finalLink} (${users} Users)`,
+            detail: `Share Link Generated (${users} Users)`,
             amount: total,
             txnId: txn.id
         });
@@ -1301,9 +1356,6 @@ async function executeHistoryDeletion() {
     }
 }
 
-// ===========================================
-// UNIFIED STATS POPULATOR (GAME + PROFILE)
-// ===========================================
 function updateStatsDashboard() {
     let totalCredit = 0;
     let totalDebit = 0;
