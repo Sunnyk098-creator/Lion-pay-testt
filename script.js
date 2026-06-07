@@ -13,6 +13,12 @@ let uploadedScreenshotBase64 = null;
 let currentQRZoom = 1;
 let isQRTorchOn = false;
 
+// Public Lifafa Global Flow Tracking
+let publicLifafaCode = null;
+let publicLifafaReferrer = null;
+let activeLifafaInfo = null;
+let activeLifafaUserPhone = null;
+
 const TAGS_LIST = ["Member", "Looter", "Bot Maker", "Admin", "Developer", "Trader", "VIP", "King", "Pro", "Legend"];
 const ACCENT_COLORS = [
     {name: "Amber", hex: "#f59e0b"}, {name: "Red", hex: "#ef4444"}, {name: "Pink", hex: "#ec4899"}, {name: "Rose", hex: "#f43f5e"}, 
@@ -73,16 +79,10 @@ async function apiCall(action, data = {}) {
     } catch(err) { showToast(err.message); throw err; }
 }
 
-// Bot Alerts Logic integrated here (isTxnAlert param controls the override)
 async function sendTelegramMsg(chatId, text, isTxnAlert = true) {
     try {
         if(!chatId) return false;
-        
-        // Disable sending if it's a generic transaction alert and the user toggled it OFF.
-        if (isTxnAlert && currentUser && currentUser.botAlerts === false) {
-            return true; // Pretend it succeeded
-        }
-
+        if (isTxnAlert && currentUser && currentUser.botAlerts === false) return true; 
         let res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'HTML' }) }); 
         return (await res.json()).ok;
     } catch (e) { return false; }
@@ -181,7 +181,6 @@ async function processSignupStep1() {
         otpMode = 'signup';
         
         let btn = document.getElementById('btn-signup-otp'); btn.innerText = "SENDING..."; btn.disabled = true;
-        // False prevents overriding by botAlert settings during OTP
         let success = await sendTelegramMsg(telegram, `🔐 Your OTP Code\n📲 OTP: <b>${pendingOTP}</b>`, false); btn.innerText = "SEND OTP TO TELEGRAM"; btn.disabled = false;
         if(success) { showToast("OTP Sent to Telegram!"); showAuthView('otp'); } else { alert("Could not send OTP. Start the bot first!"); }
     } catch(e) {}
@@ -285,7 +284,7 @@ async function syncData() {
             if (document.getElementById('view-official').classList.contains('active')) { renderOfficialPosts(); }
         }
         updateUI();
-        updateStatsDashboard(); // Ensures the Profile stat grid also updates live
+        updateStatsDashboard();
     } catch(e) {}
 }
 
@@ -631,7 +630,7 @@ function markPostsAsRead() {
 
 function handleMessageNotificationClick() { markPostsAsRead(); showView('official'); }
 
-// --- Profile Update Handlers ---
+// Profile Update Handlers
 async function editProfileName() {
     let newName = prompt("Enter new Name:", currentUser.name);
     if (newName && newName.trim() !== "" && newName !== currentUser.name) {
@@ -641,9 +640,7 @@ async function editProfileName() {
             updateProfileDashboardUI();
             updateUI();
             showToast("Name Updated Successfully!");
-        } catch(e) {
-            showToast("Failed to update name.");
-        }
+        } catch(e) { showToast("Failed to update name."); }
     }
 }
 
@@ -662,9 +659,7 @@ function closeBotAlertModal() {
 async function saveBotAlertSettings() {
     let isEnabled = document.getElementById('toggle-bot-alert-check').checked;
     let newTgId = document.getElementById('bot-alert-tg-id').value.trim();
-    if (newTgId && !/^\d+$/.test(newTgId)) {
-        return showToast("Telegram User ID must be NUMERIC only (no @).");
-    }
+    if (newTgId && !/^\d+$/.test(newTgId)) return showToast("Telegram User ID must be NUMERIC only (no @).");
     try {
         await apiCall('UPDATE_PROFILE', { phone: currentUser.phone, botAlerts: isEnabled, tgUserId: newTgId });
         currentUser.botAlerts = isEnabled;
@@ -672,14 +667,11 @@ async function saveBotAlertSettings() {
         updateProfileDashboardUI();
         closeBotAlertModal();
         showToast("Bot Alert Settings Saved!");
-    } catch(e) {
-        showToast("Failed to save settings.");
-    }
+    } catch(e) { showToast("Failed to save settings."); }
 }
 
 function updateProfileDashboardUI() {
     if(!currentUser) return;
-    
     const pName = document.getElementById('profile-display-name');
     const pLblName = document.getElementById('profile-lbl-name');
     const pLblPhone = document.getElementById('profile-lbl-phone');
@@ -696,40 +688,32 @@ function updateProfileDashboardUI() {
         else pCrown.classList.add('hidden');
     }
 
-    if (pName) {
-        pName.innerHTML = currentUser.name + (currentUser.premium ? ` <i class="fas fa-check-circle text-blue-500 text-base" title="Verified Member"></i>` : '');
-    }
+    if (pName) pName.innerHTML = currentUser.name;
     if (pLblName) pLblName.innerText = currentUser.name;
     if (pLblPhone) pLblPhone.innerText = currentUser.phone;
     if (pLblPin) pLblPin.innerText = currentUser.pin || "****";
     
     if (pLblCustom) {
         if (currentUser.customId) {
-            pLblCustom.innerText = currentUser.customId;
-            pLblCustom.className = "font-black text-sm text-amber-500 font-mono";
+            pLblCustom.innerText = currentUser.customId; pLblCustom.className = "font-black text-sm text-amber-500 font-mono";
         } else {
-            pLblCustom.innerText = "id not configured";
-            pLblCustom.className = "font-bold text-sm text-gray-400 italic";
+            pLblCustom.innerText = "id not configured"; pLblCustom.className = "font-bold text-sm text-gray-400 italic";
         }
     }
 
     if (pLblPremium) {
         if (currentUser.premium) {
-            pLblPremium.innerText = "Premium Member";
-            pLblPremium.className = "text-[10px] uppercase font-black tracking-widest text-amber-500 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 shadow-sm";
+            pLblPremium.innerText = "Premium Member"; pLblPremium.className = "text-[10px] uppercase font-black tracking-widest text-amber-500 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 shadow-sm";
         } else {
-            pLblPremium.innerText = "Standard Member";
-            pLblPremium.className = "text-[10px] uppercase font-black tracking-widest text-gray-500 bg-gray-100 px-3 py-1 rounded-full border border-gray-200";
+            pLblPremium.innerText = "Standard Member"; pLblPremium.className = "text-[10px] uppercase font-black tracking-widest text-gray-500 bg-gray-100 px-3 py-1 rounded-full border border-gray-200";
         }
     }
 
     if (pLblTg) {
         if (currentUser.tgUserId) {
-            pLblTg.innerText = currentUser.tgUserId;
-            pLblTg.className = "font-bold text-sm text-blue-500 font-mono";
+            pLblTg.innerText = currentUser.tgUserId; pLblTg.className = "font-bold text-sm text-blue-500 font-mono";
         } else {
-            pLblTg.innerText = "Not Linked";
-            pLblTg.className = "font-medium text-sm text-gray-400 italic";
+            pLblTg.innerText = "Not Linked"; pLblTg.className = "font-medium text-sm text-gray-400 italic";
         }
     }
 
@@ -752,35 +736,17 @@ async function processLocalDpUpload(event) {
     reader.onload = function (event) {
         const img = new Image();
         img.onload = function () {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            const maxDim = 250;
-            let width = img.width;
-            let height = img.height;
-            
-            if (width > height) {
-                if (width > maxDim) { height *= maxDim / width; width = maxDim; }
-            } else {
-                if (height > maxDim) { width *= maxDim / height; height = maxDim; }
-            }
-            
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(img, 0, 0, width, height);
-            
+            const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+            const maxDim = 250; let width = img.width; let height = img.height;
+            if (width > height) { if (width > maxDim) { height *= maxDim / width; width = maxDim; } } else { if (height > maxDim) { width *= maxDim / height; height = maxDim; } }
+            canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height);
             const base64Data = canvas.toDataURL('image/jpeg', 0.7);
             
             apiCall('UPDATE_DP', { phone: currentUser?.phone, dp: base64Data })
                 .then(() => {
                     if(currentUser) currentUser.dp = base64Data;
-                    updateUI();
-                    updateProfileDashboardUI();
-                    showToast("Profile picture updated successfully!");
-                })
-                .catch(() => {
-                    showToast("Failed to upload Profile Picture.");
-                });
+                    updateUI(); updateProfileDashboardUI(); showToast("Profile picture updated successfully!");
+                }).catch(() => showToast("Failed to upload Profile Picture."));
         };
         img.src = event.target.result;
     };
@@ -797,35 +763,16 @@ function handleScreenshotUpload(event) {
     reader.onload = function (e) {
         const img = new Image();
         img.onload = function () {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            const maxDim = 320;
-            let width = img.width;
-            let height = img.height;
-            if (width > height) {
-                if (width > maxDim) { height *= maxDim / width; width = maxDim; }
-            } else {
-                if (height > maxDim) { width *= maxDim / height; height = maxDim; }
-            }
-            
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(img, 0, 0, width, height);
-            
+            const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+            const maxDim = 320; let width = img.width; let height = img.height;
+            if (width > height) { if (width > maxDim) { height *= maxDim / width; width = maxDim; } } else { if (height > maxDim) { width *= maxDim / height; height = maxDim; } }
+            canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height);
             uploadedScreenshotBase64 = canvas.toDataURL('image/jpeg', 0.6);
             
             const btn = document.getElementById('btn-upload-screenshot');
-            if (btn) {
-                btn.innerHTML = `<i class="fas fa-exchange-alt"></i> Change Screenshot`;
-                btn.classList.add('bg-green-50', 'text-green-600', 'border-green-300', 'dark:bg-green-950/20');
-            }
-            const previewContainer = document.getElementById('screenshot-preview-container');
-            const previewImg = document.getElementById('screenshot-preview-img');
-            if (previewContainer && previewImg) {
-                previewImg.src = uploadedScreenshotBase64;
-                previewContainer.classList.remove('hidden');
-            }
+            if (btn) { btn.innerHTML = `<i class="fas fa-exchange-alt"></i> Change Screenshot`; btn.classList.add('bg-green-50', 'text-green-600', 'border-green-300', 'dark:bg-green-950/20'); }
+            const previewContainer = document.getElementById('screenshot-preview-container'); const previewImg = document.getElementById('screenshot-preview-img');
+            if (previewContainer && previewImg) { previewImg.src = uploadedScreenshotBase64; previewContainer.classList.remove('hidden'); }
             showToast("Screenshot successfully uploaded!");
         };
         img.src = e.target.result;
@@ -840,35 +787,20 @@ async function submitCustomTagRequest() {
     
     let adminChatId = globalSettings.adminChatId || "6038965890";
     let msg = `🏷️ <b>NEW CUSTOM TAG REQUEST</b>\n\n👤 Name: <b>${currentUser?.name}</b>\n📲 Number: <code>${currentUser?.phone}</code>\nDesired Tag: <b>${reqTag}</b>\n\n<i>Admin approval required inside realtime database console!</i>`;
-    
     showToast("Submitting Request...");
     let success = await sendTelegramMsg(adminChatId, msg, false);
-    if(success) {
-        showToast("Request submitted for approval!");
-        document.getElementById('custom-tag-request-input').value = '';
-    } else {
-        showToast("Failed to submit request.");
-    }
+    if(success) { showToast("Request submitted for approval!"); document.getElementById('custom-tag-request-input').value = ''; } 
+    else showToast("Failed to submit request.");
 }
 
-function redirectToTelegramChannel() {
-    let link = (globalSettings && globalSettings.channelUrl) ? globalSettings.channelUrl : "https://t.me/lionpay";
-    window.open(link, '_blank');
-}
+function redirectToTelegramChannel() { let link = (globalSettings && globalSettings.channelUrl) ? globalSettings.channelUrl : "https://t.me/lionpay"; window.open(link, '_blank'); }
 
 async function handleSplashScreen() {
     return new Promise(resolve => {
         setTimeout(() => {
             const splash = document.getElementById('splash-screen');
-            if(splash) {
-                splash.classList.add('opacity-0');
-                setTimeout(() => {
-                    splash.classList.add('hidden');
-                    resolve();
-                }, 500);
-            } else {
-                resolve();
-            }
+            if(splash) { splash.classList.add('opacity-0'); setTimeout(() => { splash.classList.add('hidden'); resolve(); }, 500); } 
+            else resolve();
         }, 1500);
     });
 }
@@ -881,59 +813,37 @@ function initApp() {
         document.getElementById('sidebar-phone').innerText = currentUser.customId || currentUser.phone;
         document.getElementById('sidebar-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=LIONPAY:${currentUser.phone}:${encodeURIComponent(currentUser.name)}`;
     }
-    updateApiKeyUI();
-    
-    applyPremiumUI();
-    updateProfileDashboardUI();
-    
-    syncLoop(); 
+    updateApiKeyUI(); applyPremiumUI(); updateProfileDashboardUI(); syncLoop(); 
     
     const urlParams = new URLSearchParams(window.location.search);
     const lifafaCode = urlParams.get('lifafa');
-    if(lifafaCode) { setTimeout(() => showPublicLifafa(lifafaCode), 1000); window.history.replaceState({}, document.title, "/"); }
+    const referCode = urlParams.get('refer');
+    if(lifafaCode) { 
+        publicLifafaCode = lifafaCode; publicLifafaReferrer = referCode;
+        setTimeout(() => showPublicLifafa(lifafaCode), 1000); 
+        window.history.replaceState({}, document.title, "/"); 
+    }
 }
 
-// ============================================
-// UNIVERSAL PAYTM-STYLE TRANSACTION RENDERERS
-// ============================================
 function showActionSuccess(data) {
     return new Promise(resolve => {
-        const rocketOverlay = document.getElementById('rocket-overlay');
-        const rocketWrapper = document.getElementById('rocket-wrapper');
-        const resultOverlay = document.getElementById('txn-result-overlay');
-
-        rocketOverlay.classList.remove('hidden');
-        requestAnimationFrame(() => rocketWrapper.classList.add('animate-rocket-fly-slow'));
-
+        const rocketOverlay = document.getElementById('rocket-overlay'); const rocketWrapper = document.getElementById('rocket-wrapper'); const resultOverlay = document.getElementById('txn-result-overlay');
+        rocketOverlay.classList.remove('hidden'); requestAnimationFrame(() => rocketWrapper.classList.add('animate-rocket-fly-slow'));
         setTimeout(() => {
-            rocketOverlay.classList.add('hidden');
-            rocketWrapper.classList.remove('animate-rocket-fly-slow');
-            
+            rocketOverlay.classList.add('hidden'); rocketWrapper.classList.remove('animate-rocket-fly-slow');
             document.getElementById('txn-result-icon-bg').className = "w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4 shadow-inner animate-[slideDown_0.5s_ease-out] bg-green-100 text-green-500 border border-green-200";
             document.getElementById('txn-result-icon').className = "fas fa-check";
             document.getElementById('txn-result-title').innerText = 'Payment Successful';
             document.getElementById('txn-result-title').className = "text-xl font-bold text-gray-800 dark:text-white mb-2 tracking-wide animate-[slideUpFade_0.5s_ease-out_0.1s] opacity-0";
             document.getElementById('txn-result-amount').innerText = parseFloat(data.amount).toFixed(2);
             
-            const dpImg = document.getElementById('txn-result-dp');
-            const dpInitial = document.getElementById('txn-result-initial');
-            if(data.dp) {
-                dpImg.src = data.dp; dpImg.classList.remove('hidden'); dpInitial.classList.add('hidden');
-            } else {
-                dpImg.classList.add('hidden'); dpInitial.classList.remove('hidden');
-                dpInitial.innerText = data.name ? data.name.charAt(0).toUpperCase() : 'U';
-            }
-
-            document.getElementById('txn-result-name').innerText = data.name || 'User';
-            document.getElementById('txn-result-desc').innerText = data.detail || 'Details';
-            document.getElementById('txn-result-id').innerText = data.txnId || generateTxnId();
-            document.getElementById('txn-result-date').innerText = formatDateTime();
-            
+            const dpImg = document.getElementById('txn-result-dp'); const dpInitial = document.getElementById('txn-result-initial');
+            if(data.dp) { dpImg.src = data.dp; dpImg.classList.remove('hidden'); dpInitial.classList.add('hidden'); } 
+            else { dpImg.classList.add('hidden'); dpInitial.classList.remove('hidden'); dpInitial.innerText = data.name ? data.name.charAt(0).toUpperCase() : 'U'; }
+            document.getElementById('txn-result-name').innerText = data.name || 'User'; document.getElementById('txn-result-desc').innerText = data.detail || 'Details';
+            document.getElementById('txn-result-id').innerText = data.txnId || generateTxnId(); document.getElementById('txn-result-date').innerText = formatDateTime();
             document.getElementById('txn-result-error-box').classList.add('hidden');
-
-            resultOverlay.classList.remove('hidden');
-            resultOverlay.style.display = 'flex';
-            resolve();
+            resultOverlay.classList.remove('hidden'); resultOverlay.style.display = 'flex'; resolve();
         }, 2000); 
     });
 }
@@ -941,77 +851,46 @@ function showActionSuccess(data) {
 function showActionError(data) {
     return new Promise(resolve => {
         const resultOverlay = document.getElementById('txn-result-overlay');
-        
         document.getElementById('txn-result-icon-bg').className = "w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4 shadow-inner animate-[slideDown_0.5s_ease-out] bg-red-100 text-red-500 border border-red-200";
         document.getElementById('txn-result-icon').className = "fas fa-times animate-shake";
         document.getElementById('txn-result-title').innerText = 'Payment Failed';
         document.getElementById('txn-result-title').className = "text-xl font-bold text-red-600 dark:text-red-400 mb-2 tracking-wide animate-[slideUpFade_0.5s_ease-out_0.1s] opacity-0";
         document.getElementById('txn-result-amount').innerText = parseFloat(data.amount || 0).toFixed(2);
         
-        document.getElementById('txn-result-dp').classList.add('hidden'); 
-        document.getElementById('txn-result-initial').classList.remove('hidden');
-        document.getElementById('txn-result-initial').innerText = data.name ? data.name.charAt(0).toUpperCase() : 'X';
-
-        document.getElementById('txn-result-name').innerText = data.name || 'Unknown Request';
-        document.getElementById('txn-result-desc').innerText = data.detail || 'Failed Transaction';
-        document.getElementById('txn-result-id').innerText = 'FAILED-' + Date.now().toString(36).toUpperCase();
-        document.getElementById('txn-result-date').innerText = formatDateTime();
+        document.getElementById('txn-result-dp').classList.add('hidden'); document.getElementById('txn-result-initial').classList.remove('hidden'); document.getElementById('txn-result-initial').innerText = data.name ? data.name.charAt(0).toUpperCase() : 'X';
+        document.getElementById('txn-result-name').innerText = data.name || 'Unknown Request'; document.getElementById('txn-result-desc').innerText = data.detail || 'Failed Transaction';
+        document.getElementById('txn-result-id').innerText = 'FAILED-' + Date.now().toString(36).toUpperCase(); document.getElementById('txn-result-date').innerText = formatDateTime();
         
-        document.getElementById('txn-result-error-box').classList.remove('hidden');
-        document.getElementById('txn-result-error-reason').innerText = data.message || "Something went wrong.";
-
-        resultOverlay.classList.remove('hidden');
-        resultOverlay.style.display = 'flex';
-        resolve();
+        document.getElementById('txn-result-error-box').classList.remove('hidden'); document.getElementById('txn-result-error-reason').innerText = data.message || "Something went wrong.";
+        resultOverlay.classList.remove('hidden'); resultOverlay.style.display = 'flex'; resolve();
     });
 }
 
-function closeSuccessOverlay() {
-    document.getElementById('txn-result-overlay').classList.add('hidden');
-    showView('home');
-}
+function closeSuccessOverlay() { document.getElementById('txn-result-overlay').classList.add('hidden'); showView('home'); }
 
 async function processSend() {
     if(!checkCooldown()) return;
     let pin = document.getElementById('send-pin').value; if(!checkSecurityPin(pin)) return;
     if (!sendResolvedPhone) return showActionError({ amount: 0, name: "Unknown", detail: "N/A", message: "Invalid Receiver or Not Found!"});
     if (sendResolvedPhone === currentUser?.phone) return showActionError({ amount: 0, name: "Self", detail: sendResolvedPhone, message: "Cannot send to yourself!"});
-    let amt = parseFloat(document.getElementById('send-amt').value); 
-    let comment = document.getElementById('send-comment').value.trim();
-    
+    let amt = parseFloat(document.getElementById('send-amt').value); let comment = document.getElementById('send-comment').value.trim();
     if(isNaN(amt) || amt <= 0) return showActionError({ amount: amt, name: "Invalid Amount", message: "Enter a valid amount."});
     if(amt > currentBalance) return showActionError({ amount: amt, name: document.getElementById('send-name').innerText, detail: sendResolvedPhone, message: "Insufficient Wallet Balance!"});
 
-    let isGhost = document.getElementById('send-ghost') && document.getElementById('send-ghost').checked;
-    let txnMode = isGhost ? 'GHOST_SEND' : 'SEND';
+    let isGhost = document.getElementById('send-ghost') && document.getElementById('send-ghost').checked; let txnMode = isGhost ? 'GHOST_SEND' : 'SEND';
 
     try {
         let receiver = await apiCall('CHECK_USER', { phone: sendResolvedPhone }); 
         if (!receiver) return showActionError({ amount: amt, detail: sendResolvedPhone, message: "Receiver not found!" });
         let name = receiver.name || 'Unknown User'; 
-
         let txn = createTxnObj('out', (isGhost ? 'Ghost Sent to ' : 'Sent to ') + name, amt, 'Success', isGhost ? 'fa-ghost' : 'fa-paper-plane', 'yellow', name, sendResolvedPhone);
         txn.comment = comment;
 
         await apiCall('EXECUTE_TXN', { mode: txnMode, sender: currentUser?.phone, receiver: sendResolvedPhone, amount: amt, txn });
-        
-        playSound('debit');
-        sendTelegramMsg(currentUser?.tgUserId, formatTgMsg(currentUser?.premium, 'out', 'Payment Sent to ' + name, amt, `TXN: ${txn.id}`)); 
-        
-        document.getElementById('form-send').reset(); 
-        currentBalance -= amt; updateUI(); 
-
-        showActionSuccess({
-            type: 'transfer',
-            dp: receiver.dp,
-            name: name,
-            detail: sendResolvedPhone,
-            amount: amt,
-            txnId: txn.id
-        });
-    } catch(e) {
-        showActionError({ amount: amt, detail: sendResolvedPhone, message: e.message || "Payment processing failed." });
-    }
+        playSound('debit'); sendTelegramMsg(currentUser?.tgUserId, formatTgMsg(currentUser?.premium, 'out', 'Payment Sent to ' + name, amt, `TXN: ${txn.id}`)); 
+        document.getElementById('form-send').reset(); currentBalance -= amt; updateUI(); 
+        showActionSuccess({ type: 'transfer', dp: receiver.dp, name: name, detail: sendResolvedPhone, amount: amt, txnId: txn.id });
+    } catch(e) { showActionError({ amount: amt, detail: sendResolvedPhone, message: e.message || "Payment processing failed." }); }
 }
 
 async function processScanPay() {
@@ -1020,9 +899,7 @@ async function processScanPay() {
     let receiverNum = document.getElementById('scan-res-phone').innerText;
     if (!receiverNum) return showActionError({ amount: 0, name: "Unknown", message: "Invalid Receiver from Scan!"});
     if (receiverNum === currentUser?.phone) return showActionError({ amount: 0, name: "Self", message: "Cannot send to yourself!"});
-    let amt = parseFloat(document.getElementById('scan-amt').value); 
-    let comment = document.getElementById('scan-comment').value.trim();
-    
+    let amt = parseFloat(document.getElementById('scan-amt').value); let comment = document.getElementById('scan-comment').value.trim();
     if(isNaN(amt) || amt <= 0) return showActionError({ amount: amt, name: "Invalid", message: "Enter a valid amount."});
     if(amt > currentBalance) return showActionError({ amount: amt, name: document.getElementById('scan-res-name').innerText, detail: receiverNum, message: "Insufficient Wallet Balance!"});
 
@@ -1030,97 +907,46 @@ async function processScanPay() {
         let receiver = await apiCall('CHECK_USER', { phone: receiverNum }); 
         if (!receiver) return showActionError({ amount: amt, detail: receiverNum, message: "Receiver not found!" });
         let name = receiver.name || 'Unknown User'; 
-
         let txn = createTxnObj('out', 'Scanned & Sent to ' + name, amt, 'Success', 'fa-qrcode', 'blue', name, receiverNum);
         txn.comment = comment;
 
         await apiCall('EXECUTE_TXN', { mode: 'SEND', sender: currentUser?.phone, receiver: receiverNum, amount: amt, txn });
-        
-        playSound('debit');
-        sendTelegramMsg(currentUser?.tgUserId, formatTgMsg(currentUser?.premium, 'out', 'Scanned Payment Sent to ' + name, amt, `TXN: ${txn.id}`)); 
-        
+        playSound('debit'); sendTelegramMsg(currentUser?.tgUserId, formatTgMsg(currentUser?.premium, 'out', 'Scanned Payment Sent to ' + name, amt, `TXN: ${txn.id}`)); 
         document.getElementById('scan-amt').value = ''; document.getElementById('scan-pin').value = ''; document.getElementById('scan-comment').value = '';
-        currentBalance -= amt; updateUI(); 
-
-        document.getElementById('scan-result').classList.add('hidden');
-        showActionSuccess({
-            type: 'transfer',
-            dp: receiver.dp,
-            name: name,
-            detail: receiverNum,
-            amount: amt,
-            txnId: txn.id
-        });
-    } catch(e) {
-        showActionError({ amount: amt, detail: receiverNum, message: e.message || "Payment processing failed." });
-    }
+        currentBalance -= amt; updateUI(); document.getElementById('scan-result').classList.add('hidden');
+        showActionSuccess({ type: 'transfer', dp: receiver.dp, name: name, detail: receiverNum, amount: amt, txnId: txn.id });
+    } catch(e) { showActionError({ amount: amt, detail: receiverNum, message: e.message || "Payment processing failed." }); }
 }
 
 async function processAdd() {
     if(!checkCooldown()) return;
-    let utr = document.getElementById('add-utr').value.trim(); 
-    let amt = parseFloat(document.getElementById('add-amt').value);
-    
+    let utr = document.getElementById('add-utr').value.trim(); let amt = parseFloat(document.getElementById('add-amt').value);
     if(isNaN(amt) || amt <= 0) return showActionError({ amount: amt, name: "Deposit Failed", message: "Invalid amount!"});
     if (!utr) return showActionError({ amount: amt, name: "Deposit Failed", message: "UTR number is required!"});
     if (!uploadedScreenshotBase64) return showActionError({ amount: amt, name: "Deposit Failed", message: "Please upload a payment screenshot!"});
     
     try {
-        let txn = createTxnObj('in', 'Deposit via UTR', amt, 'Pending', 'fa-clock', 'yellow', 'Self Deposit', utr);
-        txn.screenshot = uploadedScreenshotBase64;
-
+        let txn = createTxnObj('in', 'Deposit via UTR', amt, 'Pending', 'fa-clock', 'yellow', 'Self Deposit', utr); txn.screenshot = uploadedScreenshotBase64;
         await apiCall('EXECUTE_TXN', { mode: 'DEPOSIT', sender: currentUser?.phone, txn });
-        
-        let adminChatId = globalSettings.adminChatId || null; 
-        let depositMsg = `🔔 <b>DEPOSIT REQ</b>\nUser: ${currentUser?.name}\nAmount: ₹${amt}\nUTR: ${utr}\nTXN: ${txn.id}`;
+        let adminChatId = globalSettings.adminChatId || null; let depositMsg = `🔔 <b>DEPOSIT REQ</b>\nUser: ${currentUser?.name}\nAmount: ₹${amt}\nUTR: ${utr}\nTXN: ${txn.id}`;
         if (adminChatId) sendTelegramMsg(adminChatId, depositMsg, false);
-        
-        playSound('success');
-        
-        document.getElementById('add-utr').value = ''; 
-        document.getElementById('add-amt').value = ''; 
-        uploadedScreenshotBase64 = null;
+        playSound('success'); document.getElementById('add-utr').value = ''; document.getElementById('add-amt').value = ''; uploadedScreenshotBase64 = null;
         const btn = document.getElementById('btn-upload-screenshot');
-        if (btn) {
-            btn.innerHTML = `<i class="fas fa-image"></i> Upload Screenshot`;
-            btn.className = "w-full mb-4 py-3 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border accent-border accent-text bg-transparent hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors font-black";
-        }
+        if (btn) { btn.innerHTML = `<i class="fas fa-image"></i> Upload Screenshot`; btn.className = "w-full mb-4 py-3 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border accent-border accent-text bg-transparent hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors font-black"; }
         document.getElementById('screenshot-preview-container').classList.add('hidden');
-        
-        showActionSuccess({
-            type: 'add',
-            name: "Deposit Request Sent",
-            detail: `UTR: ${utr}`,
-            amount: amt,
-            txnId: txn.id
-        });
-    } catch (e) {
-        showActionError({ amount: amt, detail: utr, message: e.message || "Deposit request failed." });
-    }
+        showActionSuccess({ type: 'add', name: "Deposit Request Sent", detail: `UTR: ${utr}`, amount: amt, txnId: txn.id });
+    } catch (e) { showActionError({ amount: amt, detail: utr, message: e.message || "Deposit request failed." }); }
 }
 
 async function processBulk() {
     if(!checkCooldown()) return;
     let pin = document.getElementById('bulk-pin').value; if(!checkSecurityPin(pin)) return;
-    let numsText = document.getElementById('bulk-nums').value.trim(); 
-    let amt = parseFloat(document.getElementById('bulk-amt').value); 
-    let comment = document.getElementById('bulk-comment').value.trim();
-    
+    let numsText = document.getElementById('bulk-nums').value.trim(); let amt = parseFloat(document.getElementById('bulk-amt').value); let comment = document.getElementById('bulk-comment').value.trim();
     if(isNaN(amt) || amt <= 0) return showActionError({ amount: amt, name: "Bulk Transfer", message: "Invalid amount!"});
     if(!numsText) return showActionError({ amount: amt, name: "Bulk Transfer", message: "Receivers list cannot be empty!"});
     
-    let rawLines = numsText.split('\n').filter(n => n.trim() !== '');
-    let resolvedReceivers = [];
-    
-    for (let r of rawLines) {
-        try {
-            let userCheck = await apiCall('CHECK_USER', { phone: r });
-            if (userCheck && userCheck.resolvedPhone && userCheck.resolvedPhone !== currentUser?.phone) {
-                resolvedReceivers.push(userCheck.resolvedPhone);
-            }
-        } catch(e) {}
-    }
-    
+    let rawLines = numsText.split('\n').filter(n => n.trim() !== ''); let resolvedReceivers = [];
+    for (let r of rawLines) { try { let userCheck = await apiCall('CHECK_USER', { phone: r }); if (userCheck && userCheck.resolvedPhone && userCheck.resolvedPhone !== currentUser?.phone) { resolvedReceivers.push(userCheck.resolvedPhone); } } catch(e) {} }
     if (resolvedReceivers.length === 0) return showActionError({ amount: amt, name: "Bulk Transfer", message: "No valid registered receivers found."});
     
     let totalAmt = resolvedReceivers.length * amt; 
@@ -1128,158 +954,261 @@ async function processBulk() {
     
     try {
         await apiCall('BULK_PAY', { sender: currentUser?.phone, receivers: resolvedReceivers, amount: amt, comment: comment, date: formatDateTime() });
-        
-        playSound('debit');
-        sendTelegramMsg(currentUser?.tgUserId, formatTgMsg(currentUser?.premium, 'out', `Bulk Sent to ${resolvedReceivers.length} users`, totalAmt, `Done!`)); 
-        
+        playSound('debit'); sendTelegramMsg(currentUser?.tgUserId, formatTgMsg(currentUser?.premium, 'out', `Bulk Sent to ${resolvedReceivers.length} users`, totalAmt, `Done!`)); 
         currentBalance -= totalAmt; updateUI();
         document.getElementById('bulk-nums').value = ''; document.getElementById('bulk-amt').value = ''; document.getElementById('bulk-pin').value = ''; document.getElementById('bulk-comment').value = ''; 
-        
-        showActionSuccess({
-            type: 'bulk',
-            name: `Bulk Transfer`,
-            detail: `${resolvedReceivers.length} Total Users Successfully Sent`,
-            amount: totalAmt,
-            txnId: generateTxnId()
-        });
-    } catch(e) {
-        showActionError({ amount: totalAmt, name: "Bulk Transfer", message: e.message || "Bulk transfer failed." });
-    }
+        showActionSuccess({ type: 'bulk', name: `Bulk Transfer`, detail: `${resolvedReceivers.length} Total Users Successfully Sent`, amount: totalAmt, txnId: generateTxnId() });
+    } catch(e) { showActionError({ amount: totalAmt, name: "Bulk Transfer", message: e.message || "Bulk transfer failed." }); }
 }
 
 async function processWithdraw() {
     if(!checkCooldown()) return;
     let pin = document.getElementById('with-pin').value; if(!checkSecurityPin(pin)) return;
-    let upi = document.getElementById('with-upi').value; 
-    let amt = parseFloat(document.getElementById('with-amt').value);
-    
+    let upi = document.getElementById('with-upi').value; let amt = parseFloat(document.getElementById('with-amt').value);
     if(isNaN(amt) || amt <= 0) return showActionError({ amount: amt, name: "Withdraw Request", message: "Invalid amount!"});
     if(amt < 10) return showActionError({ amount: amt, name: "Withdraw Request", message: "Minimum withdrawal is ₹10"}); 
     if(amt > currentBalance) return showActionError({ amount: amt, name: "Withdraw Request", message: "Insufficient Balance!"});
     
     try {
         let txn = createTxnObj('out', 'Withdrawal Request', amt, 'Pending', 'fa-university', 'yellow', 'Bank Withdraw', upi);
-        
         await apiCall('EXECUTE_TXN', { mode: 'WITHDRAW', sender: currentUser?.phone, amount: amt, txn: txn });
-        
-        let adminChatId = globalSettings.adminChatId || null; 
-        let withdrawMsg = `📤 <b>API WITHDRAWAL REQUEST</b>\n\n👤 User: <b>${currentUser?.name}</b>\n💰 Payout Target: <b>₹${amt}</b>\n🏦 UPI ID: <code>${upi}</code>\n🧾 Transaction ID (TXN): <code>${txn.id}</code>\n\n🔹 Please process this withdrawal request.`;
-        
+        let adminChatId = globalSettings.adminChatId || null; let withdrawMsg = `📤 <b>API WITHDRAWAL REQUEST</b>\n\n👤 User: <b>${currentUser?.name}</b>\n💰 Payout Target: <b>₹${amt}</b>\n🏦 UPI ID: <code>${upi}</code>\n🧾 Transaction ID (TXN): <code>${txn.id}</code>\n\n🔹 Please process this withdrawal request.`;
         if (adminChatId) sendTelegramMsg(adminChatId, withdrawMsg, false);
-        
-        playSound('debit');
-        currentBalance -= amt; updateUI(); 
+        playSound('debit'); currentBalance -= amt; updateUI(); 
         document.getElementById('with-upi').value = ''; document.getElementById('with-amt').value = ''; document.getElementById('with-pin').value = ''; 
-        
-        showActionSuccess({
-            type: 'withdraw',
-            name: "Withdraw Request Sent",
-            detail: `UPI: ${upi}`,
-            amount: amt,
-            txnId: txn.id
-        });
-    } catch(e) {
-        showActionError({ amount: amt, name: "Withdraw Request", message: e.message || "Withdrawal request failed." });
-    }
+        showActionSuccess({ type: 'withdraw', name: "Withdraw Request Sent", detail: `UPI: ${upi}`, amount: amt, txnId: txn.id });
+    } catch(e) { showActionError({ amount: amt, name: "Withdraw Request", message: e.message || "Withdrawal request failed." }); }
 }
 
 async function processGiftCreate() {
     if(!checkCooldown()) return;
     let pin = document.getElementById('gift-pin').value; if(!checkSecurityPin(pin)) return;
-    let amt = parseFloat(document.getElementById('gift-amt').value); 
-    let users = parseInt(document.getElementById('gift-users').value); 
+    let amt = parseFloat(document.getElementById('gift-amt').value); let users = parseInt(document.getElementById('gift-users').value); 
     let isPremOnly = document.getElementById('gift-premium-only') && document.getElementById('gift-premium-only').checked;
-
     if(isNaN(amt) || amt <= 0) return showActionError({ amount: amt, name: "Gift Code", message: "Invalid amount!"});
-    let total = amt * users;
-    if(total > currentBalance) return showActionError({ amount: total, name: "Gift Code", message: "Insufficient Wallet Balance!"});
+    let total = amt * users; if(total > currentBalance) return showActionError({ amount: total, name: "Gift Code", message: "Insufficient Wallet Balance!"});
     
     let code = Math.random().toString(36).substring(2, 7).toUpperCase();
     let txn = createTxnObj('out', `Gift Code Created ${isPremOnly ? '(Premium)' : ''}`, total, `Code: ${code}`, 'fa-gift', 'pink', 'Gift System', 'N/A');
 
     try {
         await apiCall('CREATE_GIFT', { phone: currentUser?.phone, code, amount: amt, users, txn });
-        
-        playSound('debit');
-        sendTelegramMsg(currentUser?.tgUserId, formatTgMsg(currentUser?.premium, 'out', 'Gift Code Generated', total, `Code: <b>${code}</b>`)); 
-        
+        playSound('debit'); sendTelegramMsg(currentUser?.tgUserId, formatTgMsg(currentUser?.premium, 'out', 'Gift Code Generated', total, `Code: <b>${code}</b>`)); 
         currentBalance -= total; updateUI(); 
         document.getElementById('gift-amt').value=''; document.getElementById('gift-users').value=''; document.getElementById('gift-pin').value=''; 
-        
-        showActionSuccess({
-            type: 'gift',
-            name: "Gift Code Active",
-            detail: `Code: ${code} (${users} Users)`,
-            amount: total,
-            txnId: txn.id
-        });
-    } catch(e) {
-        showActionError({ amount: total, name: "Gift Code", message: e.message || "Gift creation failed." });
-    }
+        showActionSuccess({ type: 'gift', name: "Gift Code Active", detail: `Code: ${code} (${users} Users)`, amount: total, txnId: txn.id });
+    } catch(e) { showActionError({ amount: total, name: "Gift Code", message: e.message || "Gift creation failed." }); }
 }
 
 async function processGiftClaim() {
     let code = document.getElementById('claim-code').value.toUpperCase(); 
     if(code.length !== 5) return showActionError({ amount: 0, name: "Gift Claim", message: "Invalid Code format. Must be 5 digits."});
-    
     try {
         let txn = createTxnObj('in', `Claimed Gift Code`, 0, `Code: ${code}`, 'fa-gift', 'green', 'Gift Code', 'N/A'); 
         let reward = await apiCall('CLAIM_GIFT', { phone: currentUser?.phone, code, txn });
-        playSound('credit');
-        sendTelegramMsg(currentUser?.tgUserId, formatTgMsg(currentUser?.premium, 'in', 'Gift Claimed', reward, `Code: <b>${code}</b>`)); 
-        
-        document.getElementById('claim-code').value = '';
-        currentBalance += reward; updateUI(); 
+        playSound('credit'); sendTelegramMsg(currentUser?.tgUserId, formatTgMsg(currentUser?.premium, 'in', 'Gift Claimed', reward, `Code: <b>${code}</b>`)); 
+        document.getElementById('claim-code').value = ''; currentBalance += reward; updateUI(); 
+        showActionSuccess({ type: 'gift-claim', name: "Gift Code Redeemed", detail: `Code: ${code}`, amount: reward, txnId: txn.id });
+    } catch(e) { showActionError({ amount: 0, name: "Gift Claim", message: e.message || "Invalid code or already claimed." }); }
+}
 
-        showActionSuccess({
-            type: 'gift-claim',
-            name: "Gift Code Redeemed",
-            detail: `Code: ${code}`,
-            amount: reward,
-            txnId: txn.id
-        });
-    } catch(e) {
-        showActionError({ amount: 0, name: "Gift Claim", message: e.message || "Invalid code or already claimed." });
+// ============================================
+// COMPLETE LIFAFA SYSTEM
+// ============================================
+let lifafaChannelsCount = 1;
+
+function toggleLifafaType() {
+    let type = document.getElementById('lif-type').value;
+    if(type === 'scratch') {
+        document.getElementById('lif-amt-standard-wrap').classList.add('hidden');
+        document.getElementById('lif-amt-scratch-wrap').classList.remove('hidden');
+    } else {
+        document.getElementById('lif-amt-standard-wrap').classList.remove('hidden');
+        document.getElementById('lif-amt-scratch-wrap').classList.add('hidden');
     }
+}
+
+function toggleLifafaRefer() {
+    let isOn = document.getElementById('lif-refer-toggle').checked;
+    if(isOn) document.getElementById('lif-refer-amt-wrap').classList.remove('hidden');
+    else document.getElementById('lif-refer-amt-wrap').classList.add('hidden');
+}
+
+function addLifafaChannel() {
+    if(lifafaChannelsCount >= 8) return showToast("Maximum 8 channels allowed.");
+    lifafaChannelsCount++;
+    const wrap = document.getElementById('lif-channels-wrap');
+    const row = document.createElement('div');
+    row.className = "flex gap-2 mb-2 lif-channel-row";
+    row.innerHTML = `<input type="text" class="lif-channel-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus-accent font-black theme-card" placeholder="@channel_username">
+        <button type="button" onclick="this.parentElement.remove(); lifafaChannelsCount--;" class="bg-red-50 text-red-500 px-3 rounded-xl border border-red-100"><i class="fas fa-times"></i></button>`;
+    wrap.appendChild(row);
 }
 
 async function processLifafaCreate() {
     if(!checkCooldown()) return;
-    if (!currentUser?.premium) return showActionError({ amount: 0, name: "Lifafa", message: "Lifafa creation is restricted to Premium Users only!"});
-    
-    let pin = document.getElementById('lif-pin').value; if(!checkSecurityPin(pin)) return;
-    let amt = parseFloat(document.getElementById('lif-amt').value); 
+    let type = document.getElementById('lif-type').value;
+    let isReferOn = document.getElementById('lif-refer-toggle').checked;
+    let referAmt = isReferOn ? parseFloat(document.getElementById('lif-refer-amt').value) : 0;
     let users = parseInt(document.getElementById('lif-users').value); 
-    let isPremOnly = document.getElementById('lif-premium-only') && document.getElementById('lif-premium-only').checked;
-    
-    if(isNaN(amt) || amt <= 0) return showActionError({ amount: amt, name: "Lifafa", message: "Invalid amount!"});
-    let total = amt * users;
-    if(total > currentBalance) return showActionError({ amount: total, name: "Lifafa", message: "Insufficient Balance!"});
+    if (isNaN(users) || users <= 0) return showActionError({ amount: 0, name: "Lifafa", message: "Invalid users count."});
 
-    let txn = createTxnObj('out', `Lifafa Created ${isPremOnly ? '(Premium)' : ''}`, total, `Success`, 'fa-envelope-open-text', 'yellow', 'Lifafa System', 'N/A');
-    try {
-        let lifafaId = await apiCall('CREATE_LIFAFA', { phone: currentUser?.phone, amount: amt, totalUsers: users, isPremiumOnly: isPremOnly, txn });
-        playSound('debit');
-        
-        currentBalance -= total; updateUI(); 
-        document.getElementById('lif-amt').value=''; document.getElementById('lif-users').value=''; document.getElementById('lif-pin').value=''; 
-        
-        let finalLink = `https://${window.location.host}/?lifafa=${lifafaId}`;
-        showActionSuccess({
-            type: 'lifafa',
-            name: "Lifafa Deployed",
-            detail: `Share Link Generated (${users} Users)`,
-            amount: total,
-            txnId: txn.id
-        });
-    } catch(e) {
-        showActionError({ amount: total, name: "Lifafa", message: e.message || "Failed to create Lifafa." });
+    let baseCostPerUser = 0; let lifafaData = { type, totalUsers: users, referEnabled: isReferOn, referAmt, channels: [] };
+    if(type === 'scratch') {
+        let minA = parseFloat(document.getElementById('lif-min-amt').value); let maxA = parseFloat(document.getElementById('lif-max-amt').value);
+        if(isNaN(minA) || isNaN(maxA) || maxA < minA || maxA <= 0) return showActionError({ amount: 0, name: "Lifafa", message: "Invalid Min/Max amounts."});
+        baseCostPerUser = maxA; lifafaData.minAmt = minA; lifafaData.maxAmt = maxA; lifafaData.amount = maxA;
+    } else {
+        let amt = parseFloat(document.getElementById('lif-amt').value);
+        if(isNaN(amt) || amt <= 0) return showActionError({ amount: 0, name: "Lifafa", message: "Invalid amount."});
+        baseCostPerUser = amt; lifafaData.amount = amt;
     }
+
+    if(isReferOn && (isNaN(referAmt) || referAmt <= 0)) return showActionError({ amount: 0, name: "Lifafa", message: "Invalid Refer amount."});
+    let totalCost = (baseCostPerUser + referAmt) * users;
+    if(totalCost > currentBalance) return showActionError({ amount: totalCost, name: "Lifafa", message: `Need ₹${totalCost}. Insufficient Balance!`});
+
+    let inputs = document.querySelectorAll('.lif-channel-input');
+    inputs.forEach(i => { if(i.value.trim() !== '') lifafaData.channels.push(i.value.trim()); });
+    
+    let pwd = document.getElementById('lif-password').value.trim().toUpperCase(); if(pwd) lifafaData.password = pwd;
+    let isPremOnly = document.getElementById('lif-premium-only') && document.getElementById('lif-premium-only').checked;
+    let pwdInput = document.getElementById('lif-pin').value; if(!checkSecurityPin(pwdInput)) return;
+
+    let txn = createTxnObj('out', `Lifafa Deploy (${type})`, totalCost, `Success`, 'fa-envelope-open-text', 'yellow', 'Lifafa System', 'N/A');
+    
+    try {
+        let payload = { phone: currentUser?.phone, totalCost, isPremiumOnly: isPremOnly, txn, ...lifafaData };
+        let lifafaId = await apiCall('CREATE_LIFAFA', payload);
+        playSound('debit'); currentBalance -= totalCost; updateUI(); 
+        document.getElementById('lifafa-create-form').classList.add('hidden'); document.getElementById('lifafa-create-success').classList.remove('hidden');
+        document.getElementById('created-lifafa-link').value = window.location.origin + "/?lifafa=" + lifafaId;
+        sendTelegramMsg(currentUser?.tgUserId, formatTgMsg(currentUser?.premium, 'out', 'Lifafa Generated', totalCost, `Code: ${lifafaId}`));
+    } catch(e) { showActionError({ amount: totalCost, name: "Lifafa", message: e.message || "Failed to create Lifafa." }); }
+}
+
+function resetLifafaCreate() {
+    document.getElementById('lifafa-create-form').reset();
+    document.getElementById('lifafa-create-success').classList.add('hidden');
+    document.getElementById('lifafa-create-form').classList.remove('hidden');
+    toggleLifafaType(); toggleLifafaRefer();
+}
+
+async function loadMyLifafas() {
+    const listEl = document.getElementById('lifafa-my-list');
+    listEl.innerHTML = '<div class="text-center p-6 text-gray-400"><i class="fas fa-spinner fa-spin text-2xl"></i></div>';
+    try {
+        let myLifs = await apiCall('GET_MY_LIFAFAS', { phone: currentUser?.phone }); listEl.innerHTML = '';
+        if(!myLifs || myLifs.length === 0) { listEl.innerHTML = '<p class="text-center text-gray-400 p-6 text-xs font-bold">No Lifafas created yet</p>'; return; }
+        myLifs.forEach(l => {
+            let shareLink = `https://${window.location.host}/?lifafa=${l.id}`;
+            let statusColor = l.status === 'ACTIVE' ? 'text-green-500 bg-green-50' : 'text-gray-500 bg-gray-100';
+            listEl.innerHTML += `
+                <div class="theme-card border border-gray-100 rounded-2xl p-4 shadow-sm relative font-bold">
+                    <span class="absolute top-4 right-4 text-[9px] font-black uppercase px-2 py-1 rounded-md ${statusColor}">${l.status}</span>
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-10 h-10 accent-bg text-white rounded-full flex items-center justify-center shadow-inner"><i class="fas fa-envelope-open-text"></i></div>
+                        <div><p class="text-[10px] text-gray-400 tracking-wider">Per User</p><p class="text-lg font-black text-gray-800 dark:text-white">₹${l.amount}</p></div>
+                    </div>
+                    <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 rounded-xl p-3 mb-3 text-xs">
+                        <div><span class="text-gray-400 block mb-0.5">Claimed</span><span class="font-black text-gray-800 dark:text-white">${l.claimedUsers} / ${l.totalUsers}</span></div>
+                        <div class="text-right"><span class="text-gray-400 block mb-0.5">Link</span><button onclick="copyText('${shareLink}')" class="text-blue-500 font-bold hover:underline">Copy Link <i class="fas fa-copy"></i></button></div>
+                    </div>
+                </div>`;
+        });
+    } catch(e) { listEl.innerHTML = '<p class="text-center text-red-400 p-6 text-xs font-bold">Error loading Lifafas</p>'; }
 }
 
 function showPublicLifafa(code) {
     document.getElementById('public-lifafa-wrapper').classList.remove('hidden');
     document.getElementById('public-lifafa-wrapper').style.display = 'flex';
+    resetPublicLifafa();
+}
+
+function resetPublicLifafa() {
+    document.getElementById('lif-public-step-1').classList.remove('hidden');
+    document.getElementById('lif-public-step-2').classList.add('hidden');
+    document.getElementById('lif-public-step-3').classList.add('hidden');
+    document.getElementById('lif-public-step-4').classList.add('hidden');
+    document.getElementById('public-lif-phone').value = '';
+    document.getElementById('public-lif-password').value = '';
+    activeLifafaInfo = null; activeLifafaUserPhone = null;
+}
+
+async function verifyLifafaUser() {
+    let num = document.getElementById('public-lif-phone').value.trim();
+    if(!num) return showToast("Enter your registered Number/ID");
+    showToast("Verifying...");
+    try {
+        let userCheck = await apiCall('CHECK_USER', { phone: num });
+        if(!userCheck || !userCheck.resolvedPhone) return showToast("User not found! Register first.");
+        activeLifafaUserPhone = userCheck.resolvedPhone;
+        
+        activeLifafaInfo = await apiCall('GET_LIFAFA_INFO', { code: publicLifafaCode });
+        if (activeLifafaInfo.status !== 'ACTIVE') return alert("This Lifafa is fully claimed or inactive!");
+        if (activeLifafaInfo.isPremiumOnly && !userCheck.premium) return alert("This Lifafa is strictly for Premium Users!");
+        
+        if(activeLifafaInfo.channels && activeLifafaInfo.channels.length > 0) {
+            renderPublicChannels(); document.getElementById('lif-public-step-1').classList.add('hidden'); document.getElementById('lif-public-step-2').classList.remove('hidden');
+        } else {
+            document.getElementById('lif-public-step-1').classList.add('hidden'); goToStep3();
+        }
+    } catch(e) { showToast(e.message || "Failed to load Lifafa info."); }
+}
+
+function renderPublicChannels() {
+    const grid = document.getElementById('public-channels-grid'); grid.innerHTML = '';
+    activeLifafaInfo.channels.forEach((ch, idx) => {
+        let chUrl = ch.startsWith('@') ? `https://t.me/${ch.substring(1)}` : ch;
+        let display = ch.startsWith('@') ? ch : `Channel ${idx+1}`;
+        grid.innerHTML += `<a href="${chUrl}" target="_blank" class="bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-xl p-3 flex flex-col items-center justify-center text-center hover:bg-blue-100 transition-colors"><i class="fab fa-telegram-plane text-2xl text-blue-500 mb-1"></i><span class="text-[10px] font-black text-blue-600 truncate w-full">${display}</span></a>`;
+    });
+}
+
+function verifyLifafaChannelsJoined() { document.getElementById('lif-public-step-2').classList.add('hidden'); goToStep3(); }
+
+function goToStep3() {
+    document.getElementById('lif-public-step-3').classList.remove('hidden');
+    if(activeLifafaInfo.password) document.getElementById('public-lif-password-box').classList.remove('hidden');
+    else document.getElementById('public-lif-password-box').classList.add('hidden');
+}
+
+async function executePublicLifafaClaim() {
+    let pwd = document.getElementById('public-lif-password').value.trim().toUpperCase();
+    if(activeLifafaInfo.password && !pwd) return showToast("Password is required!");
+    
+    showToast("Claiming...");
+    try {
+        let payload = { code: publicLifafaCode, targetPhone: activeLifafaUserPhone, password: pwd };
+        if(publicLifafaReferrer) payload.referrer = publicLifafaReferrer;
+        let result = await apiCall('CLAIM_LIFAFA', payload); 
+        
+        document.getElementById('lif-public-step-3').classList.add('hidden');
+        document.getElementById('lif-public-step-4').classList.remove('hidden');
+        
+        let wonAmt = parseFloat(result.amount);
+        let referLink = window.location.origin + "/?lifafa=" + publicLifafaCode + "&refer=" + activeLifafaUserPhone;
+
+        if(wonAmt > 0) {
+            playSound('credit');
+            document.getElementById('lif-res-icon').innerHTML = '<i class="fas fa-check"></i>';
+            document.getElementById('lif-res-icon').className = "w-20 h-20 bg-green-100 text-green-500 rounded-full mx-auto flex items-center justify-center text-4xl mb-4 border border-green-200 animate-bounce";
+            document.getElementById('lif-res-title').innerText = "Congratulations! 🎉";
+            document.getElementById('lif-res-amt-box').innerHTML = `₹<span id="lif-res-amt">${wonAmt.toFixed(2)}</span>`;
+        } else {
+            document.getElementById('lif-res-icon').innerHTML = '<i class="fas fa-times"></i>';
+            document.getElementById('lif-res-icon').className = "w-20 h-20 bg-red-100 text-red-500 rounded-full mx-auto flex items-center justify-center text-4xl mb-4 border border-red-200";
+            document.getElementById('lif-res-title').innerText = "Hard Luck! 😢";
+            document.getElementById('lif-res-amt-box').innerHTML = `Better luck next time!`;
+        }
+
+        if(activeLifafaInfo.referEnabled) {
+            document.getElementById('lif-refer-box').classList.remove('hidden');
+            document.getElementById('lif-refer-link').value = referLink;
+        } else {
+            document.getElementById('lif-refer-box').classList.add('hidden');
+        }
+    } catch(e) { alert(e.message || "Claim failed."); }
 }
 
 async function processKeeperLock() {
@@ -1290,8 +1219,7 @@ async function processKeeperLock() {
     if(amt > currentBalance) return alert("Insufficient Wallet Balance!");
     let txn = createTxnObj('out', 'Locked in Keeper', amt, 'Success', 'fa-lock', 'orange', 'Self Vault', 'N/A');
     await apiCall('EXECUTE_TXN', { mode: 'KEEPER_LOCK', sender: currentUser?.phone, amount: amt, txn });
-    playSound('debit');
-    currentBalance -= amt; keeperBalance += amt; updateUI(); document.getElementById('kl-amt').value = ''; document.getElementById('kl-pin').value = ''; showToast(`₹${amt} safely locked!`);
+    playSound('debit'); currentBalance -= amt; keeperBalance += amt; updateUI(); document.getElementById('kl-amt').value = ''; document.getElementById('kl-pin').value = ''; showToast(`₹${amt} safely locked!`);
 }
 
 async function processKeeperWithdraw() {
@@ -1302,44 +1230,27 @@ async function processKeeperWithdraw() {
     if(amt > keeperBalance) return alert("Insufficient Keeper Balance!");
     let txn = createTxnObj('in', 'Withdrawn from Keeper', amt, 'Success', 'fa-unlock', 'green', 'Self Vault', 'N/A');
     await apiCall('EXECUTE_TXN', { mode: 'KEEPER_WITHDRAW', sender: currentUser?.phone, amount: Number(amt), txn });
-    playSound('credit');
-    keeperBalance -= amt; currentBalance += amt; updateUI(); document.getElementById('kw-amt').value = ''; document.getElementById('kw-pin').value = ''; showToast(`₹${amt} moved to Wallet!`);
+    playSound('credit'); keeperBalance -= amt; currentBalance += amt; updateUI(); document.getElementById('kw-amt').value = ''; document.getElementById('kw-pin').value = ''; showToast(`₹${amt} moved to Wallet!`);
 }
 
 async function toggleTxnVisibility() {
     if (!currentModalTxnId) return;
     try {
-        let isHidden = true; 
-        await apiCall('TOGGLE_TXN_VISIBILITY', { phone: currentUser?.phone, txnId: currentModalTxnId, isHidden });
-        if (!currentUser.hiddenTxns) currentUser.hiddenTxns = {};
-        currentUser.hiddenTxns[currentModalTxnId] = true;
-        showToast("Transaction hidden from home!");
-        closeTxnModal();
-        updateUI();
+        let isHidden = true; await apiCall('TOGGLE_TXN_VISIBILITY', { phone: currentUser?.phone, txnId: currentModalTxnId, isHidden });
+        if (!currentUser.hiddenTxns) currentUser.hiddenTxns = {}; currentUser.hiddenTxns[currentModalTxnId] = true;
+        showToast("Transaction hidden from home!"); closeTxnModal(); updateUI();
     } catch(e) {}
 }
 
-let lastRenderedBalance = null;
-let lastRenderedKeeper = null;
-let lastTxnSignature = "";
+let lastRenderedBalance = null; let lastRenderedKeeper = null; let lastTxnSignature = "";
 
-// ===========================================
-// SECRET HISTORY ERASER LOGIC (15 TAPS)
-// ===========================================
-let deleteHistoryTapCount = 0;
-let deleteHistoryTimer;
-
+let deleteHistoryTapCount = 0; let deleteHistoryTimer;
 function handleSecretDeleteHistoryTap() {
-    deleteHistoryTapCount++;
-    clearTimeout(deleteHistoryTimer);
-    
+    deleteHistoryTapCount++; clearTimeout(deleteHistoryTimer);
     deleteHistoryTimer = setTimeout(() => { deleteHistoryTapCount = 0; }, 2000); 
-    
     if (deleteHistoryTapCount >= 15) {
         deleteHistoryTapCount = 0; 
-        if (confirm("Confirm to delete all transactions history?")) {
-            executeHistoryDeletion();
-        }
+        if (confirm("Confirm to delete all transactions history?")) { executeHistoryDeletion(); }
     }
 }
 
@@ -1347,28 +1258,15 @@ async function executeHistoryDeletion() {
     try {
         showToast("Deleting transaction history...");
         await apiCall('CLEAR_HISTORY', { phone: currentUser?.phone });
-        transactions = []; 
-        updateStatsDashboard();
-        updateUI();
-        showToast("Transaction history completely cleared!");
-    } catch(e) {
-        showToast("Failed to delete history.");
-    }
+        transactions = []; updateStatsDashboard(); updateUI(); showToast("Transaction history completely cleared!");
+    } catch(e) { showToast("Failed to delete history."); }
 }
 
 function updateStatsDashboard() {
-    let totalCredit = 0;
-    let totalDebit = 0;
-    let successCount = 0;
-    let totalTxns = transactions.length;
-
+    let totalCredit = 0; let totalDebit = 0; let successCount = 0; let totalTxns = transactions.length;
     transactions.forEach(t => {
         let amt = Number(t.amount) || 0;
-        if (t.status === 'Success') {
-            successCount++;
-            if (t.type === 'in') totalCredit += amt;
-            else if (t.type === 'out') totalDebit += amt;
-        }
+        if (t.status === 'Success') { successCount++; if (t.type === 'in') totalCredit += amt; else if (t.type === 'out') totalDebit += amt; }
     });
 
     let successRate = totalTxns > 0 ? ((successCount / totalTxns) * 100).toFixed(1) + '%' : '100%';
@@ -1391,133 +1289,52 @@ function filterStatsTransactions() {
     const statusFilter = document.getElementById('stats-status-filter').value;
     const typeFilter = document.getElementById('stats-type-filter').value;
     const listEl = document.getElementById('stats-txn-list');
-    
-    if(!listEl) return;
-    listEl.innerHTML = '';
+    if(!listEl) return; listEl.innerHTML = '';
 
     const filtered = transactions.filter(t => {
-        const nameMatch = (t.name || '').toLowerCase().includes(query) || 
-                          (t.title || '').toLowerCase().includes(query) ||
-                          (t.id || '').toLowerCase().includes(query) ||
-                          (t.comment || '').toLowerCase().includes(query);
-        
-        let statusMatch = true;
-        if (statusFilter !== 'all') {
-            if (statusFilter === 'Fail') {
-                statusMatch = (t.status === 'Rejected' || t.status === 'Fail');
-            } else {
-                statusMatch = (t.status === statusFilter);
-            }
-        }
-
+        const nameMatch = (t.name || '').toLowerCase().includes(query) || (t.title || '').toLowerCase().includes(query) || (t.id || '').toLowerCase().includes(query) || (t.comment || '').toLowerCase().includes(query);
+        let statusMatch = true; if (statusFilter !== 'all') { if (statusFilter === 'Fail') { statusMatch = (t.status === 'Rejected' || t.status === 'Fail'); } else { statusMatch = (t.status === statusFilter); } }
         let typeMatch = true;
         if (typeFilter !== 'all') {
-            if (typeFilter === 'Received') {
-                typeMatch = (t.type === 'in' && !t.isApi && !t.title.toLowerCase().includes('deposit'));
-            } else if (typeFilter === 'Credit') {
-                typeMatch = (t.type === 'in');
-            } else if (typeFilter === 'Debit') {
-                typeMatch = (t.type === 'out');
-            } else if (typeFilter === 'Api') {
-                typeMatch = (t.isApi === true);
-            } else if (typeFilter === 'Withdraw') {
-                typeMatch = (t.title.toLowerCase().includes('withdraw') || t.icon === 'fa-university');
-            } else if (typeFilter === 'Taxes') {
-                typeMatch = (t.title.toLowerCase().includes('fee') || t.title.toLowerCase().includes('maintenance'));
-            }
+            if (typeFilter === 'Received') { typeMatch = (t.type === 'in' && !t.isApi && !t.title.toLowerCase().includes('deposit')); } 
+            else if (typeFilter === 'Credit') { typeMatch = (t.type === 'in'); } else if (typeFilter === 'Debit') { typeMatch = (t.type === 'out'); } 
+            else if (typeFilter === 'Api') { typeMatch = (t.isApi === true); } else if (typeFilter === 'Withdraw') { typeMatch = (t.title.toLowerCase().includes('withdraw') || t.icon === 'fa-university'); } 
+            else if (typeFilter === 'Taxes') { typeMatch = (t.title.toLowerCase().includes('fee') || t.title.toLowerCase().includes('maintenance')); }
         }
-
         return nameMatch && statusMatch && typeMatch;
     });
 
-    if(filtered.length === 0) {
-        listEl.innerHTML = '<p class="text-center text-gray-400 p-6 text-xs font-bold font-black">No transactions found</p>';
-        return;
-    }
-
+    if(filtered.length === 0) { listEl.innerHTML = '<p class="text-center text-gray-400 p-6 text-xs font-bold font-black">No transactions found</p>'; return; }
     filtered.forEach(txn => {
-        let amountClass = '';
-        let statusColor = 'text-gray-400';
-        let sign = '';
-
-        if (txn.status === 'Pending') {
-            statusColor = 'text-yellow-500'; amountClass = 'text-yellow-500';
-        } else if (txn.status === 'Rejected' || txn.status === 'Fail') {
-            statusColor = 'text-red-500'; amountClass = 'text-red-500';
-        } else {
-            if (txn.type === 'in') { statusColor = 'text-green-500'; amountClass = 'text-green-500'; sign = '+'; } 
-            else { statusColor = 'text-green-500'; amountClass = 'text-red-500'; sign = '-'; }
-        }
-
-        listEl.innerHTML += `
-            <div onclick="openTxnModal('${txn.id}')" class="flex justify-between items-center p-4 border-b border-gray-100 hover:bg-gray-50 theme-card cursor-pointer transition-colors font-bold">
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-2xl theme-card flex items-center justify-center text-lg border border-gray-200"><i class="fas ${txn.icon}"></i></div>
-                    <div>
-                        <p class="text-sm font-bold text-gray-800 dark:text-gray-200">${txn.title}</p>
-                        <p class="text-[10px] ${statusColor} font-bold mt-0.5">${txn.status} • ${txn.date.split(',')[0]}</p>
-                    </div>
-                </div>
-                <p class="font-black ${amountClass}">${sign}₹${parseFloat(txn.amount).toFixed(2)}</p>
-            </div>`;
+        let amountClass = ''; let statusColor = 'text-gray-400'; let sign = '';
+        if (txn.status === 'Pending') { statusColor = 'text-yellow-500'; amountClass = 'text-yellow-500'; } else if (txn.status === 'Rejected' || txn.status === 'Fail') { statusColor = 'text-red-500'; amountClass = 'text-red-500'; } 
+        else { if (txn.type === 'in') { statusColor = 'text-green-500'; amountClass = 'text-green-500'; sign = '+'; } else { statusColor = 'text-green-500'; amountClass = 'text-red-500'; sign = '-'; } }
+        listEl.innerHTML += `<div onclick="openTxnModal('${txn.id}')" class="flex justify-between items-center p-4 border-b border-gray-100 hover:bg-gray-50 theme-card cursor-pointer transition-colors font-bold"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl theme-card flex items-center justify-center text-lg border border-gray-200"><i class="fas ${txn.icon}"></i></div><div><p class="text-sm font-bold text-gray-800 dark:text-gray-200">${txn.title}</p><p class="text-[10px] ${statusColor} font-bold mt-0.5">${txn.status} • ${txn.date.split(',')[0]}</p></div></div><p class="font-black ${amountClass}">${sign}₹${parseFloat(txn.amount).toFixed(2)}</p></div>`;
     });
 }
 
-function clearStatsFilters() {
-    document.getElementById('stats-search-input').value = '';
-    document.getElementById('stats-status-filter').value = 'all';
-    document.getElementById('stats-type-filter').value = 'all';
-    filterStatsTransactions();
-}
+function clearStatsFilters() { document.getElementById('stats-search-input').value = ''; document.getElementById('stats-status-filter').value = 'all'; document.getElementById('stats-type-filter').value = 'all'; filterStatsTransactions(); }
 
 function updateUI() {
-    if (currentBalance !== lastRenderedBalance) {
-        document.querySelectorAll('.global-balance').forEach(el => el.innerText = currentBalance.toFixed(2));
-        lastRenderedBalance = currentBalance;
-    }
-    if (keeperBalance !== lastRenderedKeeper) {
-        document.querySelectorAll('.global-keeper-balance').forEach(el => el.innerText = keeperBalance.toFixed(2));
-        lastRenderedKeeper = keeperBalance;
-    }
+    if (currentBalance !== lastRenderedBalance) { document.querySelectorAll('.global-balance').forEach(el => el.innerText = currentBalance.toFixed(2)); lastRenderedBalance = currentBalance; }
+    if (keeperBalance !== lastRenderedKeeper) { document.querySelectorAll('.global-keeper-balance').forEach(el => el.innerText = keeperBalance.toFixed(2)); lastRenderedKeeper = keeperBalance; }
     
     const uiUserInitial = document.getElementById('ui-user-initial');
-    if (uiUserInitial) {
-        if (currentUser && currentUser.dp) {
-            uiUserInitial.innerHTML = `<img src="${currentUser.dp}" class="w-full h-full object-cover">`;
-        } else if (currentUser) {
-            uiUserInitial.innerHTML = currentUser.name.charAt(0).toUpperCase();
-        }
-    }
+    if (uiUserInitial) { if (currentUser && currentUser.dp) { uiUserInitial.innerHTML = `<img src="${currentUser.dp}" class="w-full h-full object-cover">`; } else if (currentUser) { uiUserInitial.innerHTML = currentUser.name.charAt(0).toUpperCase(); } }
 
-    const listEl = document.getElementById('home-txn-list'); 
-    if(!listEl) return;
-
+    const listEl = document.getElementById('home-txn-list'); if(!listEl) return;
     let visibleTxns = transactions.filter(t => !(currentUser?.hiddenTxns && currentUser?.hiddenTxns[t.id]));
     let currentTxnSignature = visibleTxns.slice(0,10).map(t => t.id + t.status).join('-');
     
     if (currentTxnSignature !== lastTxnSignature) {
-        lastTxnSignature = currentTxnSignature;
-        listEl.innerHTML = '';
-        
+        lastTxnSignature = currentTxnSignature; listEl.innerHTML = '';
         if(visibleTxns.length === 0) return listEl.innerHTML = '<p class="text-center text-gray-400 p-6 text-xs font-bold font-black">No recent transactions</p>';
-        
         visibleTxns.slice(0,10).forEach(txn => {
-            let amountClass = '';
-            let titleClass = 'text-gray-800';
+            let amountClass = ''; let titleClass = 'text-gray-800';
             if(currentUser && currentUser.theme === 'dark' && !document.documentElement.classList.contains('premium-mode')) titleClass = 'text-gray-200';
-            
-            let sign = '';
-            let statusColor = 'text-gray-400';
-
-            if (txn.status === 'Pending') {
-                statusColor = 'text-yellow-500'; amountClass = 'text-yellow-500'; titleClass = 'text-yellow-500'; sign = '';
-            } else if (txn.status === 'Rejected') {
-                statusColor = 'text-red-500'; amountClass = 'text-red-500'; titleClass = 'text-red-500'; sign = '';
-            } else {
-                if (txn.type === 'in') { statusColor = 'text-green-500'; amountClass = 'text-green-500'; titleClass = 'text-green-500'; sign = '+'; } 
-                else { statusColor = 'text-green-500'; amountClass = 'text-red-500'; sign = '-'; }
-            }
-            
+            let sign = ''; let statusColor = 'text-gray-400';
+            if (txn.status === 'Pending') { statusColor = 'text-yellow-500'; amountClass = 'text-yellow-500'; titleClass = 'text-yellow-500'; sign = ''; } else if (txn.status === 'Rejected') { statusColor = 'text-red-500'; amountClass = 'text-red-500'; titleClass = 'text-red-500'; sign = ''; } 
+            else { if (txn.type === 'in') { statusColor = 'text-green-500'; amountClass = 'text-green-500'; titleClass = 'text-green-500'; sign = '+'; } else { statusColor = 'text-green-500'; amountClass = 'text-red-500'; sign = '-'; } }
             listEl.innerHTML += `<div onclick="openTxnModal('${txn.id}')" class="flex justify-between items-center p-4 border-b border-gray-100 hover:bg-gray-50 theme-card cursor-pointer transition-colors"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl theme-card accent-text flex items-center justify-center text-lg border border-gray-200"><i class="fas ${txn.icon}"></i></div><div><p class="text-sm font-bold ${titleClass}">${txn.title}</p><p class="text-[10px] ${statusColor} font-bold mt-0.5">${txn.status} • ${txn.date.split(',')[0]}</p></div></div><p class="font-black ${amountClass}">${sign}₹${parseFloat(txn.amount).toFixed(2)}</p></div>`;
         });
     }
@@ -1526,81 +1343,29 @@ function updateUI() {
 let currentModalTxnId = '';
 function openTxnModal(txnId) { 
     let txn = transactions.find(t => t.id === txnId); if(!txn) return; 
-    currentModalTxnId = txn.id; 
-    document.getElementById('txnModalIcon').className = `fas ${txn.icon}`; 
-    
-    let modalSign = '';
-    let modalAmtClass = '';
-    let titleClass = 'text-gray-800';
+    currentModalTxnId = txn.id; document.getElementById('txnModalIcon').className = `fas ${txn.icon}`; 
+    let modalSign = ''; let modalAmtClass = ''; let titleClass = 'text-gray-800';
     if(currentUser && currentUser.theme === 'dark' && !document.documentElement.classList.contains('premium-mode')) titleClass = 'text-gray-200';
+    if (txn.status === 'Pending') { modalSign = ''; modalAmtClass = 'text-yellow-500'; titleClass = 'text-yellow-500'; } else if (txn.status === 'Rejected') { modalSign = ''; modalAmtClass = 'text-red-500'; titleClass = 'text-red-500'; } 
+    else { if (txn.type === 'in') { modalSign = '+'; modalAmtClass = 'text-green-500'; titleClass = 'text-green-500'; } else { modalSign = '-'; modalAmtClass = 'text-red-500'; } }
 
-    if (txn.status === 'Pending') {
-        modalSign = ''; modalAmtClass = 'text-yellow-500'; titleClass = 'text-yellow-500';
-    } else if (txn.status === 'Rejected') {
-        modalSign = ''; modalAmtClass = 'text-red-500'; titleClass = 'text-red-500';
-    } else {
-        if (txn.type === 'in') { modalSign = '+'; modalAmtClass = 'text-green-500'; titleClass = 'text-green-500'; } 
-        else { modalSign = '-'; modalAmtClass = 'text-red-500'; }
-    }
-
-    document.getElementById('txnModalTitle').innerText = txn.title; 
-    document.getElementById('txnModalTitle').className = `text-xl font-black ${titleClass}`;
-    document.getElementById('txnModalAmount').innerText = modalSign + '₹' + parseFloat(txn.amount).toFixed(2); 
-    document.getElementById('txnModalAmount').className = `text-3xl font-black mt-2 tracking-tight ${modalAmtClass}`; 
+    document.getElementById('txnModalTitle').innerText = txn.title; document.getElementById('txnModalTitle').className = `text-xl font-black ${titleClass}`;
+    document.getElementById('txnModalAmount').innerText = modalSign + '₹' + parseFloat(txn.amount).toFixed(2); document.getElementById('txnModalAmount').className = `text-3xl font-black mt-2 tracking-tight ${modalAmtClass}`; 
     
     const statusEl = document.getElementById('txnModalStatus');
     if (statusEl) {
-        statusEl.innerText = txn.status;
-        statusEl.className = "text-xs font-black uppercase tracking-wider mt-2 rounded-full px-3 py-1 inline-block";
-        if (txn.status === 'Success') {
-            statusEl.style.backgroundColor = 'rgba(34, 197, 94, 0.15)'; 
-            statusEl.style.color = '#22c55e'; 
-        } else if (txn.status === 'Pending') {
-            statusEl.style.backgroundColor = 'rgba(234, 179, 8, 0.15)'; 
-            statusEl.style.color = '#eab308'; 
-        } else if (txn.status === 'Rejected' || txn.status === 'Fail') {
-            statusEl.style.backgroundColor = 'rgba(239, 68, 68, 0.15)'; 
-            statusEl.style.color = '#ef4444'; 
-        }
+        statusEl.innerText = txn.status; statusEl.className = "text-xs font-black uppercase tracking-wider mt-2 rounded-full px-3 py-1 inline-block";
+        if (txn.status === 'Success') { statusEl.style.backgroundColor = 'rgba(34, 197, 94, 0.15)'; statusEl.style.color = '#22c55e'; } else if (txn.status === 'Pending') { statusEl.style.backgroundColor = 'rgba(234, 179, 8, 0.15)'; statusEl.style.color = '#eab308'; } else if (txn.status === 'Rejected' || txn.status === 'Fail') { statusEl.style.backgroundColor = 'rgba(239, 68, 68, 0.15)'; statusEl.style.color = '#ef4444'; }
     }
 
-    document.getElementById('txnModalType').innerText = txn.type === 'in' ? 'Received' : 'Sent'; 
-    document.getElementById('txnModalName').innerText = txn.name || 'N/A'; 
-    document.getElementById('txnModalNumber').innerText = txn.number || 'N/A'; 
-    document.getElementById('txnModalId').innerText = txn.id; 
-    document.getElementById('txnModalComment').innerText = txn.comment && txn.comment.trim() !== '' ? txn.comment : 'None';
-    document.getElementById('txnModalDate').innerText = txn.date; 
-
+    document.getElementById('txnModalType').innerText = txn.type === 'in' ? 'Received' : 'Sent'; document.getElementById('txnModalName').innerText = txn.name || 'N/A'; document.getElementById('txnModalNumber').innerText = txn.number || 'N/A'; document.getElementById('txnModalId').innerText = txn.id; document.getElementById('txnModalComment').innerText = txn.comment && txn.comment.trim() !== '' ? txn.comment : 'None'; document.getElementById('txnModalDate').innerText = txn.date; 
     const modalContent = document.getElementById('txnModalContent');
     if (modalContent) {
-        if (document.documentElement.classList.contains('dark-mode')) {
-            modalContent.style.backgroundColor = '#1e293b';
-            modalContent.style.color = '#ffffff';
-        } else {
-            if (currentUser && currentUser.premium) {
-                modalContent.style.backgroundColor = '#ffffff';
-                modalContent.style.color = '#1f2937';
-            } else {
-                let accentHex = (currentUser && currentUser.accentColor) ? currentUser.accentColor : '#f59e0b';
-                modalContent.style.backgroundColor = hexToRgba(accentHex, 0.08);
-                modalContent.style.color = '#1f2937';
-            }
-        }
+        if (document.documentElement.classList.contains('dark-mode')) { modalContent.style.backgroundColor = '#1e293b'; modalContent.style.color = '#ffffff'; } else { if (currentUser && currentUser.premium) { modalContent.style.backgroundColor = '#ffffff'; modalContent.style.color = '#1f2937'; } else { let accentHex = (currentUser && currentUser.accentColor) ? currentUser.accentColor : '#f59e0b'; modalContent.style.backgroundColor = hexToRgba(accentHex, 0.08); modalContent.style.color = '#1f2937'; } }
     }
-
-    const ssContainer = document.getElementById('txnModalScreenshotContainer');
-    const ssImg = document.getElementById('txnModalScreenshotImg');
-    if (txn.screenshot) {
-        if (ssContainer && ssImg) {
-            ssImg.src = txn.screenshot;
-            ssContainer.classList.remove('hidden');
-        }
-    } else {
-        if (ssContainer) ssContainer.classList.add('hidden');
-    }
-
-    document.getElementById('txnModal').classList.remove('hidden'); 
-    setTimeout(()=>document.getElementById('txnModal').classList.remove('opacity-0'), 10); 
+    const ssContainer = document.getElementById('txnModalScreenshotContainer'); const ssImg = document.getElementById('txnModalScreenshotImg');
+    if (txn.screenshot) { if (ssContainer && ssImg) { ssImg.src = txn.screenshot; ssContainer.classList.remove('hidden'); } } else { if (ssContainer) ssContainer.classList.add('hidden'); }
+    document.getElementById('txnModal').classList.remove('hidden'); setTimeout(()=>document.getElementById('txnModal').classList.remove('opacity-0'), 10); 
 }
 
 function closeTxnModal() { document.getElementById('txnModal').classList.add('opacity-0'); setTimeout(()=>document.getElementById('txnModal').classList.add('hidden'), 300); }
@@ -1609,33 +1374,13 @@ function showToast(msg) { const toast = document.getElementById('toast'); docume
 function copyText(text) { navigator.clipboard.writeText(text); showToast("Copied!"); }
 
 async function showView(viewId) { 
-    if (currentUser) {
-        try {
-            await syncData(); 
-        } catch(e) {
-            console.error("Sync error:", e);
-        }
-    }
-
-    if (viewId === 'official') {
-        markPostsAsRead();
-        renderOfficialPosts();
-    }
+    if (currentUser) { try { await syncData(); } catch(e) { console.error("Sync error:", e); } }
+    if (viewId === 'official') { markPostsAsRead(); renderOfficialPosts(); }
     if (viewId === 'game') updateStatsDashboard();
     if (viewId === 'myprofile') updateProfileDashboardUI();
     
-    document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); 
-    document.getElementById('view-' + viewId).classList.add('active'); 
-    
-    document.querySelectorAll('.nav-item').forEach(el => { 
-        el.classList.remove('accent-text'); 
-        el.classList.add('text-gray-400'); 
-        if(el.innerHTML.includes(viewId)) { 
-            el.classList.remove('text-gray-400'); 
-            el.classList.add('accent-text'); 
-        } 
-    }); 
-    
+    document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); document.getElementById('view-' + viewId).classList.add('active'); 
+    document.querySelectorAll('.nav-item').forEach(el => { el.classList.remove('accent-text'); el.classList.add('text-gray-400'); if(el.innerHTML.includes(viewId)) { el.classList.remove('text-gray-400'); el.classList.add('accent-text'); } }); 
     window.scrollTo({top:0, behavior:'smooth'}); 
 }
 
@@ -1645,118 +1390,54 @@ function switchLifafaTab(tabId) { document.querySelectorAll('.tab-btn').forEach(
 function switchKeeperTab(tabId) { document.querySelectorAll('.keeper-tab-btn').forEach(btn => btn.classList.remove('active')); document.querySelectorAll('.keeper-tab-content').forEach(c => c.classList.remove('active')); document.getElementById('btn-'+tabId).classList.add('active'); document.getElementById(tabId).classList.add('active'); }
 
 function startScanner() {
-    document.getElementById('scanner-container').classList.remove('hidden'); 
-    document.getElementById('scan-result').classList.add('hidden');
-    
-    if (html5QrcodeScanner) {
-        try { html5QrcodeScanner.clear(); } catch(e) {}
-    }
+    document.getElementById('scanner-container').classList.remove('hidden'); document.getElementById('scan-result').classList.add('hidden');
+    if (html5QrcodeScanner) { try { html5QrcodeScanner.clear(); } catch(e) {} }
     html5QrcodeScanner = new Html5Qrcode("reader");
-    
-    html5QrcodeScanner.start(
-        { facingMode: "environment" }, 
-        { fps: 10, qrbox: 250 }, 
-        handleQRResult, 
-        (err) => {}
-    ).catch(err => {
-        html5QrcodeScanner.start({ facingMode: "user" }, { fps: 10, qrbox: 250 }, handleQRResult, () => {})
-        .catch(e => showToast("Camera initialization failed. Grant access permissions."));
+    html5QrcodeScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, handleQRResult, (err) => {}).catch(err => {
+        html5QrcodeScanner.start({ facingMode: "user" }, { fps: 10, qrbox: 250 }, handleQRResult, () => {}).catch(e => showToast("Camera initialization failed. Grant access permissions."));
     });
 }
-
-function stopScanner() { 
-    if(html5QrcodeScanner) { 
-        html5QrcodeScanner.stop().then(()=>html5QrcodeScanner.clear()).catch(()=>{}); 
-    } 
-}
+function stopScanner() { if(html5QrcodeScanner) { html5QrcodeScanner.stop().then(()=>html5QrcodeScanner.clear()).catch(()=>{}); } }
 
 function handleQRResult(text) {
-    playSound('success');
-    stopScanner(); 
+    playSound('success'); stopScanner(); 
     let parsedName = "Unknown", parsedNumber = text;
-    if(text.startsWith("LIONPAY:")) { 
-        let parts = text.split(":"); 
-        if(parts.length>=3) { parsedNumber = parts[1]; parsedName = decodeURIComponent(parts[2]); } 
-    }
-    document.getElementById('scanner-container').classList.add('hidden'); 
-    document.getElementById('scan-result').classList.remove('hidden');
-    document.getElementById('scan-res-name').innerText = parsedName; 
-    document.getElementById('scan-res-phone').innerText = parsedNumber;
-    
-    document.getElementById('scan-amt').value = ''; 
-    document.getElementById('scan-pin').value = ''; 
-    document.getElementById('scan-comment').value = '';
+    if(text.startsWith("LIONPAY:")) { let parts = text.split(":"); if(parts.length>=3) { parsedNumber = parts[1]; parsedName = decodeURIComponent(parts[2]); } }
+    document.getElementById('scanner-container').classList.add('hidden'); document.getElementById('scan-result').classList.remove('hidden');
+    document.getElementById('scan-res-name').innerText = parsedName; document.getElementById('scan-res-phone').innerText = parsedNumber;
+    document.getElementById('scan-amt').value = ''; document.getElementById('scan-pin').value = ''; document.getElementById('scan-comment').value = '';
 }
-
 function resetScanner() { startScanner(); }
 
 function handleQRUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
+    const file = event.target.files[0]; if (!file) return;
     showToast("Scanning image...");
     const html5QrCode = new Html5Qrcode("reader");
-    html5QrCode.scanFile(file, true)
-    .then(decodedText => {
-        handleQRResult(decodedText);
-        document.getElementById('qr-upload').value = ''; 
-    })
-    .catch(err => {
-        showToast("Invalid QR Code or unable to read.");
-        document.getElementById('qr-upload').value = ''; 
-    });
+    html5QrCode.scanFile(file, true).then(decodedText => { handleQRResult(decodedText); document.getElementById('qr-upload').value = ''; }).catch(err => { showToast("Invalid QR Code or unable to read."); document.getElementById('qr-upload').value = ''; });
 }
 
 function toggleQRZoom() {
     if(!html5QrcodeScanner || html5QrcodeScanner.getState() !== 2) return showToast("Start scanner first!");
-    
     const videoTrack = html5QrcodeScanner.getRunningTrackCameraCapabilities();
     if(videoTrack && videoTrack.zoomFeature().isSupported()) {
-        currentQRZoom++;
-        if(currentQRZoom > 5) currentQRZoom = 1;
-        
-        html5QrcodeScanner.applyVideoConstraints({ zoom: currentQRZoom }).then(() => {
-            document.getElementById('btn-qr-zoom').innerText = currentQRZoom + 'x';
-        }).catch(err => {
-            showToast("Zoom limit reached or not supported.");
-        });
-    } else {
-        showToast("Zoom feature not supported on this device.");
-    }
+        currentQRZoom++; if(currentQRZoom > 5) currentQRZoom = 1;
+        html5QrcodeScanner.applyVideoConstraints({ zoom: currentQRZoom }).then(() => { document.getElementById('btn-qr-zoom').innerText = currentQRZoom + 'x'; }).catch(err => { showToast("Zoom limit reached or not supported."); });
+    } else { showToast("Zoom feature not supported on this device."); }
 }
 
 function toggleQRTorch() {
     if(!html5QrcodeScanner || html5QrcodeScanner.getState() !== 2) return showToast("Start scanner first!");
-    
     const videoTrack = html5QrcodeScanner.getRunningTrackCameraCapabilities();
     if(videoTrack && videoTrack.torchFeature().isSupported()) {
         isQRTorchOn = !isQRTorchOn;
-        html5QrcodeScanner.applyVideoConstraints({ torch: isQRTorchOn }).then(() => {
-            const btn = document.getElementById('btn-qr-torch');
-            if(isQRTorchOn) {
-                btn.classList.replace('text-white', 'text-yellow-400');
-            } else {
-                btn.classList.replace('text-yellow-400', 'text-white');
-            }
-        }).catch(err => {
-            showToast("Torch feature not supported.");
-        });
-    } else {
-        showToast("Torch feature not supported on this device.");
-    }
+        html5QrcodeScanner.applyVideoConstraints({ torch: isQRTorchOn }).then(() => { const btn = document.getElementById('btn-qr-torch'); if(isQRTorchOn) { btn.classList.replace('text-white', 'text-yellow-400'); } else { btn.classList.replace('text-yellow-400', 'text-white'); } }).catch(err => { showToast("Torch feature not supported."); });
+    } else { showToast("Torch feature not supported on this device."); }
 }
 
 function searchTxn() {
-    let tid = document.getElementById('search-txn-id').value.trim().toUpperCase();
-    if(!tid) return showToast("Enter Transaction ID");
-    
+    let tid = document.getElementById('search-txn-id').value.trim().toUpperCase(); if(!tid) return showToast("Enter Transaction ID");
     let txn = transactions.find(t => t.id === tid);
-    if(txn) {
-        openTxnModal(txn.id);
-        document.getElementById('search-txn-id').value = '';
-    } else {
-        showToast("Transaction not found in your history.");
-    }
+    if(txn) { openTxnModal(txn.id); document.getElementById('search-txn-id').value = ''; } else { showToast("Transaction not found in your history."); }
 }
 
 window.onload = async () => {
