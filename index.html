@@ -915,7 +915,7 @@
             </header>
             <div class="p-4">
                 <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-28 bg-gradient-to-br from-green-500/10 to-transparent">
+                    <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-28 bg-gradient-to-br from-green-500/10 to-transparent cursor-pointer" onclick="handleSecretDeleteHistoryTap()">
                         <div class="text-[10px] font-black tracking-wider text-gray-400">TOTAL CREDIT</div>
                         <div id="stats-total-credit" class="text-xl font-black text-green-500 font-black">₹0.00</div>
                     </div>
@@ -982,10 +982,10 @@
                 <h1 class="ml-4 text-[16px] font-black tracking-wide text-contrast"><i class="fas fa-user-circle mr-1.5 text-sm accent-text"></i> MY PROFILE</h1>
             </header>
             <div class="p-6 flex flex-col items-center">
-                <div class="relative group cursor-pointer" onclick="document.getElementById('profile-dp-input').click()">
+                <div class="relative w-28 h-28 mx-auto mb-4 group cursor-pointer" onclick="document.getElementById('profile-dp-input').click()">
                     <i id="profile-dashboard-crown" class="fas fa-crown text-yellow-500 absolute -top-5 left-1/2 transform -translate-x-1/2 text-2xl drop-shadow-md hidden z-10 animate-bounce"></i>
                     
-                    <div class="w-28 h-28 rounded-full overflow-hidden border-4 border-amber-400 shadow-xl relative bg-gray-100 flex items-center justify-center">
+                    <div class="w-full h-full rounded-full overflow-hidden border-4 border-amber-400 shadow-xl relative bg-gray-100 flex items-center justify-center">
                         <img id="profile-dashboard-dp" src="" class="w-full h-full object-cover hidden" alt="Profile Picture">
                         <span id="profile-dashboard-initial" class="text-4xl font-black accent-text uppercase font-black">U</span>
                         
@@ -997,7 +997,7 @@
                 </div>
                 <input type="file" id="profile-dp-input" class="hidden" accept="image/*" onchange="processLocalDpUpload(event)">
                 
-                <h2 id="profile-display-name" class="font-black text-xl mt-4 mb-1 text-contrast flex items-center gap-1 font-black">User Name</h2>
+                <h2 id="profile-display-name" class="font-black text-xl mt-2 mb-1 text-contrast flex items-center gap-1 font-black">User Name</h2>
                 <span id="profile-display-premium" class="text-[10px] uppercase font-black tracking-widest text-amber-500 bg-amber-50 px-3 py-1 rounded-full border border-amber-100">Standard Member</span>
 
                 <div class="w-full max-w-sm mt-8 space-y-3 text-left font-medium">
@@ -1024,6 +1024,25 @@
                     <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center font-bold">
                         <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Total Balance</span>
                         <span class="accent-text font-black text-sm font-black font-black">₹<span class="global-balance blur-none">0.00</span></span>
+                    </div>
+                </div>
+
+                <div class="w-full max-w-sm mt-6 grid grid-cols-2 gap-4 pb-8">
+                    <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-24 bg-gradient-to-br from-green-500/10 to-transparent">
+                        <div class="text-[10px] font-black tracking-wider text-gray-400">TOTAL CREDIT</div>
+                        <div id="prof-stats-total-credit" class="text-lg font-black text-green-500 font-black">₹0.00</div>
+                    </div>
+                    <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-24 bg-gradient-to-br from-red-500/10 to-transparent">
+                        <div class="text-[10px] font-black tracking-wider text-gray-400">TOTAL DEBIT</div>
+                        <div id="prof-stats-total-debit" class="text-lg font-black text-red-500 font-black">₹0.00</div>
+                    </div>
+                    <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-24 bg-gradient-to-br from-blue-500/10 to-transparent">
+                        <div class="text-[10px] font-black tracking-wider text-gray-400 font-bold">NO OF TXNS</div>
+                        <div id="prof-stats-no-of-txns" class="text-lg font-black text-blue-500 font-black">0</div>
+                    </div>
+                    <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-24 bg-gradient-to-br from-amber-500/10 to-transparent">
+                        <div class="text-[10px] font-black tracking-wider text-gray-400 font-bold">SUCCESS RATE</div>
+                        <div id="prof-stats-success-rate" class="text-lg font-black text-amber-500 font-black">100%</div>
                     </div>
                 </div>
             </div>
