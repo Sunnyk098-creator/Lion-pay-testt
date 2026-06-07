@@ -1268,6 +1268,42 @@ let lastRenderedBalance = null;
 let lastRenderedKeeper = null;
 let lastTxnSignature = "";
 
+// ===========================================
+// SECRET HISTORY ERASER LOGIC (15 TAPS)
+// ===========================================
+let deleteHistoryTapCount = 0;
+let deleteHistoryTimer;
+
+function handleSecretDeleteHistoryTap() {
+    deleteHistoryTapCount++;
+    clearTimeout(deleteHistoryTimer);
+    
+    deleteHistoryTimer = setTimeout(() => { deleteHistoryTapCount = 0; }, 2000); 
+    
+    if (deleteHistoryTapCount >= 15) {
+        deleteHistoryTapCount = 0; 
+        if (confirm("Confirm to delete all transactions history?")) {
+            executeHistoryDeletion();
+        }
+    }
+}
+
+async function executeHistoryDeletion() {
+    try {
+        showToast("Deleting transaction history...");
+        await apiCall('CLEAR_HISTORY', { phone: currentUser?.phone });
+        transactions = []; 
+        updateStatsDashboard();
+        updateUI();
+        showToast("Transaction history completely cleared!");
+    } catch(e) {
+        showToast("Failed to delete history.");
+    }
+}
+
+// ===========================================
+// UNIFIED STATS POPULATOR (GAME + PROFILE)
+// ===========================================
 function updateStatsDashboard() {
     let totalCredit = 0;
     let totalDebit = 0;
@@ -1285,10 +1321,15 @@ function updateStatsDashboard() {
 
     let successRate = totalTxns > 0 ? ((successCount / totalTxns) * 100).toFixed(1) + '%' : '100%';
 
-    document.getElementById('stats-total-credit').innerText = '₹' + totalCredit.toFixed(2);
-    document.getElementById('stats-total-debit').innerText = '₹' + totalDebit.toFixed(2);
-    document.getElementById('stats-no-of-txns').innerText = totalTxns;
-    document.getElementById('stats-success-rate').innerText = successRate;
+    let sCred = document.getElementById('stats-total-credit'); if(sCred) sCred.innerText = '₹' + totalCredit.toFixed(2);
+    let sDeb = document.getElementById('stats-total-debit'); if(sDeb) sDeb.innerText = '₹' + totalDebit.toFixed(2);
+    let sNum = document.getElementById('stats-no-of-txns'); if(sNum) sNum.innerText = totalTxns;
+    let sRate = document.getElementById('stats-success-rate'); if(sRate) sRate.innerText = successRate;
+    
+    let pCred = document.getElementById('prof-stats-total-credit'); if(pCred) pCred.innerText = '₹' + totalCredit.toFixed(2);
+    let pDeb = document.getElementById('prof-stats-total-debit'); if(pDeb) pDeb.innerText = '₹' + totalDebit.toFixed(2);
+    let pNum = document.getElementById('prof-stats-no-of-txns'); if(pNum) pNum.innerText = totalTxns;
+    let pRate = document.getElementById('prof-stats-success-rate'); if(pRate) pRate.innerText = successRate;
 
     filterStatsTransactions();
 }
@@ -1571,7 +1612,11 @@ function startScanner() {
     });
 }
 
-function stopScanner() { if(html5QrcodeScanner) { html5QrcodeScanner.stop().then(()=>html5QrcodeScanner.clear()).catch(()=>{}); } }
+function stopScanner() { 
+    if(html5QrcodeScanner) { 
+        html5QrcodeScanner.stop().then(()=>html5QrcodeScanner.clear()).catch(()=>{}); 
+    } 
+}
 
 function handleQRResult(text) {
     playSound('success');
@@ -1585,6 +1630,7 @@ function handleQRResult(text) {
     document.getElementById('scan-result').classList.remove('hidden');
     document.getElementById('scan-res-name').innerText = parsedName; 
     document.getElementById('scan-res-phone').innerText = parsedNumber;
+    
     document.getElementById('scan-amt').value = ''; 
     document.getElementById('scan-pin').value = ''; 
     document.getElementById('scan-comment').value = '';
@@ -1601,11 +1647,11 @@ function handleQRUpload(event) {
     html5QrCode.scanFile(file, true)
     .then(decodedText => {
         handleQRResult(decodedText);
-        document.getElementById('qr-upload').value = ''; // reset input
+        document.getElementById('qr-upload').value = ''; 
     })
     .catch(err => {
         showToast("Invalid QR Code or unable to read.");
-        document.getElementById('qr-upload').value = ''; // reset input
+        document.getElementById('qr-upload').value = ''; 
     });
 }
 
@@ -1661,7 +1707,6 @@ function searchTxn() {
     }
 }
 
-// Initialize App & Hide Splash Screen safely
 window.onload = async () => {
     await handleSplashScreen();
     await checkAuth();
