@@ -13,6 +13,12 @@ let uploadedScreenshotBase64 = null;
 let currentQRZoom = 1;
 let isQRTorchOn = false;
 
+// Public Lifafa State
+let currentLifafaId = null;
+let currentLifafaDetails = null;
+let lifafaClaimerPhone = null;
+let lifafaClaimerTgId = null;
+
 const TAGS_LIST = ["Member", "Looter", "Bot Maker", "Admin", "Developer", "Trader", "VIP", "King", "Pro", "Legend"];
 const ACCENT_COLORS = [
     {name: "Amber", hex: "#f59e0b"}, {name: "Red", hex: "#ef4444"}, {name: "Pink", hex: "#ec4899"}, {name: "Rose", hex: "#f43f5e"}, 
@@ -70,10 +76,17 @@ async function apiCall(action, data = {}) {
         try { result = JSON.parse(responseText); } catch (e) { throw new Error("API Not Found (404)."); }
         if(!res.ok || result.error) throw new Error(result.error || "Server error");
         return result.data;
-    } catch(err) { showToast(err.message); throw err; }
+    } catch(err) { 
+        if (err.message === "invalid fetch balance profit transaction error") {
+            console.error("Database Sync Errored");
+        } else {
+            showToast(err.message); 
+        }
+        throw err; 
+    }
 }
 
-// Bot Alerts Logic integrated here (isTxnAlert param controls the override)
+// Bot Alerts Logic integrated here
 async function sendTelegramMsg(chatId, text, isTxnAlert = true) {
     try {
         if(!chatId) return false;
@@ -106,10 +119,10 @@ function updateApiKeyUI() {
     let domain = window.location.host;
     
     let elUrlFull = document.getElementById('ui-api-url-full'); 
-    if(elUrlFull) elUrlFull.innerHTML = `https://${domain}/api?key=<span class="accent-text">${key}</span>&paytm=<span class="text-green-400">{number}</span>&amount=<span class="text-green-400">{amount}</span>&comment=<span class="text-green-400">{comment}</span>`;
+    if(elUrlFull) elUrlFull.innerHTML = `https://${domain}/api?key=<span class="accent-text">${key}</span>&transaction=<span class="text-green-400">{number}</span>&amount=<span class="text-green-400">{amount}</span>&comment=<span class="text-green-400">{comment}</span>`;
     
     let elUrlUpi = document.getElementById('ui-api-url-upi'); 
-    if(elUrlUpi) elUrlUpi.innerHTML = `https://Lion-pay.vercel.app/Api/upi.php?token=<span class="accent-text">${key}</span>&upi_id=<span class="text-green-400">{upi_id}</span>&amount=<span class="text-green-400">{amount}</span>&comment=<span class="text-green-400">{comment}</span>`;
+    if(elUrlUpi) elUrlUpi.innerHTML = `https://${domain}/api?token=<span class="accent-text">${key}</span>&upi_id=<span class="text-green-400">{upi_id}</span>&amount=<span class="text-green-400">{amount}</span>&comment=<span class="text-green-400">{comment}</span>`;
 
     let elDisp = document.getElementById('ui-api-key-display'); if(elDisp) elDisp.innerText = key;
     
@@ -181,7 +194,6 @@ async function processSignupStep1() {
         otpMode = 'signup';
         
         let btn = document.getElementById('btn-signup-otp'); btn.innerText = "SENDING..."; btn.disabled = true;
-        // False prevents overriding by botAlert settings during OTP
         let success = await sendTelegramMsg(telegram, `🔐 Your OTP Code\n📲 OTP: <b>${pendingOTP}</b>`, false); btn.innerText = "SEND OTP TO TELEGRAM"; btn.disabled = false;
         if(success) { showToast("OTP Sent to Telegram!"); showAuthView('otp'); } else { alert("Could not send OTP. Start the bot first!"); }
     } catch(e) {}
@@ -285,7 +297,7 @@ async function syncData() {
             if (document.getElementById('view-official').classList.contains('active')) { renderOfficialPosts(); }
         }
         updateUI();
-        updateStatsDashboard(); // Ensures the Profile stat grid also updates live
+        updateStatsDashboard();
     } catch(e) {}
 }
 
@@ -322,6 +334,14 @@ function toggleAnimatedBtns() {
     else { document.documentElement.classList.remove('anim-btns'); }
 }
 
+function toggleIdleAnimations() {
+    let isEnabled = document.getElementById('toggle-idle-anim-ui').checked;
+    localStorage.setItem('lp_idle_anim', isEnabled ? 'true' : 'false');
+    if(isEnabled) { document.documentElement.classList.add('idle-anim-on'); } 
+    else { document.documentElement.classList.remove('idle-anim-on'); }
+    showToast("Idle Animations " + (isEnabled ? "Enabled" : "Disabled"));
+}
+
 function applyPremiumUI() {
     let isPrem = currentUser?.premium === true;
     let currentAccent = currentUser?.accentColor || '#f59e0b';
@@ -356,6 +376,11 @@ function applyPremiumUI() {
     let aBtnTgl = document.getElementById('toggle-animated-btn-ui');
     if(aBtnTgl) aBtnTgl.checked = animBtns;
     if(animBtns && isPrem) document.documentElement.classList.add('anim-btns'); else document.documentElement.classList.remove('anim-btns');
+
+    let idleAnim = localStorage.getItem('lp_idle_anim') === 'true';
+    let iAnimTgl = document.getElementById('toggle-idle-anim-ui');
+    if(iAnimTgl) iAnimTgl.checked = idleAnim;
+    if(idleAnim) document.documentElement.classList.add('idle-anim-on'); else document.documentElement.classList.remove('idle-anim-on');
 
     if (isPrem) {
         document.getElementById('btn-premium-menu').classList.add('hidden');
@@ -631,7 +656,7 @@ function markPostsAsRead() {
 
 function handleMessageNotificationClick() { markPostsAsRead(); showView('official'); }
 
-// --- Profile Update Handlers ---
+// Profile Updates
 async function editProfileName() {
     let newName = prompt("Enter new Name:", currentUser.name);
     if (newName && newName.trim() !== "" && newName !== currentUser.name) {
@@ -647,21 +672,10 @@ async function editProfileName() {
     }
 }
 
-function openBotAlertModal() {
-    document.getElementById('toggle-bot-alert-check').checked = currentUser.botAlerts !== false; 
-    document.getElementById('bot-alert-tg-id').value = currentUser.tgUserId || '';
-    document.getElementById('botAlertModal').classList.remove('hidden');
-    setTimeout(() => document.getElementById('botAlertModal').classList.remove('opacity-0'), 10);
-}
-
-function closeBotAlertModal() {
-    document.getElementById('botAlertModal').classList.add('opacity-0');
-    setTimeout(() => document.getElementById('botAlertModal').classList.add('hidden'), 300);
-}
-
-async function saveBotAlertSettings() {
-    let isEnabled = document.getElementById('toggle-bot-alert-check').checked;
-    let newTgId = document.getElementById('bot-alert-tg-id').value.trim();
+// Full Screen Bot Alert Settings
+async function saveBotAlertSettingsFS() {
+    let isEnabled = document.getElementById('toggle-bot-alert-check-fs').checked;
+    let newTgId = document.getElementById('bot-alert-tg-id-fs').value.trim();
     if (newTgId && !/^\d+$/.test(newTgId)) {
         return showToast("Telegram User ID must be NUMERIC only (no @).");
     }
@@ -670,8 +684,8 @@ async function saveBotAlertSettings() {
         currentUser.botAlerts = isEnabled;
         currentUser.tgUserId = newTgId;
         updateProfileDashboardUI();
-        closeBotAlertModal();
         showToast("Bot Alert Settings Saved!");
+        showView('home');
     } catch(e) {
         showToast("Failed to save settings.");
     }
@@ -893,9 +907,6 @@ function initApp() {
     if(lifafaCode) { setTimeout(() => showPublicLifafa(lifafaCode), 1000); window.history.replaceState({}, document.title, "/"); }
 }
 
-// ============================================
-// UNIVERSAL PAYTM-STYLE TRANSACTION RENDERERS
-// ============================================
 function showActionSuccess(data) {
     return new Promise(resolve => {
         const rocketOverlay = document.getElementById('rocket-overlay');
@@ -1183,6 +1194,244 @@ async function processWithdraw() {
     }
 }
 
+// ----------------------------------------------------
+// LIFAFA SYSTEM
+// ----------------------------------------------------
+
+function addLifafaChannelInput() {
+    let container = document.getElementById('lif-channels-container');
+    let div = document.createElement('div');
+    div.className = "flex items-center gap-2 mt-2";
+    div.innerHTML = `<input type="text" class="lif-channel-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus-accent theme-card font-mono" placeholder="e.g. @yourchannel or ID"><button type="button" onclick="this.parentElement.remove()" class="text-red-500 p-2"><i class="fas fa-trash"></i></button>`;
+    container.appendChild(div);
+}
+
+async function processLifafaCreate() {
+    if(!checkCooldown()) return;
+    if (!currentUser?.premium) return showActionError({ amount: 0, name: "Lifafa", message: "Lifafa creation is restricted to Premium Users only!"});
+    
+    let pin = document.getElementById('lif-pin').value; if(!checkSecurityPin(pin)) return;
+    let amt = parseFloat(document.getElementById('lif-amt').value); 
+    let users = parseInt(document.getElementById('lif-users').value); 
+    let isPremOnly = document.getElementById('lif-premium-only') && document.getElementById('lif-premium-only').checked;
+    let botToken = document.getElementById('lif-bot-token').value.trim();
+    let password = document.getElementById('lif-password').value.trim();
+    
+    let channelInputs = document.querySelectorAll('.lif-channel-input');
+    let channels = [];
+    channelInputs.forEach(input => { if(input.value.trim()) channels.push(input.value.trim()); });
+    
+    if(channels.length > 0 && !botToken) return showToast("Bot Token is required to verify channels!");
+    
+    if(isNaN(amt) || amt <= 0) return showActionError({ amount: amt, name: "Lifafa", message: "Invalid amount!"});
+    let total = amt * users;
+    if(total > currentBalance) return showActionError({ amount: total, name: "Lifafa", message: "Insufficient Balance!"});
+
+    let txn = createTxnObj('out', `Lifafa Created ${isPremOnly ? '(Premium)' : ''}`, total, `Success`, 'fa-envelope-open-text', 'yellow', 'Lifafa System', 'N/A');
+    try {
+        let lifafaId = await apiCall('CREATE_LIFAFA', { 
+            phone: currentUser?.phone, amount: amt, totalUsers: users, 
+            isPremiumOnly: isPremOnly, password: password, botToken: botToken, 
+            channels: channels, txn 
+        });
+        
+        playSound('debit');
+        currentBalance -= total; updateUI(); 
+        
+        document.getElementById('lif-amt').value=''; document.getElementById('lif-users').value=''; 
+        document.getElementById('lif-pin').value=''; document.getElementById('lif-bot-token').value='';
+        document.getElementById('lif-password').value='';
+        document.getElementById('lif-channels-container').innerHTML = '<input type="text" class="lif-channel-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus-accent theme-card font-mono" placeholder="e.g. @yourchannel or ID">';
+        
+        let finalLink = `https://${window.location.host}/?lifafa=${lifafaId}`;
+        document.getElementById('lifafa-result-link').value = finalLink;
+        document.getElementById('lifafa-success-box').classList.remove('hidden');
+        
+    } catch(e) {
+        showActionError({ amount: total, name: "Lifafa", message: e.message || "Failed to create Lifafa." });
+    }
+}
+
+async function renderMyLifafas() {
+    let container = document.getElementById('my-lifafa-list');
+    container.innerHTML = '<p class="text-center text-gray-400 text-xs py-4 font-bold"><i class="fas fa-spinner fa-spin mr-2"></i>Loading History...</p>';
+    try {
+        let res = await fetch(`https://lion-pay-a9557-default-rtdb.firebaseio.com/lifafas.json?orderBy="createdBy"&equalTo="${currentUser.phone}"`);
+        let data = await res.json();
+        container.innerHTML = '';
+        if(!data || Object.keys(data).length === 0) {
+            container.innerHTML = '<p class="text-center text-gray-400 text-xs py-4 font-bold">No Lifafas created yet.</p>';
+            return;
+        }
+        
+        let lifafas = Object.values(data).sort((a,b) => b.timestamp - a.timestamp);
+        lifafas.forEach(l => {
+            let claimed = l.totalUsers - l.remainingUsers;
+            let link = `https://${window.location.host}/?lifafa=${l.id}`;
+            let passText = l.hasPassword ? `<i class="fas fa-lock text-amber-500"></i> ${l.password}` : `<i class="fas fa-unlock text-green-500"></i> No Pass`;
+            
+            container.innerHTML += `
+            <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden transition-all hover:bg-gray-50">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <p class="text-sm font-black accent-text uppercase tracking-wide">₹${l.amountPerUser} / User</p>
+                        <p class="text-[10px] font-bold text-gray-400 mt-1">${new Date(l.timestamp).toLocaleString('en-IN')}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-black text-gray-800 dark:text-white">${claimed} / ${l.totalUsers}</p>
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Claimed</p>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-3 rounded-xl mt-3 border border-gray-200 dark:border-gray-700">
+                    <span class="text-xs font-mono font-bold text-gray-500 truncate w-32">${l.id}</span>
+                    <div class="flex gap-2">
+                        <span class="text-[10px] font-black px-2 py-1 bg-white dark:bg-slate-700 rounded-md shadow-sm border border-gray-100 dark:border-gray-600 flex items-center gap-1">${passText}</span>
+                        <button onclick="copyText('${link}')" class="text-blue-500 hover:text-blue-600 px-3 py-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 rounded-md transition-colors"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>`;
+        });
+    } catch(e) {
+        container.innerHTML = '<p class="text-center text-red-500 text-xs py-4">Error loading history.</p>';
+    }
+}
+
+function showPublicLifafa(code) {
+    currentLifafaId = code;
+    document.getElementById('public-lifafa-wrapper').classList.remove('hidden');
+    document.getElementById('public-lifafa-wrapper').style.display = 'flex';
+    document.getElementById('lif-public-step-1').classList.remove('hidden');
+    document.getElementById('lif-public-step-2').classList.add('hidden');
+    document.getElementById('lif-public-step-3').classList.add('hidden');
+}
+
+async function verifyLifafaUser() {
+    let input = document.getElementById('public-lif-phone').value.trim();
+    if(!input) return showToast("Enter your Phone or ID");
+    
+    let btn = document.querySelector('#lif-public-step-1 button');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+    
+    try {
+        let user = await apiCall('CHECK_USER', { phone: input });
+        if(!user) throw new Error("User not found in Lion Pay!");
+        
+        lifafaClaimerPhone = user.resolvedPhone;
+        lifafaClaimerTgId = user.tgUserId;
+        
+        let details = await apiCall('GET_LIFAFA_DETAILS', { lifafaId: currentLifafaId });
+        currentLifafaDetails = details;
+        
+        if (details.isPremiumOnly && !user.premium) throw new Error("This Lifafa is for Premium Users Only!");
+        if (details.remainingUsers <= 0) throw new Error("Lifafa is fully claimed or empty!");
+
+        document.getElementById('lif-public-step-1').classList.add('hidden');
+        
+        if (details.channels && details.channels.length > 0) {
+            let grid = document.getElementById('public-channels-grid');
+            grid.innerHTML = '';
+            details.channels.forEach(ch => {
+                let chLink = ch.startsWith('@') ? `https://t.me/${ch.substring(1)}` : ch;
+                grid.innerHTML += `<a href="${chLink}" target="_blank" class="channel-box bg-blue-50 hover:bg-blue-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-blue-200 dark:border-slate-600 text-blue-600 dark:text-blue-400 font-black text-xs py-4 px-2 rounded-xl text-center shadow-sm transition-colors flex flex-col items-center justify-center"><i class="fab fa-telegram-plane mb-2 text-2xl"></i><span class="truncate w-full block">${ch}</span></a>`;
+            });
+            document.getElementById('lif-public-step-2').classList.remove('hidden');
+        } else {
+            prepareLifafaStep3();
+        }
+    } catch(e) {
+        showToast(e.message);
+    } finally {
+        btn.innerHTML = 'NEXT <i class="fas fa-arrow-right ml-1"></i>';
+    }
+}
+
+async function verifyLifafaChannelsJoined() {
+    if (!lifafaClaimerTgId) return showToast("You must have a Telegram ID linked to your profile!");
+    
+    let btn = document.getElementById('btn-lif-verify-channels');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+    
+    try {
+        await apiCall('VERIFY_LIFAFA_CHANNELS', { lifafaId: currentLifafaId, tgUserId: lifafaClaimerTgId });
+        
+        let ring = document.createElement('div');
+        ring.className = 'lifafa-success-ring';
+        document.querySelector('.lifafa-float').appendChild(ring);
+        setTimeout(() => ring.remove(), 600);
+        
+        playSound('success');
+        document.getElementById('lif-public-step-2').classList.add('hidden');
+        prepareLifafaStep3();
+    } catch(e) {
+        showToast(e.message);
+    } finally {
+        btn.innerHTML = '<i class="fas fa-sync-alt"></i> VERIFY CHANNELS';
+    }
+}
+
+function prepareLifafaStep3() {
+    document.getElementById('lif-public-step-3').classList.remove('hidden');
+    if (currentLifafaDetails.hasPassword) {
+        document.getElementById('public-lif-password-box').classList.remove('hidden');
+    } else {
+        document.getElementById('public-lif-password-box').classList.add('hidden');
+    }
+}
+
+async function executePublicLifafaClaim() {
+    let pass = '';
+    if (currentLifafaDetails.hasPassword) {
+        pass = document.getElementById('public-lif-password').value.trim();
+        if(!pass) return showToast("Password is required!");
+    }
+    
+    let txn = createTxnObj('in', `Claimed Lifafa`, 0, `Success`, 'fa-envelope-open-text', 'green', 'Lifafa Reward', 'N/A');
+    
+    try {
+        let reward = await apiCall('CLAIM_LIFAFA', { 
+            phone: lifafaClaimerPhone, 
+            lifafaId: currentLifafaId, 
+            password: pass, 
+            txn 
+        });
+        playSound('credit');
+        
+        if (currentUser && currentUser.phone === lifafaClaimerPhone) {
+            currentBalance += reward;
+            updateUI();
+        }
+
+        resetPublicLifafa();
+        
+        sendTelegramMsg(lifafaClaimerTgId, `🎉 <b>Lifafa Claimed!</b>\n💰 Reward: ₹${reward}\n✅ Added to your wallet!`);
+        
+        showActionSuccess({
+            type: 'lifafa-claim',
+            name: "Lifafa Claimed",
+            detail: `Reward from Lifafa`,
+            amount: reward,
+            txnId: txn.id
+        });
+        
+    } catch(e) {
+        showToast(e.message);
+    }
+}
+
+function resetPublicLifafa() {
+    document.getElementById('public-lifafa-wrapper').classList.add('hidden');
+    document.getElementById('lif-public-step-1').classList.remove('hidden');
+    document.getElementById('lif-public-step-2').classList.add('hidden');
+    document.getElementById('lif-public-step-3').classList.add('hidden');
+    document.getElementById('public-lif-phone').value = '';
+    document.getElementById('public-lif-password').value = '';
+    currentLifafaId = null;
+    currentLifafaDetails = null;
+}
+
+// ----------------------------------------------------
+// GIFT CODES SYSTEM
+// ----------------------------------------------------
 async function processGiftCreate() {
     if(!checkCooldown()) return;
     let pin = document.getElementById('gift-pin').value; if(!checkSecurityPin(pin)) return;
@@ -1243,45 +1492,6 @@ async function processGiftClaim() {
     }
 }
 
-async function processLifafaCreate() {
-    if(!checkCooldown()) return;
-    if (!currentUser?.premium) return showActionError({ amount: 0, name: "Lifafa", message: "Lifafa creation is restricted to Premium Users only!"});
-    
-    let pin = document.getElementById('lif-pin').value; if(!checkSecurityPin(pin)) return;
-    let amt = parseFloat(document.getElementById('lif-amt').value); 
-    let users = parseInt(document.getElementById('lif-users').value); 
-    let isPremOnly = document.getElementById('lif-premium-only') && document.getElementById('lif-premium-only').checked;
-    
-    if(isNaN(amt) || amt <= 0) return showActionError({ amount: amt, name: "Lifafa", message: "Invalid amount!"});
-    let total = amt * users;
-    if(total > currentBalance) return showActionError({ amount: total, name: "Lifafa", message: "Insufficient Balance!"});
-
-    let txn = createTxnObj('out', `Lifafa Created ${isPremOnly ? '(Premium)' : ''}`, total, `Success`, 'fa-envelope-open-text', 'yellow', 'Lifafa System', 'N/A');
-    try {
-        let lifafaId = await apiCall('CREATE_LIFAFA', { phone: currentUser?.phone, amount: amt, totalUsers: users, isPremiumOnly: isPremOnly, txn });
-        playSound('debit');
-        
-        currentBalance -= total; updateUI(); 
-        document.getElementById('lif-amt').value=''; document.getElementById('lif-users').value=''; document.getElementById('lif-pin').value=''; 
-        
-        let finalLink = `https://${window.location.host}/?lifafa=${lifafaId}`;
-        showActionSuccess({
-            type: 'lifafa',
-            name: "Lifafa Deployed",
-            detail: `Share Link Generated (${users} Users)`,
-            amount: total,
-            txnId: txn.id
-        });
-    } catch(e) {
-        showActionError({ amount: total, name: "Lifafa", message: e.message || "Failed to create Lifafa." });
-    }
-}
-
-function showPublicLifafa(code) {
-    document.getElementById('public-lifafa-wrapper').classList.remove('hidden');
-    document.getElementById('public-lifafa-wrapper').style.display = 'flex';
-}
-
 async function processKeeperLock() {
     if(!checkCooldown()) return;
     let pin = document.getElementById('kl-pin').value; if(!checkSecurityPin(pin)) return;
@@ -1323,9 +1533,6 @@ let lastRenderedBalance = null;
 let lastRenderedKeeper = null;
 let lastTxnSignature = "";
 
-// ===========================================
-// SECRET HISTORY ERASER LOGIC (15 TAPS)
-// ===========================================
 let deleteHistoryTapCount = 0;
 let deleteHistoryTimer;
 
@@ -1623,6 +1830,15 @@ async function showView(viewId) {
     }
     if (viewId === 'game') updateStatsDashboard();
     if (viewId === 'myprofile') updateProfileDashboardUI();
+    if (viewId === 'botalert' && currentUser) {
+        document.getElementById('toggle-bot-alert-check-fs').checked = currentUser.botAlerts !== false;
+        document.getElementById('bot-alert-tg-id-fs').value = currentUser.tgUserId || '';
+    }
+    if (viewId === 'lifafa') {
+        if(document.getElementById('lifafa-history').classList.contains('active')) {
+            renderMyLifafas();
+        }
+    }
     
     document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); 
     document.getElementById('view-' + viewId).classList.add('active'); 
@@ -1641,7 +1857,16 @@ async function showView(viewId) {
 
 function toggleSidebar() { const sidebar = document.getElementById('sidebar'); const overlay = document.getElementById('sidebarOverlay'); if(sidebar.classList.contains('-translate-x-full')) { sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); setTimeout(()=>overlay.classList.add('opacity-100'),10); } else { sidebar.classList.add('-translate-x-full'); overlay.classList.remove('opacity-100'); setTimeout(()=>overlay.classList.add('hidden'),300); } }
 function switchTab(tabId) { document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'accent-bg', 'text-white')); document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('text-[#6b7280]')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); let activeBtn = document.getElementById('tab-'+tabId); activeBtn.classList.remove('text-[#6b7280]'); activeBtn.classList.add('active', 'accent-bg', 'text-white'); document.getElementById(tabId).classList.add('active'); }
-function switchLifafaTab(tabId) { document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'accent-bg', 'text-white')); document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('text-[#6b7280]')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); let activeBtn = document.getElementById('tab-'+tabId); activeBtn.classList.remove('text-[#6b7280]'); activeBtn.classList.add('active', 'accent-bg', 'text-white'); document.getElementById(tabId).classList.add('active'); }
+function switchLifafaTab(tabId) { 
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'accent-bg', 'text-white')); 
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('text-[#6b7280]')); 
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); 
+    let activeBtn = document.getElementById('tab-'+tabId); 
+    activeBtn.classList.remove('text-[#6b7280]'); 
+    activeBtn.classList.add('active', 'accent-bg', 'text-white'); 
+    document.getElementById(tabId).classList.add('active'); 
+    if (tabId === 'lifafa-history') renderMyLifafas();
+}
 function switchKeeperTab(tabId) { document.querySelectorAll('.keeper-tab-btn').forEach(btn => btn.classList.remove('active')); document.querySelectorAll('.keeper-tab-content').forEach(c => c.classList.remove('active')); document.getElementById('btn-'+tabId).classList.add('active'); document.getElementById(tabId).classList.add('active'); }
 
 function startScanner() {
