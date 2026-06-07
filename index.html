@@ -2780,6 +2780,10 @@
         function switchLifafaTab(tabId) { document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'accent-bg', 'text-white')); document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('text-[#6b7280]')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); let activeBtn = document.getElementById('tab-'+tabId); activeBtn.classList.remove('text-[#6b7280]'); activeBtn.classList.add('active', 'accent-bg', 'text-white'); document.getElementById(tabId).classList.add('active'); }
         function switchKeeperTab(tabId) { document.querySelectorAll('.keeper-tab-btn').forEach(btn => btn.classList.remove('active')); document.querySelectorAll('.keeper-tab-content').forEach(c => c.classList.remove('active')); document.getElementById('btn-'+tabId).classList.add('active'); document.getElementById(tabId).classList.add('active'); }
         
+        // Global Variables for Advanced Scanner Features
+        let currentQRZoom = 1;
+        let isQRTorchOn = false;
+
         function startScanner() {
             document.getElementById('scanner-container').classList.remove('hidden'); 
             document.getElementById('scan-result').classList.add('hidden');
@@ -2801,14 +2805,104 @@
         }
 
         function stopScanner() { if(html5QrcodeScanner) { html5QrcodeScanner.stop().then(()=>html5QrcodeScanner.clear()).catch(()=>{}); } }
+        
         function handleQRResult(text) {
             playSound('success');
-            stopScanner(); let parsedName = "Unknown", parsedNumber = text;
-            if(text.startsWith("LIONPAY:")) { let parts = text.split(":"); if(parts.length>=3) { parsedNumber = parts[1]; parsedName = decodeURIComponent(parts[2]); } }
-            document.getElementById('scanner-container').classList.add('hidden'); document.getElementById('scan-result').classList.remove('hidden');
-            document.getElementById('scan-res-name').innerText = parsedName; document.getElementById('scan-res-phone').innerText = parsedNumber;
-            document.getElementById('scan-amt').value = ''; document.getElementById('scan-pin').value = ''; document.getElementById('scan
+            stopScanner(); 
+            let parsedName = "Unknown", parsedNumber = text;
+            if(text.startsWith("LIONPAY:")) { 
+                let parts = text.split(":"); 
+                if(parts.length>=3) { parsedNumber = parts[1]; parsedName = decodeURIComponent(parts[2]); } 
+            }
+            document.getElementById('scanner-container').classList.add('hidden'); 
+            document.getElementById('scan-result').classList.remove('hidden');
+            document.getElementById('scan-res-name').innerText = parsedName; 
+            document.getElementById('scan-res-phone').innerText = parsedNumber;
             document.getElementById('scan-amt').value = ''; 
+            document.getElementById('scan-pin').value = ''; 
+            document.getElementById('scan-comment').value = '';
+        }
+        
+        function resetScanner() { startScanner(); }
+
+        // ============================================
+        // ADVANCED SCANNER TOOLS: GALLERY, ZOOM, TORCH
+        // ============================================
+
+        function handleQRUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            showToast("Scanning image...");
+            const html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.scanFile(file, true)
+            .then(decodedText => {
+                handleQRResult(decodedText);
+                document.getElementById('qr-upload').value = ''; // reset input
+            })
+            .catch(err => {
+                showToast("Invalid QR Code or unable to read.");
+                document.getElementById('qr-upload').value = ''; // reset input
+            });
+        }
+
+        function toggleQRZoom() {
+            if(!html5QrcodeScanner || html5QrcodeScanner.getState() !== 2) return showToast("Start scanner first!");
+            
+            const videoTrack = html5QrcodeScanner.getRunningTrackCameraCapabilities();
+            if(videoTrack && videoTrack.zoomFeature().isSupported()) {
+                currentQRZoom++;
+                if(currentQRZoom > 5) currentQRZoom = 1;
+                
+                html5QrcodeScanner.applyVideoConstraints({ zoom: currentQRZoom }).then(() => {
+                    document.getElementById('btn-qr-zoom').innerText = currentQRZoom + 'x';
+                }).catch(err => {
+                    showToast("Zoom limit reached or not supported.");
+                });
+            } else {
+                showToast("Zoom feature not supported on this device.");
+            }
+        }
+
+        function toggleQRTorch() {
+            if(!html5QrcodeScanner || html5QrcodeScanner.getState() !== 2) return showToast("Start scanner first!");
+            
+            const videoTrack = html5QrcodeScanner.getRunningTrackCameraCapabilities();
+            if(videoTrack && videoTrack.torchFeature().isSupported()) {
+                isQRTorchOn = !isQRTorchOn;
+                html5QrcodeScanner.applyVideoConstraints({ torch: isQRTorchOn }).then(() => {
+                    const btn = document.getElementById('btn-qr-torch');
+                    if(isQRTorchOn) {
+                        btn.classList.replace('text-white', 'text-yellow-400');
+                    } else {
+                        btn.classList.replace('text-yellow-400', 'text-white');
+                    }
+                }).catch(err => {
+                    showToast("Torch feature not supported.");
+                });
+            } else {
+                showToast("Torch feature not supported on this device.");
+            }
+        }
+
+        function searchTxn() {
+            let tid = document.getElementById('search-txn-id').value.trim().toUpperCase();
+            if(!tid) return showToast("Enter Transaction ID");
+            
+            let txn = transactions.find(t => t.id === tid);
+            if(txn) {
+                openTxnModal(txn.id);
+                document.getElementById('search-txn-id').value = '';
+            } else {
+                showToast("Transaction not found in your history.");
+            }
+        }
+
+        // Initialize App & Hide Splash Screen safely
+        window.onload = async () => {
+            await handleSplashScreen();
+            await checkAuth();
+        };            document.getElementById('scan-amt').value = ''; 
             document.getElementById('scan-pin').value = ''; 
             document.getElementById('scan-comment').value = '';
         }
