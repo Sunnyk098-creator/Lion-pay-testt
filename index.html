@@ -34,179 +34,132 @@
     </script>
 
     <style>
-        :root { 
-            --theme-bg: #fdfbf7; 
-            --theme-text: #1f2937; 
-            --theme-card: #ffffff; 
-        }
-        
+        :root { --theme-bg: #fdfbf7; --theme-text: #1f2937; --theme-card: #ffffff; }
         html.dark-mode body { --theme-bg: #0f172a; --theme-text: #f8fafc; --theme-card: #1e293b; background-color: var(--theme-bg); color: var(--theme-text); }
         html.dark-mode .theme-card { background-color: var(--theme-card) !important; border-color: rgba(255,255,255,0.05) !important; }
         
         body { background-color: var(--theme-bg); color: var(--theme-text); transition: background-color 0.3s ease, color 0.3s ease; }
         .theme-card { background-color: var(--theme-card); color: var(--theme-text); border-color: rgba(128,128,128,0.1); transition: background-color 0.3s ease, border-color 0.3s ease; }
         
-        /* High-contrast Dynamic Typography Overrides */
-        html:not(.dark-mode) .text-contrast { color: #111827 !important; }
-        html.dark-mode .text-contrast { color: #f8fafc !important; }
+        html:not(.dark-mode) .text-contrast { color: #111827 !important; } html.dark-mode .text-contrast { color: #f8fafc !important; }
+        html:not(.dark-mode) .text-contrast-muted { color: #4b5563 !important; } html.dark-mode .text-contrast-muted { color: #cbd5e1 !important; }
+        html.dark-mode .text-gray-800, html.dark-mode .text-black, html.dark-mode h1, html.dark-mode h2, html.dark-mode h3, html.dark-mode h4, html.dark-mode p:not(.text-white) { color: #f8fafc !important; }
+        html.dark-mode .text-gray-600 { color: #cbd5e1 !important; }
+        html:not(.dark-mode) .text-gray-800, html:not(.dark-mode) .text-black, html:not(.dark-mode) h1, html:not(.dark-mode) h2, html:not(.dark-mode) h3, html:not(.dark-mode) h4 { color: #111827 !important; }
 
-        html:not(.dark-mode) .text-contrast-muted { color: #4b5563 !important; }
-        html.dark-mode .text-contrast-muted { color: #cbd5e1 !important; }
+        #home-main-card, #home-main-card *, #home-main-card h3, #home-main-card span, #home-main-card p, #home-main-card h2 { color: #ffffff !important; }
 
-        html.dark-mode .text-gray-800, html.dark-mode .text-black, html.dark-mode h1, html.dark-mode h2, html.dark-mode h3, html.dark-mode h4, html.dark-mode p:not(.text-white) {
-            color: #f8fafc !important;
-        }
-        html.dark-mode .text-gray-600 {
-            color: #cbd5e1 !important;
-        }
-        html:not(.dark-mode) .text-gray-800, html:not(.dark-mode) .text-black, html:not(.dark-mode) h1, html:not(.dark-mode) h2, html:not(.dark-mode) h3, html:not(.dark-mode) h4 {
-            color: #111827 !important;
-        }
+        html.dark-mode input, html.dark-mode textarea, html.dark-mode select { color: #ffffff !important; background-color: #1e293b !important; border-color: #334155 !important; }
+        html:not(.dark-mode) input, html:not(.dark-mode) textarea, html:not(.dark-mode) select { color: #111827 !important; background-color: #f9fafb !important; border-color: #e5e7eb !important; }
 
-        /* CARD TEXT FORCE WHITE FIX */
-        #home-main-card, #home-main-card *, #home-main-card h3, #home-main-card span, #home-main-card p, #home-main-card h2 {
-            color: #ffffff !important;
-        }
+        button:focus, a:focus, input:focus, select:focus, textarea:focus, div:focus { outline: none !important; box-shadow: 0 0 0 3px var(--accent-glow) !important; border-radius: 9999px !important; }
+        input:focus, textarea:focus, select:focus { border-radius: 0.75rem !important; }
 
-        /* Dynamic Input Backgrounds & Text Contrasts */
-        html.dark-mode input, html.dark-mode textarea, html.dark-mode select {
-            color: #ffffff !important;
-            background-color: #1e293b !important;
-            border-color: #334155 !important;
-        }
-        html:not(.dark-mode) input, html:not(.dark-mode) textarea, html:not(.dark-mode) select {
-            color: #111827 !important;
-            background-color: #f9fafb !important;
-            border-color: #e5e7eb !important;
-        }
+        html.neon-mode body { background-color: #000000 !important; background-image: none !important; color: #ffffff !important; }
+        html.neon-mode .theme-card { background-color: #08080c !important; border: 1.5px solid var(--accent-main) !important; box-shadow: 0 0 16px var(--accent-glow) !important; color: #ffffff !important; }
+        html.neon-mode .accent-text { text-shadow: 0 0 10px var(--accent-glow) !important; color: var(--accent-main) !important; }
+        html.neon-mode h1, html.neon-mode h2, html.neon-mode h3, html.neon-mode h4 { text-shadow: 0 0 8px var(--accent-glow) !important; color: #ffffff !important; }
+        html.neon-mode input, html.neon-mode textarea, html.neon-mode select { background-color: #040406 !important; border: 1px solid var(--accent-main) !important; box-shadow: 0 0 8px var(--accent-glow) !important; color: #ffffff !important; }
 
-        /* CIRCULAR FOCUS OUTLINE CONFIGURATIONS (Fixes ugly square focus boxes) */
-        button:focus, a:focus, input:focus, select:focus, textarea:focus, div:focus {
-            outline: none !important;
-            box-shadow: 0 0 0 3px var(--accent-glow) !important;
-            border-radius: 9999px !important;
-        }
-        input:focus, textarea:focus, select:focus {
-            border-radius: 0.75rem !important; /* Keep input rounded borders while discarding raw squares */
-        }
+        .accent-bg { background-color: var(--accent-main) !important; color: white !important; } .accent-text { color: var(--accent-main) !important; } .accent-border { border-color: var(--accent-main) !important; } .accent-shadow { box-shadow: 0 4px 15px var(--accent-glow) !important; } .focus-accent:focus { border-color: var(--accent-main) !important; box-shadow: 0 0 0 2px var(--accent-glow) !important; }
 
-        /* PREMIUM ONLY NEON THEME MODE CSS LAYOUTS */
-        html.neon-mode body {
-            background-color: #000000 !important;
-            background-image: none !important;
-            color: #ffffff !important;
-        }
-        html.neon-mode .theme-card {
-            background-color: #08080c !important;
-            border: 1.5px solid var(--accent-main) !important;
-            box-shadow: 0 0 16px var(--accent-glow) !important;
-            color: #ffffff !important;
-        }
-        html.neon-mode .accent-text {
-            text-shadow: 0 0 10px var(--accent-glow) !important;
-            color: var(--accent-main) !important;
-        }
-        html.neon-mode h1, html.neon-mode h2, html.neon-mode h3, html.neon-mode h4 {
-            text-shadow: 0 0 8px var(--accent-glow) !important;
-            color: #ffffff !important;
-        }
-        html.neon-mode input, html.neon-mode textarea, html.neon-mode select {
-            background-color: #040406 !important;
-            border: 1px solid var(--accent-main) !important;
-            box-shadow: 0 0 8px var(--accent-glow) !important;
-            color: #ffffff !important;
-        }
-
-        .accent-bg { background-color: var(--accent-main) !important; color: white !important; }
-        .accent-text { color: var(--accent-main) !important; }
-        .accent-border { border-color: var(--accent-main) !important; }
-        .accent-shadow { box-shadow: 0 4px 15px var(--accent-glow) !important; }
-        .focus-accent:focus { border-color: var(--accent-main) !important; box-shadow: 0 0 0 2px var(--accent-glow) !important; }
-
-        .transition-transform { transition: transform 0.3s ease-in-out; }
-        ::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .view-section { display: none; opacity: 0; }
-        .view-section.active { display: block; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .transition-transform { transition: transform 0.3s ease-in-out; } ::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .view-section { display: none; opacity: 0; } .view-section.active { display: block; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideDown { from { transform: translate(-50%, -100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
         
         .btn-animate { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform, box-shadow; }
-        .btn-animate:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 20px var(--accent-glow); }
-        .btn-animate:active { transform: scale(0.95); }
+        .btn-animate:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 20px var(--accent-glow); } .btn-animate:active { transform: scale(0.95); }
         
-        .tab-btn.active { background-color: var(--accent-main); color: white; }
-        .tab-btn { background-color: transparent; color: #6b7280; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: slideUpFade 0.3s ease forwards; }
+        .tab-btn.active { background-color: var(--accent-main); color: white; } .tab-btn { background-color: transparent; color: #6b7280; } .tab-content { display: none; } .tab-content.active { display: block; animation: slideUpFade 0.3s ease forwards; }
+        .keeper-tab-btn.active { background-color: var(--theme-card); color: var(--accent-main); box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-weight: bold;} .keeper-tab-content { display: none; } .keeper-tab-content.active { display: block; animation: slideUpFade 0.3s ease forwards; }
         
-        .keeper-tab-btn.active { background-color: var(--theme-card); color: var(--accent-main); box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-weight: bold;}
-        .keeper-tab-content { display: none; }
-        .keeper-tab-content.active { display: block; animation: slideUpFade 0.3s ease forwards; }
-        
-        html.premium-mode body {
-            background: linear-gradient(135deg, var(--premium-grad-1), var(--premium-grad-2), var(--theme-bg));
-            background-size: 400% 400%;
-            animation: premiumBg 15s ease infinite;
-            will-change: background-position;
-        }
-        
-        html.dark-mode.premium-mode body {
-            background: linear-gradient(135deg, #020617, #0f172a, var(--premium-grad-1));
-            background-size: 300% 300%;
-            animation: premiumBg 15s ease infinite;
-            will-change: background-position;
-        }
-        
+        html.premium-mode body { background: linear-gradient(135deg, var(--premium-grad-1), var(--premium-grad-2), var(--theme-bg)); background-size: 400% 400%; animation: premiumBg 15s ease infinite; will-change: background-position; }
+        html.dark-mode.premium-mode body { background: linear-gradient(135deg, #020617, #0f172a, var(--premium-grad-1)); background-size: 300% 300%; animation: premiumBg 15s ease infinite; will-change: background-position; }
         @keyframes premiumBg { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-        
-        html.premium-mode .theme-card {
-            background: rgba(var(--theme-card), 0.8) !important;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 var(--premium-grad-2);
-        }
-        
+        html.premium-mode .theme-card { background: rgba(var(--theme-card), 0.8) !important; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 var(--premium-grad-2); }
         .premium-border { border: 2px solid var(--accent-main) !important; box-shadow: 0 0 20px var(--accent-glow) !important; animation: borderGlow 2s infinite alternate; }
         @keyframes borderGlow { from { box-shadow: 0 0 5px var(--accent-glow); } to { box-shadow: 0 0 25px var(--accent-glow); } }
-
         .sidebar-profile-bg { background: linear-gradient(180deg, var(--accent-glow) 0%, transparent 100%); }
-        
         #reader video { object-fit: cover !important; width: 100% !important; height: 100% !important; border-radius: 2rem; }
         @keyframes scanline { 0% { top: 5%; opacity: 0; } 10% { opacity: 1; } 50% { top: 95%; } 90% { opacity: 1; } 100% { top: 5%; opacity: 0; } }
         .animate-scanline { animation: scanline 2.5s ease-in-out infinite; background: var(--accent-main); box-shadow: 0 0 15px 3px var(--accent-glow); }
-        .premium-scanner { border-color: var(--accent-main) !important; box-shadow: 0 0 30px var(--accent-glow); }
 
-        /* COLORFUL THEME UTILITY LABELS (Fixed structural spacing bugs) */
-        html.colorful-mode .col-send div { background-color: #ef4444 !important; color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(239,68,68,0.4) !important; }
-        html.colorful-mode .col-bulk div { background-color: #3b82f6 !important; color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(59,130,246,0.4) !important; }
-        html.colorful-mode .col-add div { background-color: #10b981 !important; color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(16,185,129,0.4) !important; }
-        html.colorful-mode .col-withdraw div { background-color: #f59e0b !important; color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(245,158,11,0.4) !important; }
-        html.colorful-mode .col-lifafa div { background-color: #8b5cf6 !important; color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(139,92,246,0.4) !important; }
-        html.colorful-mode .col-gift div { background-color: #ec4899 !important; color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(236,72,153,0.4) !important; }
-        html.colorful-mode .col-api div { background-color: #06b6d4 !important; color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(6,182,212,0.4) !important; }
-        html.colorful-mode .col-txn div { background-color: #f97316 !important; color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(249,115,22,0.4) !important; }
-        html.colorful-mode .col-premium div { background-color: #eab308 !important; color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(234,179,8,0.4) !important; }
-        html.colorful-mode .col-theme div { background-color: #64748b !important; color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(100,116,139,0.4) !important; }
-        html.colorful-mode .col-tags div { background-color: #f43f5e !important; color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(244,63,94,0.4) !important; }
-        html.colorful-mode .col-official div { background-color: #6366f1 !important; color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(99,102,241,0.4) !important; }
-        html.colorful-mode .col-keeper div { background-color: #14b8a6 !important; color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(20,184,166,0.4) !important; }
-        html.colorful-mode .col-stats div { background-color: #ea580c !important; color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(234,88,12,0.4) !important; }
-        html.colorful-mode .col-help div { background-color: #475569 !important; color: white !important; border: none !important; box-shadow: 0 4px 15px rgba(71,85,105,0.4) !important; }
+        /* VIBRANT DEFAULT DASHBOARD ICONS COLORS */
+        .color-send { color: #3b82f6 !important; }
+        .color-bulk { color: #a855f7 !important; }
+        .color-add { color: #10b981 !important; }
+        .color-withdraw { color: #ef4444 !important; }
+        .color-lifafa { color: #f59e0b !important; }
+        .color-gift { color: #ec4899 !important; }
+        .color-api { color: #6366f1 !important; }
+        .color-txn { color: #14b8a6 !important; }
+        .color-stats { color: #0ea5e9 !important; }
+
+        /* OVERRIDE TO MONOCHROMATIC ACCENT IF DEFAULT COLOR TOGGLE IS OFF */
+        html.mono-icons .color-send, html.mono-icons .color-bulk, html.mono-icons .color-add, html.mono-icons .color-withdraw, 
+        html.mono-icons .color-lifafa, html.mono-icons .color-gift, html.mono-icons .color-api, html.mono-icons .color-txn, html.mono-icons .color-stats {
+            color: var(--accent-main) !important;
+        }
+
+        /* 2-SECOND STRAIGHT ROCKET LAUNCH ANIMATION */
+        .rocket-ground { position: absolute; bottom: 18%; width: 100px; height: 8px; background-color: #94a3b8; border-radius: 4px; box-shadow: inset 0 -2px 5px rgba(0,0,0,0.2); z-index: 1;}
+        html.dark-mode .rocket-ground { background-color: #334155; }
+        .straight-rocket-wrapper { position: absolute; bottom: 20%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; }
+        .straight-rocket { font-size: 80px; transform: rotate(-45deg); display: inline-block; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3)); }
+        .rocket-fire { width: 16px; height: 40px; background: linear-gradient(to bottom, #fde047, #ef4444, transparent); border-radius: 0 0 20px 20px; margin-top: -15px; margin-left: -5px; animation: exhaustFlicker 0.1s infinite alternate; opacity: 0; filter: blur(2px); }
+        @keyframes exhaustFlicker { 0% { transform: scaleY(1); opacity: 0.8; } 100% { transform: scaleY(1.3); opacity: 1; } }
+        @keyframes slowRocketLaunch { 0% { transform: translateY(0) scale(1); } 15% { transform: translateY(0) scale(1); } 100% { transform: translateY(-150vh) scale(1.1); } }
+        .animate-rocket-fly-slow { animation: slowRocketLaunch 2s cubic-bezier(0.5, 0.05, 0.1, 1) forwards; }
+        .animate-rocket-fly-slow .rocket-fire { opacity: 1; transition: opacity 0.2s; }
+
+        /* ADVANCED PREMIUM BUTTON ANIMATIONS */
+        html.anim-btns .anim-send:hover i { animation: planeFly 1s ease forwards; }
+        @keyframes planeFly { 0% { transform: translate(0,0); opacity: 1; } 40% { transform: translate(15px, -15px) scale(0); opacity: 0; } 41% { transform: translate(-15px, 15px) scale(0); } 100% { transform: translate(0,0) scale(1); opacity: 1; } }
+        
+        html.anim-btns .anim-bulk:hover i { animation: popStagger 0.5s ease; }
+        @keyframes popStagger { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        
+        html.anim-btns .anim-add:hover i { animation: rotateScaleIn 0.5s ease; }
+        @keyframes rotateScaleIn { 0% { transform: rotate(-90deg) scale(0.5); } 100% { transform: rotate(0) scale(1); } }
+        
+        html.anim-btns .anim-withdraw:hover i { animation: slideUpBounce 0.6s ease; }
+        @keyframes slideUpBounce { 0% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(0); } 80% { transform: translateY(-4px); } 100% { transform: translateY(0); } }
+        
+        html.anim-btns .anim-lifafa:hover i { animation: envelopeOpen 0.8s ease; }
+        @keyframes envelopeOpen { 0% { transform: scale(1); } 50% { transform: scale(1.1) rotateY(180deg); } 100% { transform: scale(1) rotateY(360deg); } }
+
+        html.anim-btns .anim-gift:hover i { animation: giftSpark 0.6s ease; }
+        @keyframes giftSpark { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-15deg) scale(1.1); } 75% { transform: rotate(15deg) scale(1.1); } }
+
+        html.anim-btns .anim-api:hover i { animation: pulseBrackets 0.8s ease; }
+        @keyframes pulseBrackets { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } }
+
+        html.anim-btns .anim-stats:hover i { animation: graphRise 0.8s ease; }
+        @keyframes graphRise { 0% { clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); } 100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); } }
+
+        html.anim-btns .anim-official:hover i { animation: megaphonePulse 0.6s ease infinite; }
+        @keyframes megaphonePulse { 0%, 100% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.2) rotate(-10deg); } }
+
+        html.anim-btns .anim-keeper:hover i { animation: lockTwist 0.6s ease; }
+        @keyframes lockTwist { 0% { transform: rotate(0deg); } 25% { transform: rotate(-15deg); } 75% { transform: rotate(15deg); } 100% { transform: rotate(0deg); } }
+
+        /* PAYTM-STYLE GLOBAL RECEIPT BACKGROUND DYNAMICS */
+        .paytm-receipt-bg { background-color: var(--theme-bg); color: var(--theme-text); }
+        html.dark-mode .paytm-receipt-bg { background-color: #0f172a; color: #f8fafc; }
+        
+        html.colorful-mode .col-send div, html.colorful-mode .col-bulk div, html.colorful-mode .col-add div, html.colorful-mode .col-withdraw div, html.colorful-mode .col-lifafa div, html.colorful-mode .col-gift div, html.colorful-mode .col-api div, html.colorful-mode .col-txn div, html.colorful-mode .col-premium div, html.colorful-mode .col-theme div, html.colorful-mode .col-tags div, html.colorful-mode .col-official div, html.colorful-mode .col-keeper div, html.colorful-mode .col-stats div, html.colorful-mode .col-help div { color: white !important; border: none !important; }
+        html.colorful-mode .col-send div { background-color: #3b82f6 !important; box-shadow: 0 4px 15px rgba(59,130,246,0.4) !important; }
+        html.colorful-mode .col-bulk div { background-color: #a855f7 !important; box-shadow: 0 4px 15px rgba(168,85,247,0.4) !important; }
+        html.colorful-mode .col-add div { background-color: #10b981 !important; box-shadow: 0 4px 15px rgba(16,185,129,0.4) !important; }
+        html.colorful-mode .col-withdraw div { background-color: #ef4444 !important; box-shadow: 0 4px 15px rgba(239,68,68,0.4) !important; }
+        html.colorful-mode .col-lifafa div { background-color: #f59e0b !important; box-shadow: 0 4px 15px rgba(245,158,11,0.4) !important; }
+        html.colorful-mode .col-gift div { background-color: #ec4899 !important; box-shadow: 0 4px 15px rgba(236,72,153,0.4) !important; }
+        html.colorful-mode .col-api div { background-color: #6366f1 !important; box-shadow: 0 4px 15px rgba(99,102,241,0.4) !important; }
+        html.colorful-mode .col-txn div { background-color: #14b8a6 !important; box-shadow: 0 4px 15px rgba(20,184,166,0.4) !important; }
+        html.colorful-mode .col-stats div { background-color: #0ea5e9 !important; box-shadow: 0 4px 15px rgba(14,165,233,0.4) !important; }
 
         .privacy-blur { filter: blur(8px); user-select: none; transition: filter 0.3s ease; }
-
-        /* ROCKET SUCCESS ANIMATIONS CSS */
-        @keyframes flyRocket {
-            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
-            20% { transform: translateY(50vh) scale(1.2); opacity: 1; }
-            80% { transform: translateY(-50vh) scale(1.5); opacity: 1; }
-            100% { transform: translateY(-150vh) scale(0.5); opacity: 0; }
-        }
-        .animate-rocket-fly {
-            animation: flyRocket 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
     </style>
 </head>
 <body class="font-sans pb-20 text-contrast transition-all duration-500">
@@ -222,29 +175,68 @@
         </div>
     </div>
 
-    <div id="rocket-overlay" class="fixed inset-0 z-[9999] bg-white dark:bg-slate-900 hidden flex items-center justify-center transition-opacity">
-        <i id="rocket-icon" class="fas fa-rocket text-7xl text-blue-500 drop-shadow-2xl"></i>
+    <div id="rocket-overlay" class="fixed inset-0 z-[9999] paytm-receipt-bg hidden flex-col items-center justify-center transition-opacity">
+        <div class="rocket-ground"></div>
+        <div id="rocket-wrapper" class="straight-rocket-wrapper">
+            <span class="straight-rocket">🚀</span>
+            <div class="rocket-fire"></div>
+        </div>
     </div>
 
-    <div id="success-card-overlay" class="fixed inset-0 z-[9998] bg-white dark:bg-slate-900 hidden flex flex-col items-center justify-center p-6 text-center overflow-y-auto pt-20">
-        <div class="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-5xl mb-6 shadow-inner border border-green-200 animate-[slideDown_0.5s_ease-out]">
-            <i class="fas fa-check"></i>
+    <div id="txn-result-overlay" class="fixed inset-0 z-[9998] paytm-receipt-bg hidden flex-col items-center p-6 text-center overflow-y-auto">
+        <div class="w-full flex justify-between items-center pt-4 mb-2">
+            <span class="text-xs font-black tracking-widest text-gray-400 uppercase">Transaction Details</span>
+            <button onclick="closeSuccessOverlay()" class="text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors"><i class="fas fa-times text-2xl"></i></button>
         </div>
-        <h2 class="text-3xl font-black text-gray-800 dark:text-white mb-8 tracking-wide">SUCCESS</h2>
         
-        <div class="theme-card rounded-3xl p-6 shadow-2xl w-full max-w-sm border border-gray-100 relative overflow-hidden animate-[slideUpFade_0.5s_ease-out_0.2s] opacity-0" style="animation-fill-mode: forwards;">
-            <div id="success-card-content">
+        <div id="txn-result-icon-bg" class="w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4 shadow-inner animate-[slideDown_0.5s_ease-out]">
+            <i id="txn-result-icon" class="fas fa-check"></i>
+        </div>
+        
+        <h2 id="txn-result-title" class="text-xl font-bold text-gray-800 dark:text-white mb-2 tracking-wide animate-[slideUpFade_0.5s_ease-out_0.1s] opacity-0" style="animation-fill-mode: forwards;">Payment Successful</h2>
+        
+        <div class="text-5xl font-black tracking-tight mb-8 animate-[slideUpFade_0.5s_ease-out_0.2s] opacity-0" style="animation-fill-mode: forwards;">
+            ₹<span id="txn-result-amount">0.00</span>
+        </div>
+
+        <div class="theme-card rounded-3xl p-6 shadow-sm w-full max-w-sm border border-gray-100 dark:border-gray-800 relative overflow-hidden animate-[slideUpFade_0.5s_ease-out_0.3s] opacity-0 text-left" style="animation-fill-mode: forwards;">
+            <div class="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100 dark:border-gray-800">
+                <div class="w-14 h-14 rounded-full border-2 border-gray-200 dark:border-gray-700 overflow-hidden shrink-0 shadow-inner bg-gray-100">
+                    <img id="txn-result-dp" src="" class="w-full h-full object-cover hidden">
+                    <div id="txn-result-initial" class="w-full h-full flex items-center justify-center text-xl font-black text-gray-400">U</div>
                 </div>
+                <div class="overflow-hidden">
+                    <p class="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">To / Detail</p>
+                    <p id="txn-result-name" class="font-black text-lg text-contrast truncate w-full">User Name</p>
+                    <p id="txn-result-desc" class="text-xs text-gray-500 font-mono mt-0.5 truncate">Details</p>
+                </div>
+            </div>
+            
+            <div id="txn-result-error-box" class="hidden mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-100 dark:border-red-800 rounded-xl">
+                <p class="text-[10px] font-black text-red-500 uppercase tracking-widest mb-1">Failure Reason</p>
+                <p id="txn-result-error-reason" class="text-sm font-bold text-red-600 dark:text-red-400">Insufficient Balance</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Transaction ID</span>
+                    <span id="txn-result-id" class="text-xs font-mono font-black text-contrast">TXN123456</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Date & Time</span>
+                    <span id="txn-result-date" class="text-xs font-bold text-contrast">--</span>
+                </div>
+            </div>
         </div>
-        
-        <button onclick="closeSuccessOverlay()" class="mt-8 btn-animate accent-bg text-white font-black py-4 px-16 rounded-xl shadow-lg tracking-widest uppercase animate-[slideUpFade_0.5s_ease-out_0.4s] opacity-0" style="animation-fill-mode: forwards;">DONE</button>
+
+        <button onclick="closeSuccessOverlay()" class="mt-8 mb-6 w-full max-w-sm theme-card border border-gray-200 dark:border-gray-700 text-contrast font-black py-4 rounded-xl shadow-sm tracking-wide animate-[slideUpFade_0.5s_ease-out_0.5s] opacity-0" style="animation-fill-mode: forwards;">BACK TO DASHBOARD</button>
     </div>
 
     <div id="public-lifafa-wrapper" class="fixed inset-0 theme-card z-[1000] hidden flex-col items-center justify-center p-6 text-center overflow-y-auto">
         <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-3xl mx-auto flex items-center justify-center text-4xl mb-6 shadow-inner border border-amber-100"><i class="fas fa-envelope-open-text"></i></div>
         <h1 class="text-3xl font-black italic tracking-tight mb-2">LIFAFA <span class="text-amber-500">CLAIM</span></h1>
         <p class="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-8">Claim your free reward</p>
-        
+
         <div id="lif-public-step-1" class="w-full max-w-sm theme-card rounded-3xl p-6 shadow-sm border border-gray-100 text-left">
             <label class="block text-xs font-bold text-gray-400 mb-2 tracking-wide uppercase">Your Number / ID</label>
             <input type="text" id="public-lif-phone" placeholder="Enter Registered Phone" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 text-sm mb-5 focus-accent theme-card font-bold">
@@ -254,8 +246,7 @@
 
         <div id="lif-public-step-2" class="hidden w-full max-w-sm theme-card rounded-3xl p-6 shadow-sm border border-gray-100 text-left">
             <label class="block text-xs font-bold text-gray-400 mb-4 tracking-wide uppercase">Join Required Channels</label>
-            <div id="public-channels-grid" class="grid grid-cols-2 gap-3 mb-6">
-                </div>
+            <div id="public-channels-grid" class="grid grid-cols-2 gap-3 mb-6"></div>
             <button type="button" onclick="verifyLifafaChannelsJoined()" class="btn-animate w-full bg-green-500 text-white font-black py-4 rounded-xl shadow-lg transition-colors tracking-wide">VERIFY & CONTINUE</button>
             <div class="text-center mt-4"><button type="button" onclick="resetPublicLifafa()" class="text-gray-400 hover:text-amber-600 text-xs font-bold transition-colors">Back</button></div>
         </div>
@@ -271,11 +262,7 @@
 
     <div id="new-message-popup" class="fixed top-6 left-1/2 transform -translate-x-1/2 w-11/12 max-w-sm bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl p-4 shadow-2xl z-[400] hidden flex-row items-center gap-4 cursor-pointer hover:scale-[1.02] transition-all duration-300 animate-[slideDown_0.5s_ease-out]" onclick="handleMessageNotificationClick()">
         <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0 shadow-inner"><i class="fas fa-bell text-xl animate-pulse"></i></div>
-        <div class="flex-1">
-            <h3 class="font-black text-sm tracking-wide">New messages by admin</h3>
-            <p class="text-xs text-blue-100 opacity-90 truncate font-medium">Tap to view official posts</p>
-        </div>
-        <i class="fas fa-chevron-right opacity-70"></i>
+        <div class="flex-1"><h3 class="font-black text-sm tracking-wide">New messages by admin</h3><p class="text-xs text-blue-100 opacity-90 truncate font-medium">Tap to view official posts</p></div><i class="fas fa-chevron-right opacity-70"></i>
     </div>
 
     <div id="customIdModal" class="fixed inset-0 bg-black bg-opacity-70 z-[600] hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0">
@@ -453,24 +440,24 @@
 
             <div class="theme-card rounded-t-3xl pt-6 px-4 pb-6 shadow-sm mt-2">
                 <div class="grid grid-cols-4 gap-y-6 gap-x-2" id="grid-container-actions">
-                    <button onclick="showView('send')" class="col-send btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-paper-plane"></i></div><span class="text-[10px] font-bold text-gray-600">Send</span></button>
-                    <button onclick="showView('bulk')" class="col-bulk btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-users"></i></div><span class="text-[10px] font-bold text-gray-600">Bulk</span></button>
-                    <button onclick="showView('add')" class="col-add btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-plus"></i></div><span class="text-[10px] font-bold text-gray-600 font-bold">Add</span></button>
-                    <button onclick="showView('withdraw')" class="col-withdraw btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-arrow-up"></i></div><span class="text-[10px] font-bold text-gray-600">Withdraw</span></button>
+                    <button onclick="showView('send')" class="col-send anim-send btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 color-send hover:shadow-lg transition-all"><i class="fas fa-paper-plane"></i></div><span class="text-[10px] font-bold text-gray-600">Send</span></button>
+                    <button onclick="showView('bulk')" class="col-bulk anim-bulk btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 color-bulk hover:shadow-lg transition-all"><i class="fas fa-users"></i></div><span class="text-[10px] font-bold text-gray-600">Bulk</span></button>
+                    <button onclick="showView('add')" class="col-add anim-add btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 color-add hover:shadow-lg transition-all"><i class="fas fa-plus"></i></div><span class="text-[10px] font-bold text-gray-600 font-bold">Add</span></button>
+                    <button onclick="showView('withdraw')" class="col-withdraw anim-withdraw btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 color-withdraw hover:shadow-lg transition-all"><i class="fas fa-arrow-up"></i></div><span class="text-[10px] font-bold text-gray-600">Withdraw</span></button>
                     
-                    <button onclick="showView('lifafa')" class="col-lifafa btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-envelope-open-text"></i></div><span class="text-[10px] font-bold text-gray-600">Lifafa</span></button>
-                    <button onclick="showView('gift')" class="col-gift btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-gift"></i></div><span class="text-[10px] font-bold text-gray-600">Gift Code</span></button>
-                    <button onclick="showView('api')" class="col-api btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-code"></i></div><span class="text-[10px] font-bold text-gray-600 font-bold">API Keys</span></button>
-                    <button onclick="showView('txn')" class="col-txn btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-search-dollar"></i></div><span class="text-[10px] font-bold text-gray-600">TXN Find</span></button>
+                    <button onclick="showView('lifafa')" class="col-lifafa anim-lifafa btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 color-lifafa hover:shadow-lg transition-all"><i class="fas fa-envelope-open-text"></i></div><span class="text-[10px] font-bold text-gray-600">Lifafa</span></button>
+                    <button onclick="showView('gift')" class="col-gift anim-gift btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 color-gift hover:shadow-lg transition-all"><i class="fas fa-gift"></i></div><span class="text-[10px] font-bold text-gray-600">Gift Code</span></button>
+                    <button onclick="showView('api')" class="col-api anim-api btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 color-api hover:shadow-lg transition-all"><i class="fas fa-code"></i></div><span class="text-[10px] font-bold text-gray-600 font-bold">API Keys</span></button>
+                    <button onclick="showView('txn')" class="col-txn anim-api btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 color-txn hover:shadow-lg transition-all"><i class="fas fa-search-dollar"></i></div><span class="text-[10px] font-bold text-gray-600">TXN Find</span></button>
                     
                     <button id="btn-premium-menu" onclick="showView('premium')" class="col-premium btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 text-yellow-500 hover:shadow-lg transition-all"><i class="fas fa-crown"></i></div><span class="text-[10px] font-bold text-gray-600 font-bold">Premium</span></button>
-                    <button id="btn-theme-menu" onclick="showView('themes')" class="col-theme hidden btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-palette"></i></div><span class="text-[10px] font-bold text-gray-600 font-bold">Settings</span></button>
+                    <button id="btn-theme-menu" onclick="showView('themes')" class="col-theme hidden btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-palette"></i></div><span class="text-[10px] font-bold text-gray-600 font-bold">Customisation</span></button>
                     <button id="btn-tags-menu" onclick="showView('tags')" class="col-tags hidden btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-tags"></i></div><span class="text-[10px] font-bold text-gray-600 font-bold">Tags</span></button>
                     
-                    <button onclick="showView('official')" class="col-official btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-bullhorn"></i></div><span class="text-[10px] font-bold text-gray-600">Official</span></button>
-                    <button onclick="showView('keeper')" class="col-keeper btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-vault"></i></div><span class="text-[10px] font-bold text-gray-600 font-bold">Keeper</span></button>
-                    <button onclick="showView('game')" class="col-stats btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-chart-line"></i></div><span class="text-[10px] font-bold text-gray-600">Stats</span></button>
-                    <button onclick="showView('help')" class="col-help btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-headset"></i></div><span class="text-[10px] font-bold text-gray-600 font-bold">Help</span></button>
+                    <button onclick="showView('official')" class="col-official anim-official btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 color-send hover:shadow-lg transition-all"><i class="fas fa-bullhorn"></i></div><span class="text-[10px] font-bold text-gray-600">Official</span></button>
+                    <button onclick="showView('keeper')" class="col-keeper anim-keeper btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 color-api hover:shadow-lg transition-all"><i class="fas fa-vault"></i></div><span class="text-[10px] font-bold text-gray-600 font-bold">Keeper</span></button>
+                    <button onclick="showView('game')" class="col-stats anim-stats btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 color-stats hover:shadow-lg transition-all"><i class="fas fa-chart-line"></i></div><span class="text-[10px] font-bold text-gray-600">Stats</span></button>
+                    <button onclick="showView('help')" class="col-help btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 text-gray-500 hover:shadow-lg transition-all"><i class="fas fa-headset"></i></div><span class="text-[10px] font-bold text-gray-600 font-bold">Help</span></button>
                 </div>
             </div>
 
@@ -525,6 +512,10 @@
 
             <div class="bg-white text-gray-800 rounded-3xl mx-4 mb-8 overflow-hidden shadow-2xl py-2 theme-card font-semibold text-gray-800 dark:text-gray-100">
                 <div class="flex items-center gap-4 p-3 border-b border-gray-50 dark:border-gray-800">
+                    <div class="w-10 h-10 rounded-xl theme-card accent-text flex items-center justify-center shrink-0 text-lg shadow-sm border border-gray-200"><i class="fas fa-magic"></i></div>
+                    <div class="flex-1"><h4 class="font-black text-[14px]">Animated Button Logos</h4><p class="text-[11px] text-gray-500 leading-tight font-medium mt-0.5">Exclusive micro-animations on all dashboard actions.</p></div>
+                </div>
+                <div class="flex items-center gap-4 p-3 border-b border-gray-50 dark:border-gray-800">
                     <div class="w-10 h-10 rounded-xl theme-card accent-text flex items-center justify-center shrink-0 text-lg shadow-sm border border-gray-200"><i class="fas fa-ghost"></i></div>
                     <div class="flex-1"><h4 class="font-black text-[14px]">Ghost Transfer</h4><p class="text-[11px] text-gray-500 leading-tight font-medium mt-0.5">Send money without showing in receiver's history.</p></div>
                 </div>
@@ -532,17 +523,14 @@
                     <div class="w-10 h-10 rounded-xl theme-card accent-text flex items-center justify-center shrink-0 text-lg shadow-sm border border-gray-200"><i class="fas fa-eye-slash"></i></div>
                     <div class="flex-1"><h4 class="font-black text-[14px]">Privacy Mode</h4><p class="text-[11px] text-gray-500 leading-tight font-medium mt-0.5">Hide balance & hide specific transactions from home.</p></div>
                 </div>
-
                 <div class="flex items-center gap-4 p-3 border-b border-gray-50 dark:border-gray-800">
                     <div class="w-10 h-10 rounded-xl theme-card accent-text flex items-center justify-center shrink-0 text-lg shadow-sm border border-gray-200"><i class="fas fa-lightbulb"></i></div>
                     <div class="flex-1"><h4 class="font-black text-[14px]">Neon Glowing Theme</h4><p class="text-[11px] text-gray-500 leading-tight font-medium mt-0.5">Unlock a spectacular pitch black background with glowing cyber elements.</p></div>
                 </div>
-
                 <div class="flex items-center gap-4 p-3 border-b border-gray-50 dark:border-gray-800">
                     <div class="w-10 h-10 rounded-xl theme-card accent-text flex items-center justify-center shrink-0 text-lg shadow-sm border border-gray-200"><i class="fas fa-unlock"></i></div>
                     <div class="flex-1"><h4 class="font-black text-[14px]">Premium Exclusive Gift Codes</h4><p class="text-[11px] text-gray-500 leading-tight font-medium mt-0.5">Generate customized promotional codes redeemable exclusively by premium users.</p></div>
                 </div>
-
                 <div class="flex items-center gap-4 p-3 border-b border-gray-50 dark:border-gray-800">
                     <div class="w-10 h-10 rounded-xl theme-card accent-text flex items-center justify-center shrink-0 text-lg shadow-sm border border-gray-200"><i class="fas fa-envelope"></i></div>
                     <div class="flex-1"><h4 class="font-black text-[14px]">Premium Only Lifafa</h4><p class="text-[11px] text-gray-500 leading-tight font-medium mt-0.5">Create Lifafa that only Premium users can claim.</p></div>
@@ -551,7 +539,6 @@
                     <div class="w-10 h-10 rounded-xl theme-card accent-text flex items-center justify-center shrink-0 text-lg shadow-sm border border-gray-200"><i class="fas fa-palette"></i></div>
                     <div class="flex-1"><h4 class="font-black text-[14px]">Colorful App Theme</h4><p class="text-[11px] text-gray-500 leading-tight font-medium mt-0.5">Unlock the special colorful gradient theme mode.</p></div>
                 </div>
-                
                 <div class="flex items-center gap-4 p-3 border-b border-gray-50 dark:border-gray-800">
                     <div class="w-10 h-10 rounded-xl theme-card accent-text flex items-center justify-center shrink-0 text-lg shadow-sm border border-gray-200"><i class="fas fa-key"></i></div>
                     <div class="flex-1"><h4 class="font-black text-[14px]">Custom API Key</h4><p class="text-[11px] text-gray-500 leading-tight font-medium mt-0.5">Set a personalized custom API key for your gateway.</p></div>
@@ -588,7 +575,7 @@
         <div id="view-themes" class="view-section">
             <header class="flex items-center p-4 theme-card shadow-sm sticky top-0 z-30">
                 <button onclick="showView('home')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-800 dark:text-white"><i class="fas fa-arrow-left"></i></button>
-                <h1 class="ml-4 text-[16px] font-black tracking-wide text-contrast">SETTINGS & THEMES</h1>
+                <h1 class="ml-4 text-[16px] font-black tracking-wide text-contrast">CUSTOMISATION</h1>
             </header>
 
             <h3 class="font-black text-sm accent-text mb-3 px-4 mt-4"><i class="fas fa-lock"></i> Privacy Controls</h3>
@@ -611,6 +598,28 @@
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                       <input type="checkbox" id="toggle-sound-ui" class="sr-only peer" onchange="toggleSoundEffects()">
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                    </label>
+                </div>
+
+                <div class="p-4 theme-card rounded-2xl flex items-center justify-between shadow-sm border border-gray-100">
+                    <div>
+                        <h3 class="font-black text-sm text-contrast">Default Icon Colors</h3>
+                        <p class="text-[10px] text-gray-500 mt-0.5">Use colorful dashboard icons instead of theme color</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" id="toggle-default-logo-ui" class="sr-only peer" onchange="toggleDefaultLogos()">
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                    </label>
+                </div>
+
+                <div class="p-4 theme-card rounded-2xl flex items-center justify-between shadow-sm border border-gray-100">
+                    <div>
+                        <h3 class="font-black text-sm text-contrast">Animated Premium Buttons</h3>
+                        <p class="text-[10px] text-gray-500 mt-0.5">Enable smooth micro-animations on interaction</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" id="toggle-animated-btn-ui" class="sr-only peer" onchange="toggleAnimatedBtns()">
                       <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
                     </label>
                 </div>
@@ -814,33 +823,21 @@
             <div class="px-4 mt-4 mb-4">
                 <div class="flex theme-card rounded-xl p-1 gap-1 border border-gray-100 shadow-sm font-bold">
                     <button onclick="switchLifafaTab('lifafa-create')" id="tab-lifafa-create" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all tab-btn active accent-bg text-white">CREATE</button>
-                    <button onclick="switchLifafaTab('lifafa-my'); loadMyLifafas();" id="tab-lifafa-my" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all tab-btn text-gray-500 hover:bg-gray-50">MY LIFAFA</button>
+                    <button onclick="switchLifafaTab('lifafa-claim')" id="tab-lifafa-claim" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all tab-btn text-gray-500 hover:bg-gray-50">CLAIM</button>
                 </div>
             </div>
 
             <div id="lifafa-create" class="tab-content active px-4 pb-10">
-                <div class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 p-3 rounded-xl mb-6 text-xs font-bold border border-blue-100 dark:border-blue-800">
-                    <i class="fas fa-info-circle mr-1"></i> Make @Lion_Pay_Alert_Bot an admin in your channel before adding it here.
+                <div class="theme-card rounded-2xl p-6 text-center shadow-sm border border-gray-100 mb-6 font-bold">
+                    <p class="text-[10px] font-bold uppercase opacity-90 mb-1 tracking-wider text-gray-400 font-bold">AVAILABLE BALANCE</p>
+                    <div class="text-4xl font-black tracking-tight accent-text">₹<span class="global-balance blur-none transition-all">0.00</span></div>
                 </div>
-                
                 <form onsubmit="event.preventDefault(); processLifafaCreate()" class="theme-card rounded-2xl p-5 shadow-sm border border-gray-100 font-medium">
-                    <div id="lifafa-channels-container">
-                        <label class="block text-xs font-bold text-gray-400 mb-2">TELEGRAM CHANNEL LINK (OPTIONAL)</label>
-                        <div class="flex gap-2 mb-2">
-                            <input type="text" class="lif-channel-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus-accent font-black theme-card" placeholder="@channel_username or https://t.me/...">
-                        </div>
-                    </div>
-                    <button type="button" onclick="addLifafaChannel()" class="text-xs text-blue-500 font-bold mb-5 flex items-center gap-1 hover:underline"><i class="fas fa-plus"></i> Add Channel</button>
-
                     <label class="block text-xs font-bold text-gray-400 mb-2">NUMBER OF USERS</label>
                     <input type="number" id="lif-users" required min="1" placeholder="e.g. 5" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-black theme-card font-bold">
-                    
                     <label class="block text-xs font-bold text-gray-400 mb-2">AMOUNT PER USER (₹)</label>
                     <input type="number" id="lif-amt" required min="1" placeholder="e.g. 10" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-black theme-card font-bold">
                     
-                    <label class="block text-xs font-bold text-gray-400 mb-2">PASSWORD (OPTIONAL)</label>
-                    <input type="text" id="lif-password" placeholder="Set a password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-black theme-card">
-
                     <div id="premium-lifafa-box" class="hidden mb-5 theme-card rounded-xl p-3 border border-yellow-200 bg-yellow-50 flex items-center justify-between font-bold">
                         <div>
                             <p class="text-xs font-bold text-yellow-700"><i class="fas fa-crown"></i> Premium Only</p>
@@ -858,9 +855,13 @@
                 </form>
             </div>
 
-            <div id="lifafa-my" class="tab-content px-4">
-                <div id="my-lifafas-list" class="space-y-4 pb-10">
-                    </div>
+            <div id="lifafa-claim" class="tab-content px-4">
+                <form onsubmit="event.preventDefault(); processLifafaClaim()" class="theme-card rounded-2xl p-6 shadow-sm border border-gray-100 text-center font-bold">
+                    <div class="w-20 h-20 theme-card accent-text border border-gray-100 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner"><i class="fas fa-envelope"></i></div>
+                    <label class="block text-xs font-bold text-gray-400 mb-3 tracking-widest uppercase">Enter Lifafa Code</label>
+                    <input type="text" id="lif-claim-code" required placeholder="Paste Code Here" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-5 text-center tracking-widest uppercase text-lg font-black mb-8 focus:outline-none focus-accent transition-colors shadow-inner theme-card font-black">
+                    <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-xl shadow-lg text-lg font-black">OPEN LIFAFA</button>
+                </form>
             </div>
         </div>
 
@@ -1159,26 +1160,15 @@
             <header class="flex items-center p-4 sticky top-0 z-[100] bg-transparent pointer-events-none">
                 <button onclick="stopScanner(); showView('home')" class="w-10 h-10 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center pointer-events-auto shadow-lg"><i class="fas fa-arrow-left"></i></button>
             </header>
-            <div class="flex flex-col items-center justify-center px-4 pt-8 relative z-10" id="scanner-container">
+            <div class="flex flex-col items-center justify-center px-4 pt-16 relative z-10" id="scanner-container">
                 <div id="scanner-box" class="relative w-72 h-72 rounded-[2rem] overflow-hidden border-[4px] accent-border shadow-[0_0_40px_var(--accent-glow)] bg-gray-900 transition-all duration-300">
                     <div id="reader" class="w-full h-full"></div>
                     <div class="absolute inset-0 pointer-events-none z-10 scanner-corners">
                         <div class="absolute left-0 w-full h-1 animate-scanline"></div>
                     </div>
                 </div>
-                
-                <div class="flex justify-center gap-6 mt-10 relative z-10 pointer-events-auto">
-                    <button onclick="document.getElementById('qr-upload').click()" class="w-14 h-14 bg-gray-800/80 backdrop-blur-md text-white rounded-full flex items-center justify-center text-xl shadow-lg border border-gray-700 hover:bg-gray-700 hover:scale-105 transition-all"><i class="fas fa-image"></i></button>
-                    <input type="file" id="qr-upload" class="hidden" accept="image/*" onchange="handleQRUpload(event)">
-                    
-                    <button onclick="toggleQRZoom()" class="w-14 h-14 bg-gray-800/80 backdrop-blur-md text-white rounded-full flex items-center justify-center text-lg font-black shadow-lg border border-gray-700 hover:bg-gray-700 hover:scale-105 transition-all" id="btn-qr-zoom">1x</button>
-                    
-                    <button onclick="toggleQRTorch()" class="w-14 h-14 bg-gray-800/80 backdrop-blur-md text-white rounded-full flex items-center justify-center text-xl shadow-lg border border-gray-700 hover:bg-gray-700 hover:scale-105 transition-all" id="btn-qr-torch"><i class="fas fa-bolt"></i></button>
-                </div>
-
-                <p class="text-white/90 text-xl font-black tracking-[0.2em] mt-8 drop-shadow-md relative z-10 font-bold">SCAN TO PAY</p>
+                <p class="text-white/90 text-2xl font-black tracking-[0.2em] mt-12 drop-shadow-md relative z-10 font-bold">SCAN TO PAY</p>
             </div>
-
             <div id="scan-result" class="hidden px-4 pb-8 pt-4 theme-card min-h-screen mt-4 rounded-t-3xl relative z-20 font-bold">
                 <div class="text-center mb-6">
                     <h2 class="text-2xl font-black" id="scan-res-name">User Name</h2>
@@ -1251,17 +1241,7 @@
         let html5QrcodeScanner = null;
         let uploadedScreenshotBase64 = null;
 
-        // Scanner configuration state
-        let currentQRZoom = 1;
-        let isQRTorchOn = false;
-
-        // Active public Lifafa info
-        let activeLifafaCode = null;
-        let activeLifafaInfo = null;
-        let activeLifafaUserPhone = null;
-
         const TAGS_LIST = ["Member", "Looter", "Bot Maker", "Admin", "Developer", "Trader", "VIP", "King", "Pro", "Legend"];
-        
         const ACCENT_COLORS = [
             {name: "Amber", hex: "#f59e0b"}, {name: "Red", hex: "#ef4444"}, {name: "Pink", hex: "#ec4899"}, {name: "Rose", hex: "#f43f5e"}, 
             {name: "Purple", hex: "#a855f7"}, {name: "Fuchsia", hex: "#d946ef"}, {name: "Indigo", hex: "#6366f1"}, {name: "Blue", hex: "#3b82f6"},
@@ -1292,6 +1272,7 @@
         function playSound(type) {
             if(!currentUser || !currentUser.premium) return;
             if(localStorage.getItem('lp_sound') === 'false') return;
+
             try { 
                 if(type === 'click') sndClick.play();
                 else if(type === 'credit') sndCredit.play();
@@ -1315,8 +1296,8 @@
                 let res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, data }) });
                 const responseText = await res.text();
                 let result;
-                try { result = JSON.parse(responseText); } catch (e) { throw new Error("API Not Found or Invalid DB (404)."); }
-                if(!res.ok || result.error) throw new Error(result.error || "Server/Database error");
+                try { result = JSON.parse(responseText); } catch (e) { throw new Error("API Not Found (404)."); }
+                if(!res.ok || result.error) throw new Error(result.error || "Server error");
                 return result.data;
             } catch(err) { showToast(err.message); throw err; }
         }
@@ -1340,10 +1321,10 @@
         function formatDateTime() { return new Date().toLocaleString('en-IN', { hour12: true, day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
         function generateApiKey() { return 'LP-' + Math.random().toString(36).substring(2, 10).toUpperCase(); }
         function generateTxnId() { return 'TXN' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase(); }
-        function checkSecurityPin(inputPin) { if(inputPin === currentUser.pin) return true; showToast("Incorrect Security PIN!"); return false; }
+        function checkSecurityPin(inputPin) { if(inputPin === currentUser?.pin) return true; showToast("Incorrect Security PIN!"); return false; }
 
         function updateApiKeyUI() {
-            let key = currentUser.apiKey || 'LP-PENDING'; 
+            let key = currentUser?.apiKey || 'LP-PENDING'; 
             let domain = window.location.host;
             
             let elUrlFull = document.getElementById('ui-api-url-full'); 
@@ -1356,7 +1337,7 @@
             
             let premiumApiSec = document.getElementById('premium-api-edit');
             if(premiumApiSec) {
-                if (currentUser.premium) premiumApiSec.classList.remove('hidden');
+                if (currentUser?.premium) premiumApiSec.classList.remove('hidden');
                 else premiumApiSec.classList.add('hidden');
             }
         }
@@ -1366,16 +1347,18 @@
             if(!newKey) return showToast("Enter an API Key");
             if(/\s/.test(newKey) || !/^[a-zA-Z0-9_-]+$/.test(newKey)) return showToast("Spaces not allowed. Use letters, numbers, -, _");
             try {
-                await apiCall('SET_CUSTOM_API', { phone: currentUser.phone, newKey: newKey });
-                currentUser.apiKey = newKey; updateApiKeyUI(); showToast("Custom API Key Saved!");
+                await apiCall('SET_CUSTOM_API', { phone: currentUser?.phone, newKey: newKey });
+                if(currentUser) currentUser.apiKey = newKey; 
+                updateApiKeyUI(); showToast("Custom API Key Saved!");
                 document.getElementById('custom-api-input').value = '';
             } catch(e) {}
         }
 
         async function regenerateApiKey() {
             if(!confirm("Are you sure? Old API key will stop working immediately.")) return;
-            let newKey = generateApiKey(); await apiCall('GENERATE_API', { phone: currentUser.phone, newKey });
-            currentUser.apiKey = newKey; updateApiKeyUI(); showToast("API Key Regenerated!");
+            let newKey = generateApiKey(); await apiCall('GENERATE_API', { phone: currentUser?.phone, newKey });
+            if(currentUser) currentUser.apiKey = newKey; 
+            updateApiKeyUI(); showToast("API Key Regenerated!");
         }
 
         function showAuthView(view) { ['login', 'signup', 'otp', 'reset-pin'].forEach(v => document.getElementById('auth-' + v).classList.add('hidden')); document.getElementById('auth-' + view).classList.remove('hidden'); }
@@ -1412,17 +1395,8 @@
                 let exists = await apiCall('CHECK_USER', { phone }); if(exists) return showToast("Phone number already registered!");
                 
                 pendingSignupUser = { 
-                    name, 
-                    password: pass, 
-                    pin, 
-                    tgUserId: telegram, 
-                    isBanned: false, 
-                    balance: 0, 
-                    keeperBalance: 0, 
-                    apiKey: generateApiKey(), 
-                    premium: true,
-                    premiumExpiry: Date.now() + (3 * 24 * 60 * 60 * 1000), 
-                    advancedUI: true
+                    name, password: pass, pin, tgUserId: telegram, isBanned: false, balance: 0, keeperBalance: 0, 
+                    apiKey: generateApiKey(), premium: true, premiumExpiry: Date.now() + (3 * 24 * 60 * 60 * 1000), advancedUI: true
                 }; 
                 pendingSignupUser.phone = phone; 
                 pendingOTP = Math.floor(100000 + Math.random() * 900000).toString(); 
@@ -1459,7 +1433,7 @@
             } else { showToast("Invalid OTP!"); }
         }
 
-        function createTxnObj(type, title, amount, status, icon, color, name, number) { return { id: generateTxnId(), type, title, amount, status, date: new Date().toLocaleString(), timestamp: Date.now(), icon, color, name, number, senderName: currentUser.name, senderId: type==='out'?currentUser.phone:(number!=='N/A'?number:'SYSTEM'), receiverId: type==='in'?currentUser.phone:(number!=='N/A'?number:'SYSTEM') }; }
+        function createTxnObj(type, title, amount, status, icon, color, name, number) { return { id: generateTxnId(), type, title, amount, status, date: new Date().toLocaleString(), timestamp: Date.now(), icon, color, name, number, senderName: currentUser?.name || 'User', senderId: type==='out'?(currentUser?.phone||'SYSTEM'):(number!=='N/A'?number:'SYSTEM'), receiverId: type==='in'?(currentUser?.phone||'SYSTEM'):(number!=='N/A'?number:'SYSTEM') }; }
 
         async function syncLoop() {
             if(!currentUser) return;
@@ -1549,17 +1523,28 @@
         function toggleNeonMode() {
             let isEnabled = document.getElementById('toggle-neon-ui').checked;
             localStorage.setItem('lp_neon', isEnabled ? 'true' : 'false');
-            if (isEnabled) {
-                document.documentElement.classList.add('neon-mode');
-            } else {
-                document.documentElement.classList.remove('neon-mode');
-            }
+            if (isEnabled) { document.documentElement.classList.add('neon-mode'); } 
+            else { document.documentElement.classList.remove('neon-mode'); }
             showToast("Neon Mode " + (isEnabled ? "Activated" : "Disabled"));
         }
 
+        function toggleDefaultLogos() {
+            let isEnabled = document.getElementById('toggle-default-logo-ui').checked;
+            localStorage.setItem('lp_default_logo', isEnabled ? 'true' : 'false');
+            if(isEnabled) { document.documentElement.classList.remove('mono-icons'); } 
+            else { document.documentElement.classList.add('mono-icons'); }
+        }
+
+        function toggleAnimatedBtns() {
+            let isEnabled = document.getElementById('toggle-animated-btn-ui').checked;
+            localStorage.setItem('lp_animated_btn', isEnabled ? 'true' : 'false');
+            if(isEnabled && currentUser?.premium) { document.documentElement.classList.add('anim-btns'); } 
+            else { document.documentElement.classList.remove('anim-btns'); }
+        }
+
         function applyPremiumUI() {
-            let isPrem = currentUser.premium === true;
-            let currentAccent = currentUser.accentColor || '#f59e0b';
+            let isPrem = currentUser?.premium === true;
+            let currentAccent = currentUser?.accentColor || '#f59e0b';
             
             if (!isPrem) {
                 currentAccent = '#f59e0b';
@@ -1578,13 +1563,20 @@
 
             const mainCard = document.getElementById('home-main-card');
             if (mainCard) {
-                if (isPrem) {
-                    mainCard.style.background = `linear-gradient(135deg, ${currentAccent}, #1e293b)`;
-                } else {
-                    mainCard.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
-                }
+                if (isPrem) { mainCard.style.background = `linear-gradient(135deg, ${currentAccent}, #1e293b)`; } 
+                else { mainCard.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)'; }
             }
             
+            let defaultLogos = localStorage.getItem('lp_default_logo') !== 'false';
+            let dLogoTgl = document.getElementById('toggle-default-logo-ui');
+            if(dLogoTgl) dLogoTgl.checked = defaultLogos;
+            if(defaultLogos) document.documentElement.classList.remove('mono-icons'); else document.documentElement.classList.add('mono-icons');
+
+            let animBtns = localStorage.getItem('lp_animated_btn') === 'true'; 
+            let aBtnTgl = document.getElementById('toggle-animated-btn-ui');
+            if(aBtnTgl) aBtnTgl.checked = animBtns;
+            if(animBtns && isPrem) document.documentElement.classList.add('anim-btns'); else document.documentElement.classList.remove('anim-btns');
+
             if (isPrem) {
                 document.getElementById('btn-premium-menu').classList.add('hidden');
                 document.getElementById('btn-theme-menu').classList.remove('hidden');
@@ -1596,8 +1588,6 @@
                 
                 let qrWrap = document.getElementById('qr-container-wrap');
                 if(qrWrap) qrWrap.className = "theme-card p-2 rounded-2xl mb-4 transition-all premium-border";
-                let qrBadge = document.getElementById('premium-qr-badge');
-                if(qrBadge) qrBadge.classList.remove('hidden');
 
                 let tagToShow = currentUser.customUserTag || currentUser.tag || 'Premium';
                 document.getElementById('ui-verified-badge').innerHTML = `<i class="fas fa-crown text-yellow-400"></i> ${tagToShow}`;
@@ -1625,11 +1615,8 @@
                 let isNeonEnabled = localStorage.getItem('lp_neon') === 'true';
                 let neonTgl = document.getElementById('toggle-neon-ui');
                 if (neonTgl) neonTgl.checked = isNeonEnabled;
-                if (isNeonEnabled) {
-                    document.documentElement.classList.add('neon-mode');
-                } else {
-                    document.documentElement.classList.remove('neon-mode');
-                }
+                if (isNeonEnabled) { document.documentElement.classList.add('neon-mode'); } 
+                else { document.documentElement.classList.remove('neon-mode'); }
 
                 if (currentUser.privacyMode) {
                     let eyeEl = document.getElementById('eye-balance');
@@ -1653,13 +1640,12 @@
                 
                 let qrWrap = document.getElementById('qr-container-wrap');
                 if(qrWrap) qrWrap.className = "theme-card p-2 rounded-xl shadow-sm border border-gray-200 mb-4 transition-all";
-                let qrBadge = document.getElementById('premium-qr-badge');
-                if(qrBadge) qrBadge.classList.add('hidden');
 
                 document.getElementById('ui-verified-badge').innerHTML = `<i class="fas fa-shield-alt"></i> Verified`;
                 document.documentElement.classList.remove('premium-mode');
                 document.documentElement.classList.remove('colorful-mode');
                 document.documentElement.classList.remove('neon-mode');
+                document.documentElement.classList.remove('anim-btns');
                 localStorage.setItem('lp_premiumUI', 'false');
                 localStorage.setItem('lp_colorful', 'false');
                 localStorage.setItem('lp_neon', 'false');
@@ -1668,7 +1654,7 @@
                 document.querySelectorAll('.global-balance').forEach(el => el.classList.remove('privacy-blur'));
             }
 
-            if (currentUser.theme === 'dark') {
+            if (currentUser?.theme === 'dark') {
                 document.documentElement.classList.add('dark-mode');
                 localStorage.setItem('lp_theme', 'dark');
             } else {
@@ -1700,26 +1686,28 @@
 
         async function togglePrivacyMode() {
             let isEnabled = document.getElementById('toggle-privacy-ui').checked;
-            await apiCall('UPDATE_PRIVACY', { phone: currentUser.phone, privacyMode: isEnabled });
-            currentUser.privacyMode = isEnabled; isBalanceVisible = false; applyPremiumUI(); showToast("Privacy Settings Saved");
+            await apiCall('UPDATE_PRIVACY', { phone: currentUser?.phone, privacyMode: isEnabled });
+            if(currentUser) currentUser.privacyMode = isEnabled; 
+            isBalanceVisible = false; applyPremiumUI(); showToast("Privacy Settings Saved");
         }
 
         async function toggleColorfulTheme() {
             let isEnabled = document.getElementById('toggle-colorful-ui').checked;
-            await apiCall('UPDATE_PREFS', { phone: currentUser.phone, colorfulMode: isEnabled });
-            currentUser.colorfulMode = isEnabled; applyPremiumUI(); showToast("Colorful Theme Saved");
+            await apiCall('UPDATE_PREFS', { phone: currentUser?.phone, colorfulMode: isEnabled });
+            if(currentUser) currentUser.colorfulMode = isEnabled; 
+            applyPremiumUI(); showToast("Colorful Theme Saved");
         }
 
         function renderTagsAndColors() {
             let tc = document.getElementById('tags-container');
-            if(tc) {
+            if(tc && currentUser) {
                 let currentTag = currentUser.customUserTag || currentUser.tag || 'Premium';
                 tc.innerHTML = `<button onclick="showToast('Your current tag: ${currentTag}')" class="w-full border-2 p-4 rounded-xl font-black transition-all accent-border accent-bg text-white shadow-lg flex items-center justify-center gap-2 tracking-wide text-lg"><i class="fas fa-crown text-yellow-300"></i> ${currentTag}</button>`;
             }
             
             let colorHtml = '';
             ACCENT_COLORS.forEach(c => {
-                let isSelected = currentUser.accentColor === c.hex;
+                let isSelected = currentUser?.accentColor === c.hex;
                 let activeClass = isSelected ? 'border-4 border-white shadow-[0_0_15px_var(--accent-glow)] scale-110' : 'border-2 border-transparent opacity-80 hover:opacity-100 hover:scale-105';
                 colorHtml += `<div onclick="setAccentColor('${c.hex}')" class="w-10 h-10 rounded-full cursor-pointer transition-all mx-auto ${activeClass}" style="background-color: ${c.hex};" title="${c.name}"></div>`;
             });
@@ -1728,24 +1716,28 @@
         }
 
         async function setGlobalTheme(mode) {
-            await apiCall('UPDATE_PREFS', { phone: currentUser.phone, theme: mode });
-            currentUser.theme = mode; applyPremiumUI(); showToast(mode.charAt(0).toUpperCase() + mode.slice(1) + " Mode Activated");
+            await apiCall('UPDATE_PREFS', { phone: currentUser?.phone, theme: mode });
+            if(currentUser) currentUser.theme = mode; 
+            applyPremiumUI(); showToast(mode.charAt(0).toUpperCase() + mode.slice(1) + " Mode Activated");
         }
         
         async function setGlobalTag(tag) {
-            await apiCall('UPDATE_PREFS', { phone: currentUser.phone, tag: tag, customUserTag: null });
-            currentUser.tag = tag; currentUser.customUserTag = null; applyPremiumUI(); showToast("Tag Updated");
+            await apiCall('UPDATE_PREFS', { phone: currentUser?.phone, tag: tag, customUserTag: null });
+            if(currentUser) { currentUser.tag = tag; currentUser.customUserTag = null; }
+            applyPremiumUI(); showToast("Tag Updated");
         }
 
         async function setAccentColor(hex) {
-            await apiCall('UPDATE_PREFS', { phone: currentUser.phone, accentColor: hex });
-            currentUser.accentColor = hex; applyPremiumUI(); showToast("Color Updated");
+            await apiCall('UPDATE_PREFS', { phone: currentUser?.phone, accentColor: hex });
+            if(currentUser) currentUser.accentColor = hex; 
+            applyPremiumUI(); showToast("Color Updated");
         }
 
         async function togglePremiumVisuals() {
             let isEnabled = document.getElementById('toggle-premium-ui').checked;
-            await apiCall('UPDATE_PREFS', { phone: currentUser.phone, advancedUI: isEnabled });
-            currentUser.advancedUI = isEnabled; applyPremiumUI(); showToast("Visual Settings Saved");
+            await apiCall('UPDATE_PREFS', { phone: currentUser?.phone, advancedUI: isEnabled });
+            if(currentUser) currentUser.advancedUI = isEnabled; 
+            applyPremiumUI(); showToast("Visual Settings Saved");
         }
 
         function selectPremiumPlan(planId) {
@@ -1757,10 +1749,14 @@
             });
 
             const selectedRow = document.getElementById('plan-row-' + planId);
-            selectedRow.style.background = 'var(--accent-glow)';
-            const icon = selectedRow.querySelector('.check-icon');
-            icon.className = 'w-6 h-6 rounded-full accent-bg text-white flex items-center justify-center text-xs check-icon shrink-0 shadow-inner';
-            icon.innerHTML = '<i class="fas fa-check"></i>';
+            if(selectedRow) {
+                selectedRow.style.background = 'var(--accent-glow)';
+                const icon = selectedRow.querySelector('.check-icon');
+                if(icon) {
+                    icon.className = 'w-6 h-6 rounded-full accent-bg text-white flex items-center justify-center text-xs check-icon shrink-0 shadow-inner';
+                    icon.innerHTML = '<i class="fas fa-check"></i>';
+                }
+            }
 
             document.getElementById('btn-subscribe-prem').innerText = premiumPlans[planId].text;
         }
@@ -1773,20 +1769,20 @@
         async function buyPremium(cost, durationMs) {
             if (currentBalance < cost) return showToast("Insufficient Balance");
             try {
-                await apiCall('ACTIVATE_PREMIUM', { phone: currentUser.phone, duration: durationMs, cost });
+                await apiCall('ACTIVATE_PREMIUM', { phone: currentUser?.phone, duration: durationMs, cost });
                 playSound('success'); showToast("🎁 Congratulations! Premium Activated");
-                currentUser.advancedUI = true; 
+                if(currentUser) currentUser.advancedUI = true; 
                 localStorage.setItem('lp_premiumUI', 'true');
                 syncData(); showView('home');
             } catch(e) {}
         }
 
-        function openCustomIdModal() { document.getElementById('custom-id-pricing').innerText = currentUser.premium ? "Cost: ₹3" : "Cost: ₹5"; document.getElementById('customIdModal').classList.remove('hidden'); setTimeout(()=>document.getElementById('customIdModal').classList.remove('opacity-0'), 10); }
+        function openCustomIdModal() { document.getElementById('custom-id-pricing').innerText = currentUser?.premium ? "Cost: ₹3" : "Cost: ₹5"; document.getElementById('customIdModal').classList.remove('hidden'); setTimeout(()=>document.getElementById('customIdModal').classList.remove('opacity-0'), 10); }
         function closeCustomIdModal() { document.getElementById('customIdModal').classList.add('opacity-0'); setTimeout(()=>document.getElementById('customIdModal').classList.add('hidden'), 300); }
         async function saveCustomId() {
             let cid = document.getElementById('input-custom-id').value.trim().toLowerCase();
             if(!cid || !/^[a-z0-9_]+$/.test(cid)) return showToast("Invalid ID (use lowercase/numbers)");
-            try { await apiCall('SET_CUSTOM_ID', { phone: currentUser.phone, customId: cid }); playSound('success'); showToast("Custom ID Set!"); closeCustomIdModal(); syncData(); } catch(e) {}
+            try { await apiCall('SET_CUSTOM_ID', { phone: currentUser?.phone, customId: cid }); playSound('success'); showToast("Custom ID Set!"); closeCustomIdModal(); syncData(); } catch(e) {}
         }
 
         let sendResolvedPhone = null; let debounceTimer;
@@ -1949,9 +1945,9 @@
                     
                     const base64Data = canvas.toDataURL('image/jpeg', 0.7);
                     
-                    apiCall('UPDATE_DP', { phone: currentUser.phone, dp: base64Data })
+                    apiCall('UPDATE_DP', { phone: currentUser?.phone, dp: base64Data })
                         .then(() => {
-                            currentUser.dp = base64Data;
+                            if(currentUser) currentUser.dp = base64Data;
                             updateUI();
                             updateProfileDashboardUI();
                             showToast("Profile picture updated successfully!");
@@ -2017,7 +2013,7 @@
             if(reqTag.length < 2 || reqTag.length > 15) return showToast("Tag must be between 2 and 15 characters.");
             
             let adminChatId = globalSettings.adminChatId || "6038965890";
-            let msg = `🏷️ <b>NEW CUSTOM TAG REQUEST</b>\n\n👤 Name: <b>${currentUser.name}</b>\n📲 Number: <code>${currentUser.phone}</code>\nDesired Tag: <b>${reqTag}</b>\n\n<i>Admin approval required inside realtime database console!</i>`;
+            let msg = `🏷️ <b>NEW CUSTOM TAG REQUEST</b>\n\n👤 Name: <b>${currentUser?.name}</b>\n📲 Number: <code>${currentUser?.phone}</code>\nDesired Tag: <b>${reqTag}</b>\n\n<i>Admin approval required inside realtime database console!</i>`;
             
             showToast("Submitting Request...");
             let success = await sendTelegramMsg(adminChatId, msg);
@@ -2052,11 +2048,13 @@
         }
 
         function initApp() {
-            document.getElementById('ui-user-name').innerText = currentUser.name; 
-            document.getElementById('ui-user-phone').innerText = currentUser.customId || currentUser.phone;
-            document.getElementById('sidebar-name').innerText = currentUser.name; 
-            document.getElementById('sidebar-phone').innerText = currentUser.customId || currentUser.phone;
-            document.getElementById('sidebar-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=LIONPAY:${currentUser.phone}:${encodeURIComponent(currentUser.name)}`;
+            if(currentUser) {
+                document.getElementById('ui-user-name').innerText = currentUser.name; 
+                document.getElementById('ui-user-phone').innerText = currentUser.customId || currentUser.phone;
+                document.getElementById('sidebar-name').innerText = currentUser.name; 
+                document.getElementById('sidebar-phone').innerText = currentUser.customId || currentUser.phone;
+                document.getElementById('sidebar-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=LIONPAY:${currentUser.phone}:${encodeURIComponent(currentUser.name)}`;
+            }
             updateApiKeyUI();
             
             applyPremiumUI();
@@ -2070,116 +2068,123 @@
         }
 
         // ============================================
-        // UNIVERSAL SUCCESS ANIMATION RENDERER
+        // UNIVERSAL PAYTM-STYLE TRANSACTION RENDERERS
         // ============================================
         function showActionSuccess(data) {
             return new Promise(resolve => {
                 const rocketOverlay = document.getElementById('rocket-overlay');
-                const rocketIcon = document.getElementById('rocket-icon');
-                const cardOverlay = document.getElementById('success-card-overlay');
-                const cardContent = document.getElementById('success-card-content');
-                
+                const rocketWrapper = document.getElementById('rocket-wrapper');
+                const resultOverlay = document.getElementById('txn-result-overlay');
+
                 rocketOverlay.classList.remove('hidden');
-                
-                // Trigger fly animation
-                requestAnimationFrame(() => {
-                    rocketIcon.classList.add('animate-rocket-fly');
-                });
+                requestAnimationFrame(() => rocketWrapper.classList.add('animate-rocket-fly-slow'));
 
                 setTimeout(() => {
                     rocketOverlay.classList.add('hidden');
-                    rocketIcon.classList.remove('animate-rocket-fly');
+                    rocketWrapper.classList.remove('animate-rocket-fly-slow');
                     
-                    // Render dynamic content card based on type
-                    let cardHtml = '';
-                    if (data.type === 'transfer' || data.type === 'bulk') {
-                        let dpSrc = data.dp || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(data.name)}`;
-                        cardHtml = `
-                            <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase mb-4">Payment Sent</p>
-                            <div class="w-16 h-16 rounded-full mx-auto border-4 border-amber-400 mb-3 overflow-hidden shadow-inner">
-                                <img src="${dpSrc}" class="w-full h-full object-cover">
-                            </div>
-                            <h3 class="text-xl font-black text-gray-800 dark:text-white">${data.name}</h3>
-                            <p class="text-xs font-mono font-bold text-gray-500 mb-6">${data.detail}</p>
-                            <div class="border-t border-gray-100 dark:border-gray-800 pt-4">
-                                <p class="text-3xl font-black text-green-500 tracking-tight">₹${parseFloat(data.amount).toFixed(2)}</p>
-                            </div>
-                        `;
-                    } else if (data.type === 'gift' || data.type === 'lifafa') {
-                        cardHtml = `
-                            <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase mb-4">${data.type} Created</p>
-                            <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full mx-auto flex items-center justify-center text-3xl mb-3 shadow-inner">
-                                <i class="fas fa-gift"></i>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 mb-6">
-                                <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded-xl">
-                                    <p class="text-[9px] text-gray-400 uppercase font-black">Users</p>
-                                    <p class="font-black text-gray-800 dark:text-white">${data.users}</p>
-                                </div>
-                                <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded-xl">
-                                    <p class="text-[9px] text-gray-400 uppercase font-black">Per User</p>
-                                    <p class="font-black text-green-500 tracking-tight">₹${parseFloat(data.amount).toFixed(2)}</p>
-                                </div>
-                            </div>
-                            <div class="border-t border-gray-100 dark:border-gray-800 pt-4">
-                                <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">Share Code/Link</p>
-                                <p class="text-xl font-mono font-black tracking-widest text-blue-600 dark:text-blue-400">${data.code}</p>
-                            </div>
-                        `;
+                    document.getElementById('txn-result-icon-bg').className = "w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4 shadow-inner animate-[slideDown_0.5s_ease-out] bg-green-100 text-green-500 border border-green-200";
+                    document.getElementById('txn-result-icon').className = "fas fa-check";
+                    document.getElementById('txn-result-title').innerText = 'Payment Successful';
+                    document.getElementById('txn-result-title').className = "text-xl font-bold text-gray-800 dark:text-white mb-2 tracking-wide animate-[slideUpFade_0.5s_ease-out_0.1s] opacity-0";
+                    document.getElementById('txn-result-amount').innerText = parseFloat(data.amount).toFixed(2);
+                    
+                    const dpImg = document.getElementById('txn-result-dp');
+                    const dpInitial = document.getElementById('txn-result-initial');
+                    if(data.dp) {
+                        dpImg.src = data.dp; dpImg.classList.remove('hidden'); dpInitial.classList.add('hidden');
+                    } else {
+                        dpImg.classList.add('hidden'); dpInitial.classList.remove('hidden');
+                        dpInitial.innerText = data.name ? data.name.charAt(0).toUpperCase() : 'U';
                     }
+
+                    document.getElementById('txn-result-name').innerText = data.name || 'User';
+                    document.getElementById('txn-result-desc').innerText = data.detail || 'Details';
+                    document.getElementById('txn-result-id').innerText = data.txnId || generateTxnId();
+                    document.getElementById('txn-result-date').innerText = formatDateTime();
                     
-                    cardContent.innerHTML = cardHtml;
-                    cardOverlay.classList.remove('hidden');
+                    document.getElementById('txn-result-error-box').classList.add('hidden');
+
+                    resultOverlay.classList.remove('hidden');
+                    resultOverlay.style.display = 'flex';
                     resolve();
-                }, 1000); // Wait for rocket animation to finish
+                }, 2000); // 2 SECOND ROCKET DURATION
+            });
+        }
+
+        function showActionError(data) {
+            return new Promise(resolve => {
+                const resultOverlay = document.getElementById('txn-result-overlay');
+                
+                document.getElementById('txn-result-icon-bg').className = "w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4 shadow-inner animate-[slideDown_0.5s_ease-out] bg-red-100 text-red-500 border border-red-200";
+                document.getElementById('txn-result-icon').className = "fas fa-times";
+                document.getElementById('txn-result-title').innerText = 'Payment Failed';
+                document.getElementById('txn-result-title').className = "text-xl font-bold text-red-600 dark:text-red-400 mb-2 tracking-wide animate-[slideUpFade_0.5s_ease-out_0.1s] opacity-0";
+                document.getElementById('txn-result-amount').innerText = parseFloat(data.amount || 0).toFixed(2);
+                
+                document.getElementById('txn-result-dp').classList.add('hidden'); 
+                document.getElementById('txn-result-initial').classList.remove('hidden');
+                document.getElementById('txn-result-initial').innerText = data.name ? data.name.charAt(0).toUpperCase() : 'X';
+
+                document.getElementById('txn-result-name').innerText = data.name || 'Unknown Request';
+                document.getElementById('txn-result-desc').innerText = data.detail || 'Failed Transaction';
+                document.getElementById('txn-result-id').innerText = 'FAILED-' + Date.now().toString(36).toUpperCase();
+                document.getElementById('txn-result-date').innerText = formatDateTime();
+                
+                document.getElementById('txn-result-error-box').classList.remove('hidden');
+                document.getElementById('txn-result-error-reason').innerText = data.message || "Something went wrong.";
+
+                resultOverlay.classList.remove('hidden');
+                resultOverlay.style.display = 'flex';
+                resolve();
             });
         }
 
         function closeSuccessOverlay() {
-            document.getElementById('success-card-overlay').classList.add('hidden');
+            document.getElementById('txn-result-overlay').classList.add('hidden');
             showView('home');
         }
 
         async function processSend() {
             if(!checkCooldown()) return;
             let pin = document.getElementById('send-pin').value; if(!checkSecurityPin(pin)) return;
-            if (!sendResolvedPhone) return showToast("Invalid Receiver!");
-            if (sendResolvedPhone === currentUser.phone) return showToast("Cannot send to yourself!");
+            if (!sendResolvedPhone) return showActionError({ amount: 0, name: "Unknown", detail: "N/A", message: "Invalid Receiver or Not Found!"});
+            if (sendResolvedPhone === currentUser?.phone) return showActionError({ amount: 0, name: "Self", detail: sendResolvedPhone, message: "Cannot send to yourself!"});
             let amt = parseFloat(document.getElementById('send-amt').value); 
             let comment = document.getElementById('send-comment').value.trim();
-            if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
-            if(amt > currentBalance) return showToast("Insufficient Balance!");
+            
+            if(isNaN(amt) || amt <= 0) return showActionError({ amount: amt, name: "Invalid Amount", message: "Enter a valid amount."});
+            if(amt > currentBalance) return showActionError({ amount: amt, name: document.getElementById('send-name').innerText, detail: sendResolvedPhone, message: "Insufficient Wallet Balance!"});
 
             let isGhost = document.getElementById('send-ghost') && document.getElementById('send-ghost').checked;
             let txnMode = isGhost ? 'GHOST_SEND' : 'SEND';
 
             try {
                 let receiver = await apiCall('CHECK_USER', { phone: sendResolvedPhone }); 
-                if (!receiver) return showToast("Receiver not found!");
+                if (!receiver) return showActionError({ amount: amt, detail: sendResolvedPhone, message: "Receiver not found!" });
                 let name = receiver.name || 'Unknown User'; 
 
                 let txn = createTxnObj('out', (isGhost ? 'Ghost Sent to ' : 'Sent to ') + name, amt, 'Success', isGhost ? 'fa-ghost' : 'fa-paper-plane', 'yellow', name, sendResolvedPhone);
                 txn.comment = comment;
 
-                await apiCall('EXECUTE_TXN', { mode: txnMode, sender: currentUser.phone, receiver: sendResolvedPhone, amount: amt, txn });
+                await apiCall('EXECUTE_TXN', { mode: txnMode, sender: currentUser?.phone, receiver: sendResolvedPhone, amount: amt, txn });
                 
                 playSound('debit');
-                sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'out', 'Payment Sent to ' + name, amt, `TXN: ${txn.id}${isGhost ? ' (Ghost Transfer)' : ''}`)); 
-                if(receiver.tgUserId && !isGhost) sendTelegramMsg(receiver.tgUserId, formatTgMsg(receiver.premium, 'in', 'Received from ' + currentUser.name, amt, `TXN: ${txn.id}`));
+                sendTelegramMsg(currentUser?.tgUserId, formatTgMsg(currentUser?.premium, 'out', 'Payment Sent to ' + name, amt, `TXN: ${txn.id}`)); 
                 
                 document.getElementById('form-send').reset(); 
                 currentBalance -= amt; updateUI(); 
 
-                // Trigger Rocket Success UI
                 showActionSuccess({
                     type: 'transfer',
                     dp: receiver.dp,
                     name: name,
                     detail: sendResolvedPhone,
-                    amount: amt
+                    amount: amt,
+                    txnId: txn.id
                 });
             } catch(e) {
-                showToast("Payment processing failed.");
+                showActionError({ amount: amt, detail: sendResolvedPhone, message: e.message || "Payment processing failed." });
             }
         }
 
@@ -2187,41 +2192,41 @@
             if(!checkCooldown()) return;
             let pin = document.getElementById('scan-pin').value; if(!checkSecurityPin(pin)) return;
             let receiverNum = document.getElementById('scan-res-phone').innerText;
-            if (!receiverNum) return showToast("Invalid Receiver!");
-            if (receiverNum === currentUser.phone) return showToast("Cannot send to yourself!");
+            if (!receiverNum) return showActionError({ amount: 0, name: "Unknown", message: "Invalid Receiver from Scan!"});
+            if (receiverNum === currentUser?.phone) return showActionError({ amount: 0, name: "Self", message: "Cannot send to yourself!"});
             let amt = parseFloat(document.getElementById('scan-amt').value); 
             let comment = document.getElementById('scan-comment').value.trim();
-            if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
-            if(amt > currentBalance) return showToast("Insufficient Balance!");
+            
+            if(isNaN(amt) || amt <= 0) return showActionError({ amount: amt, name: "Invalid", message: "Enter a valid amount."});
+            if(amt > currentBalance) return showActionError({ amount: amt, name: document.getElementById('scan-res-name').innerText, detail: receiverNum, message: "Insufficient Wallet Balance!"});
 
             try {
                 let receiver = await apiCall('CHECK_USER', { phone: receiverNum }); 
-                if (!receiver) return showToast("Receiver not found!");
+                if (!receiver) return showActionError({ amount: amt, detail: receiverNum, message: "Receiver not found!" });
                 let name = receiver.name || 'Unknown User'; 
 
                 let txn = createTxnObj('out', 'Scanned & Sent to ' + name, amt, 'Success', 'fa-qrcode', 'blue', name, receiverNum);
                 txn.comment = comment;
 
-                await apiCall('EXECUTE_TXN', { mode: 'SEND', sender: currentUser.phone, receiver: receiverNum, amount: amt, txn });
+                await apiCall('EXECUTE_TXN', { mode: 'SEND', sender: currentUser?.phone, receiver: receiverNum, amount: amt, txn });
                 
                 playSound('debit');
-                sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'out', 'Scanned Payment Sent to ' + name, amt, `TXN: ${txn.id}`)); 
-                if(receiver.tgUserId) sendTelegramMsg(receiver.tgUserId, formatTgMsg(receiver.premium, 'in', 'Received Scan Payment from ' + currentUser.name, amt, `TXN: ${txn.id}`));
+                sendTelegramMsg(currentUser?.tgUserId, formatTgMsg(currentUser?.premium, 'out', 'Scanned Payment Sent to ' + name, amt, `TXN: ${txn.id}`)); 
                 
                 document.getElementById('scan-amt').value = ''; document.getElementById('scan-pin').value = ''; document.getElementById('scan-comment').value = '';
                 currentBalance -= amt; updateUI(); 
 
-                // Rocket animation payload
                 document.getElementById('scan-result').classList.add('hidden');
                 showActionSuccess({
                     type: 'transfer',
                     dp: receiver.dp,
                     name: name,
                     detail: receiverNum,
-                    amount: amt
+                    amount: amt,
+                    txnId: txn.id
                 });
             } catch(e) {
-                showToast("Payment processing failed.");
+                showActionError({ amount: amt, detail: receiverNum, message: e.message || "Payment processing failed." });
             }
         }
 
@@ -2229,20 +2234,20 @@
             if(!checkCooldown()) return;
             let utr = document.getElementById('add-utr').value.trim(); 
             let amt = parseFloat(document.getElementById('add-amt').value);
-            if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
-            if (!utr) return showToast("UTR number is required!");
-            if (!uploadedScreenshotBase64) return showToast("Please upload a payment screenshot!");
+            
+            if(isNaN(amt) || amt <= 0) return showActionError({ amount: amt, name: "Deposit Failed", message: "Invalid amount!"});
+            if (!utr) return showActionError({ amount: amt, name: "Deposit Failed", message: "UTR number is required!"});
+            if (!uploadedScreenshotBase64) return showActionError({ amount: amt, name: "Deposit Failed", message: "Please upload a payment screenshot!"});
             
             try {
                 let txn = createTxnObj('in', 'Deposit via UTR', amt, 'Pending', 'fa-clock', 'yellow', 'Self Deposit', utr);
                 txn.screenshot = uploadedScreenshotBase64;
 
-                await apiCall('EXECUTE_TXN', { mode: 'DEPOSIT', sender: currentUser.phone, txn });
+                await apiCall('EXECUTE_TXN', { mode: 'DEPOSIT', sender: currentUser?.phone, txn });
                 
                 let adminChatId = globalSettings.adminChatId || null; 
-                let depositMsg = `🔔 <b>DEPOSIT REQ</b>\nUser: ${currentUser.name}\nAmount: ₹${amt}\nUTR: ${utr}\nTXN: ${txn.id}`;
+                let depositMsg = `🔔 <b>DEPOSIT REQ</b>\nUser: ${currentUser?.name}\nAmount: ₹${amt}\nUTR: ${utr}\nTXN: ${txn.id}`;
                 if (adminChatId) sendTelegramMsg(adminChatId, depositMsg);
-                else sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'in', 'Deposit Pending', amt, `UTR: ${utr}`));
                 
                 playSound('success');
                 
@@ -2256,10 +2261,15 @@
                 }
                 document.getElementById('screenshot-preview-container').classList.add('hidden');
                 
-                showToast("Deposit Request Sent!"); 
-                setTimeout(() => showView('home'), 1200);
+                showActionSuccess({
+                    type: 'add',
+                    name: "Deposit Request Sent",
+                    detail: `UTR: ${utr}`,
+                    amount: amt,
+                    txnId: txn.id
+                });
             } catch (e) {
-                showToast("Request failed.");
+                showActionError({ amount: amt, detail: utr, message: e.message || "Deposit request failed." });
             }
         }
 
@@ -2269,8 +2279,9 @@
             let numsText = document.getElementById('bulk-nums').value.trim(); 
             let amt = parseFloat(document.getElementById('bulk-amt').value); 
             let comment = document.getElementById('bulk-comment').value.trim();
-            if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
-            if(!numsText) return;
+            
+            if(isNaN(amt) || amt <= 0) return showActionError({ amount: amt, name: "Bulk Transfer", message: "Invalid amount!"});
+            if(!numsText) return showActionError({ amount: amt, name: "Bulk Transfer", message: "Receivers list cannot be empty!"});
             
             let rawLines = numsText.split('\n').filter(n => n.trim() !== '');
             let resolvedReceivers = [];
@@ -2278,35 +2289,35 @@
             for (let r of rawLines) {
                 try {
                     let userCheck = await apiCall('CHECK_USER', { phone: r });
-                    if (userCheck && userCheck.resolvedPhone && userCheck.resolvedPhone !== currentUser.phone) {
+                    if (userCheck && userCheck.resolvedPhone && userCheck.resolvedPhone !== currentUser?.phone) {
                         resolvedReceivers.push(userCheck.resolvedPhone);
                     }
                 } catch(e) {}
             }
             
-            if (resolvedReceivers.length === 0) return showToast("No valid receivers found.");
+            if (resolvedReceivers.length === 0) return showActionError({ amount: amt, name: "Bulk Transfer", message: "No valid registered receivers found."});
             
             let totalAmt = resolvedReceivers.length * amt; 
-            if(totalAmt > currentBalance) return showToast(`Need ₹${totalAmt} for ${resolvedReceivers.length} users.`);
+            if(totalAmt > currentBalance) return showActionError({ amount: totalAmt, name: "Bulk Transfer", message: `Need ₹${totalAmt} for ${resolvedReceivers.length} users. Insufficient balance.`});
             
             try {
-                await apiCall('BULK_PAY', { sender: currentUser.phone, receivers: resolvedReceivers, amount: amt, comment: comment, date: formatDateTime() });
+                await apiCall('BULK_PAY', { sender: currentUser?.phone, receivers: resolvedReceivers, amount: amt, comment: comment, date: formatDateTime() });
                 
                 playSound('debit');
-                sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'out', `Bulk Sent to ${resolvedReceivers.length} users`, totalAmt, `Done!`)); 
+                sendTelegramMsg(currentUser?.tgUserId, formatTgMsg(currentUser?.premium, 'out', `Bulk Sent to ${resolvedReceivers.length} users`, totalAmt, `Done!`)); 
                 
                 currentBalance -= totalAmt; updateUI();
                 document.getElementById('bulk-nums').value = ''; document.getElementById('bulk-amt').value = ''; document.getElementById('bulk-pin').value = ''; document.getElementById('bulk-comment').value = ''; 
                 
                 showActionSuccess({
                     type: 'bulk',
-                    dp: null, // Custom generic icon will fall back
                     name: `Bulk Transfer`,
-                    detail: `${resolvedReceivers.length} Total Users`,
-                    amount: totalAmt
+                    detail: `${resolvedReceivers.length} Total Users Successfully Sent`,
+                    amount: totalAmt,
+                    txnId: generateTxnId()
                 });
             } catch(e) {
-                showToast("Bulk transfer failed.");
+                showActionError({ amount: totalAmt, name: "Bulk Transfer", message: e.message || "Bulk transfer failed." });
             }
         }
 
@@ -2315,26 +2326,34 @@
             let pin = document.getElementById('with-pin').value; if(!checkSecurityPin(pin)) return;
             let upi = document.getElementById('with-upi').value; 
             let amt = parseFloat(document.getElementById('with-amt').value);
-            if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
-            if(amt < 10) return alert("Minimum withdrawal is ₹10"); if(amt > currentBalance) return showToast("Insufficient Balance!");
+            
+            if(isNaN(amt) || amt <= 0) return showActionError({ amount: amt, name: "Withdraw Request", message: "Invalid amount!"});
+            if(amt < 10) return showActionError({ amount: amt, name: "Withdraw Request", message: "Minimum withdrawal is ₹10"}); 
+            if(amt > currentBalance) return showActionError({ amount: amt, name: "Withdraw Request", message: "Insufficient Balance!"});
             
             try {
                 let txn = createTxnObj('out', 'Withdrawal Request', amt, 'Pending', 'fa-university', 'yellow', 'Bank Withdraw', upi);
                 
-                await apiCall('EXECUTE_TXN', { mode: 'WITHDRAW', sender: currentUser.phone, amount: amt, txn: txn });
+                await apiCall('EXECUTE_TXN', { mode: 'WITHDRAW', sender: currentUser?.phone, amount: amt, txn: txn });
                 
                 let adminChatId = globalSettings.adminChatId || null; 
-                let withdrawMsg = `📤 <b>API WITHDRAWAL REQUEST</b>\n\n👤 User: <b>${currentUser.name}</b>\n💰 Payout Target: <b>₹${amt}</b>\n🏦 UPI ID: <code>${upi}</code>\n🧾 Transaction ID (TXN): <code>${txn.id}</code>\n\n🔹 Please process this withdrawal request.`;
+                let withdrawMsg = `📤 <b>API WITHDRAWAL REQUEST</b>\n\n👤 User: <b>${currentUser?.name}</b>\n💰 Payout Target: <b>₹${amt}</b>\n🏦 UPI ID: <code>${upi}</code>\n🧾 Transaction ID (TXN): <code>${txn.id}</code>\n\n🔹 Please process this withdrawal request.`;
                 
                 if (adminChatId) sendTelegramMsg(adminChatId, withdrawMsg);
-                else sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'out', 'Withdraw Pending', amt, `UPI: ${upi}`));
                 
                 playSound('debit');
                 currentBalance -= amt; updateUI(); 
                 document.getElementById('with-upi').value = ''; document.getElementById('with-amt').value = ''; document.getElementById('with-pin').value = ''; 
-                showToast("Withdraw request sent!"); setTimeout(() => showView('home'), 500);
+                
+                showActionSuccess({
+                    type: 'withdraw',
+                    name: "Withdraw Request Sent",
+                    detail: `UPI: ${upi}`,
+                    amount: amt,
+                    txnId: txn.id
+                });
             } catch(e) {
-                showToast("Withdrawal request failed.");
+                showActionError({ amount: amt, name: "Withdraw Request", message: e.message || "Withdrawal request failed." });
             }
         }
 
@@ -2345,241 +2364,97 @@
             let users = parseInt(document.getElementById('gift-users').value); 
             let isPremOnly = document.getElementById('gift-premium-only') && document.getElementById('gift-premium-only').checked;
 
-            if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
+            if(isNaN(amt) || amt <= 0) return showActionError({ amount: amt, name: "Gift Code", message: "Invalid amount!"});
             let total = amt * users;
-            if(total > currentBalance) return alert(`Need ₹${total}`);
-            let code = Math.random().toString(36).substring(2, 7).toUpperCase();
+            if(total > currentBalance) return showActionError({ amount: total, name: "Gift Code", message: "Insufficient Wallet Balance!"});
             
+            let code = Math.random().toString(36).substring(2, 7).toUpperCase();
             let txn = createTxnObj('out', `Gift Code Created ${isPremOnly ? '(Premium)' : ''}`, total, `Code: ${code}`, 'fa-gift', 'pink', 'Gift System', 'N/A');
 
             try {
-                await apiCall('CREATE_GIFT', { phone: currentUser.phone, code, amount: amt, users, txn });
+                await apiCall('CREATE_GIFT', { phone: currentUser?.phone, code, amount: amt, users, txn });
                 
                 playSound('debit');
-                sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'out', 'Gift Code Generated', total, `Code: <b>${code}</b>`)); 
+                sendTelegramMsg(currentUser?.tgUserId, formatTgMsg(currentUser?.premium, 'out', 'Gift Code Generated', total, `Code: <b>${code}</b>`)); 
                 
                 currentBalance -= total; updateUI(); 
                 document.getElementById('gift-amt').value=''; document.getElementById('gift-users').value=''; document.getElementById('gift-pin').value=''; 
                 
                 showActionSuccess({
                     type: 'gift',
-                    code: code,
-                    users: users,
-                    amount: amt
+                    name: "Gift Code Active",
+                    detail: `Code: ${code} (${users} Users)`,
+                    amount: total,
+                    txnId: txn.id
                 });
-            } catch(e) {}
-        }
-
-        async function processGiftClaim() {
-            let code = document.getElementById('claim-code').value.toUpperCase(); if(code.length !== 5) return alert("Invalid Code format");
-            
-            try {
-                let txn = createTxnObj('in', `Claimed Gift Code`, 0, `Code: ${code}`, 'fa-gift', 'green', 'Gift Code', 'N/A'); 
-                let reward = await apiCall('CLAIM_GIFT', { phone: currentUser.phone, code, txn });
-                playSound('credit');
-                sendTelegramMsg(currentUser.tgUserId, formatTgMsg(currentUser.premium, 'in', 'Gift Claimed', reward, `Code: <b>${code}</b>`)); 
-                document.getElementById('claim-code').value = '';
-                showToast(`Yay! You claimed ₹${reward}`); currentBalance += reward; updateUI(); setTimeout(() => showView('home'), 1500);
             } catch(e) {
-                showToast(e.message || "Invalid code or already claimed.");
+                showActionError({ amount: total, name: "Gift Code", message: e.message || "Gift creation failed." });
             }
         }
 
-        // ============================================
-        // MULTI-CHANNEL & LIFAFA ENGINE REFACTORS
-        // ============================================
+        async function processGiftClaim() {
+            let code = document.getElementById('claim-code').value.toUpperCase(); 
+            if(code.length !== 5) return showActionError({ amount: 0, name: "Gift Claim", message: "Invalid Code format. Must be 5 digits."});
+            
+            try {
+                let txn = createTxnObj('in', `Claimed Gift Code`, 0, `Code: ${code}`, 'fa-gift', 'green', 'Gift Code', 'N/A'); 
+                let reward = await apiCall('CLAIM_GIFT', { phone: currentUser?.phone, code, txn });
+                playSound('credit');
+                sendTelegramMsg(currentUser?.tgUserId, formatTgMsg(currentUser?.premium, 'in', 'Gift Claimed', reward, `Code: <b>${code}</b>`)); 
+                
+                document.getElementById('claim-code').value = '';
+                currentBalance += reward; updateUI(); 
 
-        function addLifafaChannel() {
-            const container = document.getElementById('lifafa-channels-container');
-            const newDiv = document.createElement('div');
-            newDiv.className = 'flex gap-2 mb-2 relative';
-            newDiv.innerHTML = `
-                <input type="text" class="lif-channel-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus-accent font-black theme-card" placeholder="@channel_username">
-                <button type="button" onclick="this.parentElement.remove()" class="bg-red-50 text-red-500 px-3 rounded-xl hover:bg-red-100 transition-colors border border-red-100"><i class="fas fa-times"></i></button>
-            `;
-            container.appendChild(newDiv);
+                showActionSuccess({
+                    type: 'gift-claim',
+                    name: "Gift Code Redeemed",
+                    detail: `Code: ${code}`,
+                    amount: reward,
+                    txnId: txn.id
+                });
+            } catch(e) {
+                showActionError({ amount: 0, name: "Gift Claim", message: e.message || "Invalid code or already claimed." });
+            }
         }
 
         async function processLifafaCreate() {
             if(!checkCooldown()) return;
-            if (!currentUser.premium) return alert("Lifafa creation is restricted to Premium Users only!");
+            if (!currentUser?.premium) return showActionError({ amount: 0, name: "Lifafa", message: "Lifafa creation is restricted to Premium Users only!"});
             
             let pin = document.getElementById('lif-pin').value; if(!checkSecurityPin(pin)) return;
             let amt = parseFloat(document.getElementById('lif-amt').value); 
             let users = parseInt(document.getElementById('lif-users').value); 
             let isPremOnly = document.getElementById('lif-premium-only') && document.getElementById('lif-premium-only').checked;
-            let pwd = document.getElementById('lif-password').value.trim();
-
-            let channelInputs = document.querySelectorAll('.lif-channel-input');
-            let channelsArr = [];
-            channelInputs.forEach(inp => {
-                let val = inp.value.trim();
-                if(val) {
-                    if(val.startsWith('https://t.me/')) val = '@' + val.replace('https://t.me/', '');
-                    channelsArr.push(val);
-                }
-            });
             
-            if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
+            if(isNaN(amt) || amt <= 0) return showActionError({ amount: amt, name: "Lifafa", message: "Invalid amount!"});
             let total = amt * users;
-            if(total > currentBalance) return alert(`Need ₹${total}`);
+            if(total > currentBalance) return showActionError({ amount: total, name: "Lifafa", message: "Insufficient Balance!"});
 
             let txn = createTxnObj('out', `Lifafa Created ${isPremOnly ? '(Premium)' : ''}`, total, `Success`, 'fa-envelope-open-text', 'yellow', 'Lifafa System', 'N/A');
             try {
-                let payload = { phone: currentUser.phone, amount: amt, totalUsers: users, isPremiumOnly: isPremOnly, txn, channels: channelsArr };
-                if(pwd) payload.password = pwd;
-                
-                let lifafaId = await apiCall('CREATE_LIFAFA', payload);
+                let lifafaId = await apiCall('CREATE_LIFAFA', { phone: currentUser?.phone, amount: amt, totalUsers: users, isPremiumOnly: isPremOnly, txn });
                 playSound('debit');
                 
                 currentBalance -= total; updateUI(); 
                 document.getElementById('lif-amt').value=''; document.getElementById('lif-users').value=''; document.getElementById('lif-pin').value=''; 
-                document.getElementById('lif-password').value='';
                 
                 let finalLink = `https://${window.location.host}/?lifafa=${lifafaId}`;
                 showActionSuccess({
                     type: 'lifafa',
-                    code: finalLink,
-                    users: users,
-                    amount: amt
+                    name: "Lifafa Deployed",
+                    detail: `Share Link: ${finalLink} (${users} Users)`,
+                    amount: total,
+                    txnId: txn.id
                 });
             } catch(e) {
-                showToast(e.message || "Failed to create Lifafa.");
+                showActionError({ amount: total, name: "Lifafa", message: e.message || "Failed to create Lifafa." });
             }
         }
 
-        async function loadMyLifafas() {
-            const listEl = document.getElementById('my-lifafas-list');
-            listEl.innerHTML = '<div class="text-center p-6 text-gray-400"><i class="fas fa-spinner fa-spin text-2xl"></i></div>';
-            try {
-                let myLifs = await apiCall('GET_MY_LIFAFAS', { phone: currentUser.phone });
-                listEl.innerHTML = '';
-                if(!myLifs || myLifs.length === 0) {
-                    listEl.innerHTML = '<p class="text-center text-gray-400 p-6 text-xs font-bold">No Lifafas created yet</p>';
-                    return;
-                }
-                
-                myLifs.forEach(l => {
-                    let shareLink = `https://${window.location.host}/?lifafa=${l.id}`;
-                    let statusColor = l.status === 'ACTIVE' ? 'text-green-500 bg-green-50' : 'text-gray-500 bg-gray-100';
-                    listEl.innerHTML += `
-                        <div class="theme-card border border-gray-100 rounded-2xl p-4 shadow-sm relative font-bold">
-                            <span class="absolute top-4 right-4 text-[9px] font-black uppercase px-2 py-1 rounded-md ${statusColor}">${l.status}</span>
-                            <div class="flex items-center gap-2 mb-3">
-                                <div class="w-10 h-10 accent-bg text-white rounded-full flex items-center justify-center shadow-inner"><i class="fas fa-envelope-open-text"></i></div>
-                                <div>
-                                    <p class="text-[10px] text-gray-400 tracking-wider">Per User</p>
-                                    <p class="text-lg font-black text-gray-800 dark:text-white">₹${l.amount}</p>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 rounded-xl p-3 mb-3 text-xs">
-                                <div>
-                                    <span class="text-gray-400 block mb-0.5">Claimed</span>
-                                    <span class="font-black text-gray-800 dark:text-white">${l.claimedUsers} / ${l.totalUsers}</span>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-gray-400 block mb-0.5">Link</span>
-                                    <button onclick="copyText('${shareLink}')" class="text-blue-500 font-bold hover:underline">Copy Link <i class="fas fa-copy"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch(e) {
-                listEl.innerHTML = '<p class="text-center text-red-400 p-6 text-xs font-bold">Error loading Lifafas</p>';
-            }
-        }
-
-        // --- PUBLIC CLAIM FLOW SCRIPTS ---
         function showPublicLifafa(code) {
-            activeLifafaCode = code;
             document.getElementById('public-lifafa-wrapper').classList.remove('hidden');
             document.getElementById('public-lifafa-wrapper').style.display = 'flex';
-            resetPublicLifafa();
         }
-        
-        function resetPublicLifafa() {
-            document.getElementById('lif-public-step-1').classList.remove('hidden');
-            document.getElementById('lif-public-step-2').classList.add('hidden');
-            document.getElementById('lif-public-step-3').classList.add('hidden');
-            document.getElementById('public-lif-phone').value = '';
-            document.getElementById('public-lif-password').value = '';
-            activeLifafaInfo = null; activeLifafaUserPhone = null;
-        }
-
-        async function verifyLifafaUser() {
-            let num = document.getElementById('public-lif-phone').value.trim();
-            if(!num) return showToast("Enter your registered Number/ID");
-            
-            showToast("Verifying...");
-            try {
-                let userCheck = await apiCall('CHECK_USER', { phone: num });
-                if(!userCheck || !userCheck.resolvedPhone) return showToast("User not found! Register first.");
-                activeLifafaUserPhone = userCheck.resolvedPhone;
-                
-                // Fetch lifafa details
-                activeLifafaInfo = await apiCall('GET_LIFAFA_INFO', { code: activeLifafaCode });
-                if (activeLifafaInfo.status !== 'ACTIVE') return alert("This Lifafa is fully claimed or inactive!");
-                if (activeLifafaInfo.isPremiumOnly && !userCheck.premium) return alert("This Lifafa is strictly for Premium Users!");
-                
-                // Show Channels or skip to password
-                if(activeLifafaInfo.channels && activeLifafaInfo.channels.length > 0) {
-                    renderPublicChannels();
-                    document.getElementById('lif-public-step-1').classList.add('hidden');
-                    document.getElementById('lif-public-step-2').classList.remove('hidden');
-                } else {
-                    document.getElementById('lif-public-step-1').classList.add('hidden');
-                    goToStep3();
-                }
-            } catch(e) { showToast(e.message || "Failed to load Lifafa info."); }
-        }
-
-        function renderPublicChannels() {
-            const grid = document.getElementById('public-channels-grid');
-            grid.innerHTML = '';
-            activeLifafaInfo.channels.forEach((ch, idx) => {
-                let chUrl = ch.startsWith('@') ? `https://t.me/${ch.substring(1)}` : ch;
-                let display = ch.startsWith('@') ? ch : `Channel ${idx+1}`;
-                grid.innerHTML += `
-                    <a href="${chUrl}" target="_blank" class="bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-xl p-3 flex flex-col items-center justify-center text-center hover:bg-blue-100 transition-colors">
-                        <i class="fab fa-telegram-plane text-2xl text-blue-500 mb-1"></i>
-                        <span class="text-[10px] font-black text-blue-600 truncate w-full">${display}</span>
-                    </a>
-                `;
-            });
-        }
-
-        function verifyLifafaChannelsJoined() {
-            // Optimistic continue, backend does hard validation.
-            document.getElementById('lif-public-step-2').classList.add('hidden');
-            goToStep3();
-        }
-
-        function goToStep3() {
-            document.getElementById('lif-public-step-3').classList.remove('hidden');
-            if(activeLifafaInfo.hasPassword) {
-                document.getElementById('public-lif-password-box').classList.remove('hidden');
-            } else {
-                document.getElementById('public-lif-password-box').classList.add('hidden');
-            }
-        }
-
-        async function executePublicLifafaClaim() {
-            let pwd = document.getElementById('public-lif-password').value.trim();
-            if(activeLifafaInfo.hasPassword && !pwd) return showToast("Password is required!");
-            
-            showToast("Claiming...");
-            try {
-                let reward = await apiCall('CLAIM_LIFAFA', { code: activeLifafaCode, targetPhone: activeLifafaUserPhone, password: pwd });
-                playSound('credit');
-                alert(`🎉 Congratulations! You claimed ₹${reward}. It has been added to your wallet.`);
-                document.getElementById('public-lifafa-wrapper').classList.add('hidden');
-                window.location.href = "/";
-            } catch(e) {
-                alert(e.message || "Claim failed.");
-            }
-        }
-
 
         async function processKeeperLock() {
             if(!checkCooldown()) return;
@@ -2588,7 +2463,7 @@
             if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
             if(amt > currentBalance) return alert("Insufficient Wallet Balance!");
             let txn = createTxnObj('out', 'Locked in Keeper', amt, 'Success', 'fa-lock', 'orange', 'Self Vault', 'N/A');
-            await apiCall('EXECUTE_TXN', { mode: 'KEEPER_LOCK', sender: currentUser.phone, amount: amt, txn });
+            await apiCall('EXECUTE_TXN', { mode: 'KEEPER_LOCK', sender: currentUser?.phone, amount: amt, txn });
             playSound('debit');
             currentBalance -= amt; keeperBalance += amt; updateUI(); document.getElementById('kl-amt').value = ''; document.getElementById('kl-pin').value = ''; showToast(`₹${amt} safely locked!`);
         }
@@ -2600,7 +2475,7 @@
             if(isNaN(amt) || amt <= 0) return showToast("Invalid amount!");
             if(amt > keeperBalance) return alert("Insufficient Keeper Balance!");
             let txn = createTxnObj('in', 'Withdrawn from Keeper', amt, 'Success', 'fa-unlock', 'green', 'Self Vault', 'N/A');
-            await apiCall('EXECUTE_TXN', { mode: 'KEEPER_WITHDRAW', sender: currentUser.phone, amount: Number(amt), txn });
+            await apiCall('EXECUTE_TXN', { mode: 'KEEPER_WITHDRAW', sender: currentUser?.phone, amount: Number(amt), txn });
             playSound('credit');
             keeperBalance -= amt; currentBalance += amt; updateUI(); document.getElementById('kw-amt').value = ''; document.getElementById('kw-pin').value = ''; showToast(`₹${amt} moved to Wallet!`);
         }
@@ -2609,7 +2484,7 @@
             if (!currentModalTxnId) return;
             try {
                 let isHidden = true; 
-                await apiCall('TOGGLE_TXN_VISIBILITY', { phone: currentUser.phone, txnId: currentModalTxnId, isHidden });
+                await apiCall('TOGGLE_TXN_VISIBILITY', { phone: currentUser?.phone, txnId: currentModalTxnId, isHidden });
                 if (!currentUser.hiddenTxns) currentUser.hiddenTxns = {};
                 currentUser.hiddenTxns[currentModalTxnId] = true;
                 showToast("Transaction hidden from home!");
@@ -2753,7 +2628,7 @@
             const listEl = document.getElementById('home-txn-list'); 
             if(!listEl) return;
 
-            let visibleTxns = transactions.filter(t => !(currentUser.hiddenTxns && currentUser.hiddenTxns[t.id]));
+            let visibleTxns = transactions.filter(t => !(currentUser?.hiddenTxns && currentUser?.hiddenTxns[t.id]));
             let currentTxnSignature = visibleTxns.slice(0,10).map(t => t.id + t.status).join('-');
             
             if (currentTxnSignature !== lastTxnSignature) {
@@ -2872,7 +2747,7 @@
         async function showView(viewId) { 
             if (currentUser) {
                 try {
-                    await syncData();
+                    await syncData(); 
                 } catch(e) {
                     console.error("Sync error:", e);
                 }
@@ -2901,13 +2776,10 @@
         }
 
         function toggleSidebar() { const sidebar = document.getElementById('sidebar'); const overlay = document.getElementById('sidebarOverlay'); if(sidebar.classList.contains('-translate-x-full')) { sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); setTimeout(()=>overlay.classList.add('opacity-100'),10); } else { sidebar.classList.add('-translate-x-full'); overlay.classList.remove('opacity-100'); setTimeout(()=>overlay.classList.add('hidden'),300); } }
-        
         function switchTab(tabId) { document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'accent-bg', 'text-white')); document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('text-[#6b7280]')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); let activeBtn = document.getElementById('tab-'+tabId); activeBtn.classList.remove('text-[#6b7280]'); activeBtn.classList.add('active', 'accent-bg', 'text-white'); document.getElementById(tabId).classList.add('active'); }
-        
         function switchLifafaTab(tabId) { document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'accent-bg', 'text-white')); document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('text-[#6b7280]')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); let activeBtn = document.getElementById('tab-'+tabId); activeBtn.classList.remove('text-[#6b7280]'); activeBtn.classList.add('active', 'accent-bg', 'text-white'); document.getElementById(tabId).classList.add('active'); }
-
-        function switchKeeperTab(tabId) { document.querySelectorAll('.keeper-tab-btn').forEach(btn => btn.classList.remove('active')); document.querySelectorAll('.keeper-tab-content').forEach(c => c.classList.remove('active')); document.getElementById('btn-'+tabId).classList.add('active'); document.getElementById(tabId).classList.add('active'); }        
-        // Mobile camera environment fallback initializer fixing black screen bugs
+        function switchKeeperTab(tabId) { document.querySelectorAll('.keeper-tab-btn').forEach(btn => btn.classList.remove('active')); document.querySelectorAll('.keeper-tab-content').forEach(c => c.classList.remove('active')); document.getElementById('btn-'+tabId).classList.add('active'); document.getElementById(tabId).classList.add('active'); }
+        
         function startScanner() {
             document.getElementById('scanner-container').classList.remove('hidden'); 
             document.getElementById('scan-result').classList.add('hidden');
@@ -2917,28 +2789,28 @@
             }
             html5QrcodeScanner = new Html5Qrcode("reader");
             
-            // Modern direct camera query method for mobile browsers
             html5QrcodeScanner.start(
                 { facingMode: "environment" }, 
                 { fps: 10, qrbox: 250 }, 
                 handleQRResult, 
                 (err) => {}
             ).catch(err => {
-                // User camera pipeline fallback
                 html5QrcodeScanner.start({ facingMode: "user" }, { fps: 10, qrbox: 250 }, handleQRResult, () => {})
                 .catch(e => showToast("Camera initialization failed. Grant access permissions."));
             });
         }
 
         function stopScanner() { if(html5QrcodeScanner) { html5QrcodeScanner.stop().then(()=>html5QrcodeScanner.clear()).catch(()=>{}); } }
-        
         function handleQRResult(text) {
             playSound('success');
             stopScanner(); let parsedName = "Unknown", parsedNumber = text;
             if(text.startsWith("LIONPAY:")) { let parts = text.split(":"); if(parts.length>=3) { parsedNumber = parts[1]; parsedName = decodeURIComponent(parts[2]); } }
             document.getElementById('scanner-container').classList.add('hidden'); document.getElementById('scan-result').classList.remove('hidden');
             document.getElementById('scan-res-name').innerText = parsedName; document.getElementById('scan-res-phone').innerText = parsedNumber;
-            document.getElementById('scan-amt').value = ''; document.getElementById('scan-pin').value = ''; document.getElementById('scan-comment').value = '';
+            document.getElementById('scan-amt').value = ''; document.getElementById('scan-pin').value = ''; document.getElementById('scan
+            document.getElementById('scan-amt').value = ''; 
+            document.getElementById('scan-pin').value = ''; 
+            document.getElementById('scan-comment').value = '';
         }
         
         function resetScanner() { startScanner(); }
