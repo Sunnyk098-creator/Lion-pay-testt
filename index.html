@@ -60,20 +60,47 @@
             <span class="text-xs font-black tracking-widest text-gray-400 uppercase">Transaction Details</span>
             <button onclick="closeSuccessOverlay()" class="text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors"><i class="fas fa-times text-2xl"></i></button>
         </div>
-        <div id="txn-result-icon-bg" class="w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4 shadow-inner animate-[slideDown_0.5s_ease-out]"><i id="txn-result-icon" class="fas fa-check"></i></div>
+        
+        <div id="txn-result-icon-bg" class="w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4 shadow-inner animate-[slideDown_0.5s_ease-out]">
+            <i id="txn-result-icon" class="fas fa-check"></i>
+        </div>
+        
         <h2 id="txn-result-title" class="text-xl font-bold text-gray-800 dark:text-white mb-2 tracking-wide animate-[slideUpFade_0.5s_ease-out_0.1s] opacity-0" style="animation-fill-mode: forwards;">Payment Successful</h2>
-        <div class="text-5xl font-black tracking-tight mb-8 animate-[slideUpFade_0.5s_ease-out_0.2s] opacity-0" style="animation-fill-mode: forwards;">₹<span id="txn-result-amount">0.00</span></div>
+        
+        <div class="text-5xl font-black tracking-tight mb-8 animate-[slideUpFade_0.5s_ease-out_0.2s] opacity-0" style="animation-fill-mode: forwards;">
+            ₹<span id="txn-result-amount">0.00</span>
+        </div>
+
         <div class="theme-card rounded-3xl p-6 shadow-sm w-full max-w-sm border border-gray-100 dark:border-gray-800 relative overflow-hidden animate-[slideUpFade_0.5s_ease-out_0.3s] opacity-0 text-left" style="animation-fill-mode: forwards;">
             <div class="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100 dark:border-gray-800">
-                <div class="w-14 h-14 rounded-full border-2 border-gray-200 dark:border-gray-700 overflow-hidden shrink-0 shadow-inner bg-gray-100"><img id="txn-result-dp" src="" class="w-full h-full object-cover hidden"><div id="txn-result-initial" class="w-full h-full flex items-center justify-center text-xl font-black text-gray-400">U</div></div>
-                <div class="overflow-hidden"><p class="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">To / Detail</p><p id="txn-result-name" class="font-black text-lg text-contrast truncate w-full">User Name</p><p id="txn-result-desc" class="text-xs text-gray-500 font-mono mt-0.5 truncate">Details</p></div>
+                <div class="w-14 h-14 rounded-full border-2 border-gray-200 dark:border-gray-700 overflow-hidden shrink-0 shadow-inner bg-gray-100">
+                    <img id="txn-result-dp" src="" class="w-full h-full object-cover hidden">
+                    <div id="txn-result-initial" class="w-full h-full flex items-center justify-center text-xl font-black text-gray-400">U</div>
+                </div>
+                <div class="overflow-hidden">
+                    <p class="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">To / Detail</p>
+                    <p id="txn-result-name" class="font-black text-lg text-contrast truncate w-full">User Name</p>
+                    <p id="txn-result-desc" class="text-xs text-gray-500 font-mono mt-0.5 truncate">Details</p>
+                </div>
             </div>
-            <div id="txn-result-error-box" class="hidden mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-100 dark:border-red-800 rounded-xl"><p class="text-[10px] font-black text-red-500 uppercase tracking-widest mb-1">Failure Reason</p><p id="txn-result-error-reason" class="text-sm font-bold text-red-600 dark:text-red-400">Insufficient Balance</p></div>
+            
+            <div id="txn-result-error-box" class="hidden mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-100 dark:border-red-800 rounded-xl">
+                <p class="text-[10px] font-black text-red-500 uppercase tracking-widest mb-1">Failure Reason</p>
+                <p id="txn-result-error-reason" class="text-sm font-bold text-red-600 dark:text-red-400">Insufficient Balance</p>
+            </div>
+
             <div class="space-y-4">
-                <div class="flex justify-between items-center"><span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Transaction ID</span><span id="txn-result-id" class="text-xs font-mono font-black text-contrast">TXN123456</span></div>
-                <div class="flex justify-between items-center"><span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Date & Time</span><span id="txn-result-date" class="text-xs font-bold text-contrast">--</span></div>
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Transaction ID</span>
+                    <span id="txn-result-id" class="text-xs font-mono font-black text-contrast">TXN123456</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Date & Time</span>
+                    <span id="txn-result-date" class="text-xs font-bold text-contrast">--</span>
+                </div>
             </div>
         </div>
+
         <button onclick="closeSuccessOverlay()" class="mt-8 mb-6 w-full max-w-sm theme-card border border-gray-200 dark:border-gray-700 text-contrast font-black py-4 rounded-xl shadow-sm tracking-wide animate-[slideUpFade_0.5s_ease-out_0.5s] opacity-0" style="animation-fill-mode: forwards;">BACK TO DASHBOARD</button>
     </div>
 
@@ -86,73 +113,44 @@
             <p class="text-xs text-gray-500 mb-6 text-center font-medium">This bot sends real-time notifications for your deposits, withdrawals, and transfers. Disable it to stop receiving transaction alerts.</p>
             
             <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-4 rounded-xl mb-4 border border-gray-100 dark:border-gray-700">
-                <div><p class="font-bold text-sm">Transaction Alerts</p><p class="text-[10px] text-gray-500">Enable/Disable Bot Messages</p></div>
+                <div>
+                    <p class="font-bold text-sm">Transaction Alerts</p>
+                    <p class="text-[10px] text-gray-500">Enable/Disable Bot Messages</p>
+                </div>
                 <label class="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" id="toggle-bot-alert-check" class="sr-only peer">
                   <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
                 </label>
             </div>
+
             <label class="block text-xs font-bold text-gray-400 mb-1">TELEGRAM USER ID (NUMERIC)</label>
             <input type="text" id="bot-alert-tg-id" placeholder="e.g. 123456789" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus-accent font-bold theme-card font-mono">
             <button onclick="saveBotAlertSettings()" class="btn-animate w-full accent-bg text-white font-bold py-3 rounded-xl transition-colors shadow-md">Save Settings</button>
         </div>
     </div>
 
-    <div id="public-lifafa-wrapper" class="fixed inset-0 bg-white/40 dark:bg-black/60 backdrop-blur-xl z-[1000] hidden flex-col items-center justify-center p-4 text-center overflow-y-auto">
-        <div class="w-full max-w-md theme-card rounded-[2rem] p-6 shadow-2xl border border-white/20 relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-pink-500/10 pointer-events-none"></div>
-            
-            <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-3xl mx-auto flex items-center justify-center text-4xl mb-4 shadow-inner border border-amber-100 relative z-10"><i class="fas fa-envelope-open-text"></i></div>
-            <h1 class="text-3xl font-black italic tracking-tight mb-1 relative z-10">LION <span class="text-amber-500">LIFAFA</span></h1>
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-8 relative z-10">Claim Your Reward</p>
-
-            <div id="lif-public-step-1" class="relative z-10 text-left">
-                <label class="block text-xs font-bold text-gray-400 mb-2 tracking-wide uppercase">Your Number / ID</label>
-                <input type="text" id="public-lif-phone" placeholder="Registered Phone/ID" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 text-sm mb-5 focus-accent theme-card font-bold">
-                <button type="button" onclick="verifyLifafaUser()" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-xl shadow-lg transition-colors tracking-wide">VERIFY USER</button>
+    <div id="public-lifafa-wrapper" class="fixed inset-0 theme-card z-[1000] hidden flex-col items-center justify-center p-6 text-center overflow-y-auto">
+        <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-3xl mx-auto flex items-center justify-center text-4xl mb-6 shadow-inner border border-amber-100"><i class="fas fa-envelope-open-text"></i></div>
+        <h1 class="text-3xl font-black italic tracking-tight mb-2">LIFAFA <span class="text-amber-500">CLAIM</span></h1>
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-8">Claim your free reward</p>
+        <div id="lif-public-step-1" class="w-full max-w-sm theme-card rounded-3xl p-6 shadow-sm border border-gray-100 text-left">
+            <label class="block text-xs font-bold text-gray-400 mb-2 tracking-wide uppercase">Your Number / ID</label>
+            <input type="text" id="public-lif-phone" placeholder="Enter Registered Phone" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 text-sm mb-5 focus-accent theme-card font-bold">
+            <button type="button" onclick="verifyLifafaUser()" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-xl shadow-lg transition-colors tracking-wide">NEXT</button>
+            <div class="text-center mt-4"><button type="button" onclick="window.location.href='/'" class="text-gray-400 hover:text-amber-600 text-xs font-bold transition-colors">Go to Home</button></div>
+        </div>
+        <div id="lif-public-step-2" class="hidden w-full max-w-sm theme-card rounded-3xl p-6 shadow-sm border border-gray-100 text-left">
+            <label class="block text-xs font-bold text-gray-400 mb-4 tracking-wide uppercase">Join Required Channels</label>
+            <div id="public-channels-grid" class="grid grid-cols-2 gap-3 mb-6"></div>
+            <button type="button" onclick="verifyLifafaChannelsJoined()" class="btn-animate w-full bg-green-500 text-white font-black py-4 rounded-xl shadow-lg transition-colors tracking-wide">VERIFY & CONTINUE</button>
+            <div class="text-center mt-4"><button type="button" onclick="resetPublicLifafa()" class="text-gray-400 hover:text-amber-600 text-xs font-bold transition-colors">Back</button></div>
+        </div>
+        <div id="lif-public-step-3" class="hidden w-full max-w-sm theme-card rounded-3xl p-6 shadow-sm border border-gray-100 text-left">
+            <div id="public-lif-password-box" class="hidden mb-5">
+                <label class="block text-xs font-bold text-gray-400 mb-2 tracking-wide uppercase">Password Required</label>
+                <input type="text" id="public-lif-password" placeholder="Enter Password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 text-center tracking-widest text-lg focus-accent theme-card font-black">
             </div>
-
-            <div id="lif-public-step-2" class="hidden relative z-10 text-left">
-                <div class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-2xl border border-blue-100 dark:border-blue-800 mb-5">
-                    <p class="text-xs font-black text-blue-600 mb-2 uppercase tracking-wide"><i class="fas fa-robot"></i> Mandatory Task</p>
-                    <p class="text-[10px] text-gray-600 dark:text-gray-300 font-medium mb-3">You must start the Alert Bot to receive your OTP and verify your claim securely.</p>
-                    <a href="https://t.me/Lion_Pay_Alert_Bot" target="_blank" class="block w-full bg-blue-500 text-white text-center font-bold py-3 rounded-xl shadow-md text-sm"><i class="fab fa-telegram-plane"></i> Start Alert Bot</a>
-                </div>
-
-                <div id="public-channels-wrap" class="mb-5">
-                    <label class="block text-xs font-bold text-gray-400 mb-3 tracking-wide uppercase">Join Required Channels</label>
-                    <div id="public-channels-grid" class="grid grid-cols-2 gap-3 mb-2"></div>
-                </div>
-
-                <button type="button" onclick="verifyLifafaChannelsJoined()" class="btn-animate w-full bg-green-500 text-white font-black py-4 rounded-xl shadow-lg transition-colors tracking-wide">CHECK MEMBERSHIP</button>
-            </div>
-
-            <div id="lif-public-step-3" class="hidden relative z-10 text-left">
-                <div id="public-lif-password-box" class="hidden mb-5">
-                    <label class="block text-xs font-bold text-gray-400 mb-2 tracking-wide uppercase">Access Code Required</label>
-                    <input type="text" id="public-lif-password" placeholder="ENTER CODE" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 text-center tracking-widest text-lg focus-accent theme-card font-black uppercase">
-                </div>
-                <button type="button" onclick="executePublicLifafaClaim()" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-xl shadow-lg transition-colors tracking-wide text-lg"><i class="fas fa-gift mr-1"></i> CLAIM NOW</button>
-            </div>
-
-            <div id="lif-public-step-4" class="hidden relative z-10 text-center">
-                <div id="lif-res-icon" class="w-20 h-20 bg-green-100 text-green-500 rounded-full mx-auto flex items-center justify-center text-4xl mb-4 border border-green-200"><i class="fas fa-check"></i></div>
-                <h2 id="lif-res-title" class="text-2xl font-black mb-2 text-contrast">Congratulations!</h2>
-                <div id="lif-res-amt-box" class="text-4xl font-black tracking-tight text-green-500 mb-6">₹<span id="lif-res-amt">0.00</span></div>
-                
-                <div id="lif-refer-box" class="hidden mt-6 bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl border border-gray-200 dark:border-gray-700 text-left">
-                    <p class="text-xs font-black text-amber-500 mb-1 uppercase tracking-wide"><i class="fas fa-share-nodes"></i> Refer & Earn</p>
-                    <p class="text-[10px] text-gray-500 mb-3 font-medium">Share your unique link and earn bonus for every friend who claims!</p>
-                    <div class="flex gap-2">
-                        <input type="text" id="lif-refer-link" readonly class="w-full bg-white dark:bg-gray-900 border border-gray-200 rounded-xl px-3 py-2 text-[10px] font-mono theme-card focus:outline-none">
-                        <button onclick="copyText(document.getElementById('lif-refer-link').value)" class="bg-amber-500 text-white px-3 py-2 rounded-xl text-xs font-bold"><i class="fas fa-copy"></i></button>
-                    </div>
-                </div>
-
-                <button type="button" onclick="window.location.href='/'" class="mt-6 w-full theme-card border border-gray-200 text-contrast font-black py-3 rounded-xl shadow-sm text-sm">OPEN DASHBOARD</button>
-            </div>
-            
-            <div class="text-center mt-6 relative z-10"><button type="button" onclick="window.location.href='/'" class="text-gray-400 hover:text-amber-600 text-xs font-bold transition-colors">Close</button></div>
+            <button type="button" onclick="executePublicLifafaClaim()" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-xl shadow-lg transition-colors tracking-wide text-lg"><i class="fas fa-gift"></i> CLAIM NOW</button>
         </div>
     </div>
 
@@ -193,6 +191,35 @@
 
     <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl z-[300] hidden opacity-0 transition-opacity duration-300 flex items-center gap-2 border accent-border">
         <i class="fas fa-info-circle accent-text"></i> <span id="toastMsg" class="font-medium">Message</span>
+    </div>
+
+    <div id="txnModal" class="fixed inset-0 bg-black bg-opacity-70 z-[250] hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 font-bold">
+        <div id="txnModalContent" class="rounded-3xl p-6 transform scale-90 transition-transform duration-300 max-w-sm w-full mx-4 shadow-2xl relative">
+            <button onclick="closeTxnModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors"><i class="fas fa-times text-xl"></i></button>
+            <div class="text-center mb-6 mt-2">
+                <div id="txnModalIconBg" class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl mb-3 shadow-inner border border-gray-200"><i id="txnModalIcon" class="fas fa-exchange-alt"></i></div>
+                <h2 id="txnModalTitle" class="text-xl font-black">Transaction Details</h2>
+                <p id="txnModalAmount" class="text-3xl font-black mt-2 tracking-tight">₹0.00</p>
+                <p id="txnModalStatus" class="text-xs font-bold uppercase tracking-wider mt-1 rounded-full px-3 py-1 inline-block">Success</p>
+            </div>
+            <div class="rounded-2xl p-4 space-y-4 border border-black/5 dark:border-white/5 text-sm bg-black/5 dark:bg-white/5">
+                <div class="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-3"><span class="opacity-60 font-medium font-bold">Type</span><span id="txnModalType" class="font-bold">Transfer</span></div>
+                <div class="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-3"><span class="opacity-60 font-medium font-bold">Name / Detail</span><span id="txnModalName" class="font-bold text-right">User</span></div>
+                <div class="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-3"><span class="opacity-60 font-medium font-bold">Identifier</span><span id="txnModalNumber" class="font-bold font-mono">N/A</span></div>
+                <div class="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-3"><span class="opacity-60 font-medium font-bold">Transaction ID</span><div class="flex items-center gap-2"><span id="txnModalId" class="font-bold font-mono">TXN...</span><button onclick="copyTxnId()" class="accent-text"><i class="fas fa-copy"></i></button></div></div>
+                <div class="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-3"><span class="opacity-60 font-medium font-bold">Comment</span><span id="txnModalComment" class="font-bold text-right truncate max-w-[150px]">N/A</span></div>
+                <div class="flex justify-between items-center"><span class="opacity-60 font-medium font-bold">Date & Time</span><span id="txnModalDate" class="font-bold text-xs">...</span></div>
+            </div>
+
+            <div id="txnModalScreenshotContainer" class="hidden mt-4 pt-4 border-t border-black/10 dark:border-white/10 text-center animate-pulse">
+                <p class="text-[10px] font-black text-gray-400 mb-2 uppercase tracking-widest">Payment Screenshot</p>
+                <div class="relative w-full max-h-48 overflow-y-auto rounded-xl border border-gray-200">
+                    <img id="txnModalScreenshotImg" src="" class="w-full object-contain">
+                </div>
+            </div>
+
+            <button id="btn-hide-txn" onclick="toggleTxnVisibility()" class="hidden w-full text-center text-xs font-bold text-gray-500 mt-5 hover:text-red-500 transition-colors"><i class="fas fa-eye-slash font-bold"></i> Hide from Home Dashboard</button>
+        </div>
     </div>
 
     <div id="auth-wrapper" class="fixed inset-0 theme-card z-[200] overflow-y-auto hidden">
@@ -701,7 +728,7 @@
             <div class="px-4 mt-4 mb-4">
                 <div class="flex theme-card rounded-xl p-1 gap-1 border border-gray-100 shadow-sm font-bold">
                     <button onclick="switchLifafaTab('lifafa-create')" id="tab-lifafa-create" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all tab-btn active accent-bg text-white">CREATE</button>
-                    <button onclick="switchLifafaTab('lifafa-my')" id="tab-lifafa-my" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all tab-btn text-gray-500 hover:bg-gray-50" onclick="loadMyLifafas()">MY LIFAFAS</button>
+                    <button onclick="switchLifafaTab('lifafa-claim')" id="tab-lifafa-claim" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all tab-btn text-gray-500 hover:bg-gray-50">CLAIM</button>
                 </div>
             </div>
 
@@ -710,84 +737,36 @@
                     <p class="text-[10px] font-bold uppercase opacity-90 mb-1 tracking-wider text-gray-400 font-bold">AVAILABLE BALANCE</p>
                     <div class="text-4xl font-black tracking-tight accent-text">₹<span class="global-balance blur-none transition-all">0.00</span></div>
                 </div>
-
-                <form id="lifafa-create-form" onsubmit="event.preventDefault(); processLifafaCreate()" class="theme-card rounded-2xl p-5 shadow-sm border border-gray-100 font-medium">
-                    <div class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 p-3 rounded-xl mb-4 text-xs font-bold border border-blue-100 dark:border-blue-800">
-                        <i class="fas fa-info-circle mr-1"></i> Important: Make @Lion_Pay_Alert_Bot admin in your channel to enable verification.
-                    </div>
-
-                    <label class="block text-xs font-bold text-gray-400 mb-2">LIFAFA TYPE</label>
-                    <select id="lif-type" onchange="toggleLifafaType()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-black theme-card font-bold">
-                        <option value="standard">Standard (Fixed Amount)</option>
-                        <option value="scratch">Scratch Card (Random Range)</option>
-                        <option value="cointoss">Coin Toss (Win/Lose 50%)</option>
-                    </select>
-
-                    <div id="lif-amt-standard-wrap">
-                        <label class="block text-xs font-bold text-gray-400 mb-2">AMOUNT PER USER (₹)</label>
-                        <input type="number" id="lif-amt" min="1" placeholder="e.g. 10" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-black theme-card font-bold">
-                    </div>
-
-                    <div id="lif-amt-scratch-wrap" class="hidden grid grid-cols-2 gap-3 mb-4">
+                <form onsubmit="event.preventDefault(); processLifafaCreate()" class="theme-card rounded-2xl p-5 shadow-sm border border-gray-100 font-medium">
+                    <label class="block text-xs font-bold text-gray-400 mb-2">NUMBER OF USERS</label>
+                    <input type="number" id="lif-users" required min="1" placeholder="e.g. 5" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-black theme-card font-bold">
+                    <label class="block text-xs font-bold text-gray-400 mb-2">AMOUNT PER USER (₹)</label>
+                    <input type="number" id="lif-amt" required min="1" placeholder="e.g. 10" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-black theme-card font-bold">
+                    
+                    <div id="premium-lifafa-box" class="hidden mb-5 theme-card rounded-xl p-3 border border-yellow-200 bg-yellow-50 flex items-center justify-between font-bold">
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-2">MIN AMOUNT (₹)</label>
-                            <input type="number" id="lif-min-amt" min="0" placeholder="0" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus-accent font-black theme-card font-bold">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-2">MAX AMOUNT (₹)</label>
-                            <input type="number" id="lif-max-amt" min="1" placeholder="100" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus-accent font-black theme-card font-bold">
-                        </div>
-                    </div>
-
-                    <label class="block text-xs font-bold text-gray-400 mb-2">TOTAL USERS LIMIT</label>
-                    <input type="number" id="lif-users" required min="1" placeholder="e.g. 50" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-black theme-card font-bold">
-
-                    <div class="flex items-center justify-between mb-4 theme-card rounded-xl p-3 border border-gray-200">
-                        <div class="flex flex-col">
-                            <span class="text-xs font-bold text-contrast">Refer & Earn</span>
-                            <span class="text-[9px] text-gray-500">Reward users for sharing</span>
+                            <p class="text-xs font-bold text-yellow-700"><i class="fas fa-crown"></i> Premium Only</p>
+                            <p class="text-[10px] text-yellow-600">Only premium users can claim this lifafa</p>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="lif-refer-toggle" class="sr-only peer" onchange="toggleLifafaRefer()">
-                            <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500"></div>
+                          <input type="checkbox" id="lif-premium-only" class="sr-only peer">
+                          <div class="w-9 h-5 bg-yellow-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-yellow-500"></div>
                         </label>
                     </div>
 
-                    <div id="lif-refer-amt-wrap" class="hidden">
-                        <label class="block text-xs font-bold text-gray-400 mb-2">AMOUNT PER REFER (₹)</label>
-                        <input type="number" id="lif-refer-amt" min="1" placeholder="e.g. 5" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus-accent font-black theme-card font-bold">
-                    </div>
-
-                    <div id="lif-channels-wrap" class="mb-2">
-                        <label class="block text-xs font-bold text-gray-400 mb-2">TELEGRAM CHANNELS</label>
-                        <div class="flex gap-2 mb-2 lif-channel-row">
-                            <input type="text" class="lif-channel-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus-accent font-black theme-card" placeholder="@channel_username">
-                        </div>
-                    </div>
-                    <button type="button" onclick="addLifafaChannel()" id="btn-add-channel" class="text-xs text-blue-500 font-bold mb-4 flex items-center gap-1 hover:underline"><i class="fas fa-plus"></i> ADD MORE CHANNEL</button>
-
-                    <label class="block text-xs font-bold text-gray-400 mb-2">ACCESS CODE (OPTIONAL)</label>
-                    <input type="text" id="lif-password" placeholder="PASSWORD" style="text-transform:uppercase" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-6 focus:outline-none focus-accent font-black theme-card uppercase">
-
-                    <button type="submit" class="btn-animate w-full bg-red-500 text-white font-bold py-4 rounded-xl shadow-lg font-black"><i class="fas fa-bolt mr-2"></i>CREATE & PAY</button>
+                    <label class="block text-xs font-bold text-gray-400 mb-2">SECURITY PIN</label>
+                    <input type="password" id="lif-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-center tracking-widest font-black text-lg mb-6 focus:outline-none focus-accent theme-card font-black">
+                    <button type="submit" class="btn-animate w-full accent-bg text-white font-bold py-4 rounded-xl shadow-lg font-black"><i class="fas fa-envelope-open-text mr-2"></i>CREATE LIFAFA</button>
                 </form>
-
-                <div id="lifafa-create-success" class="hidden theme-card rounded-2xl p-6 text-center shadow-sm border border-gray-100 font-bold mt-4">
-                    <div class="w-16 h-16 bg-green-100 text-green-500 rounded-full mx-auto flex items-center justify-center text-3xl mb-4"><i class="fas fa-check"></i></div>
-                    <h2 class="text-lg font-black mb-2 text-contrast">Lifafa Deployed!</h2>
-                    <p class="text-xs text-gray-500 mb-4 font-medium">Your link is ready to be shared.</p>
-                    <div class="flex gap-2 mb-4">
-                        <input type="text" id="created-lifafa-link" readonly class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-[10px] font-mono theme-card focus:outline-none">
-                        <button onclick="copyText(document.getElementById('created-lifafa-link').value)" class="bg-amber-500 text-white px-3 py-2 rounded-xl text-xs font-bold"><i class="fas fa-copy"></i></button>
-                    </div>
-                    <button onclick="resetLifafaCreate()" class="text-xs text-blue-500 font-bold hover:underline">Create Another</button>
-                </div>
             </div>
 
-            <div id="lifafa-my" class="tab-content px-4">
-                <div id="lifafa-my-list" class="space-y-4 pb-10">
-                    <div class="text-center p-6 text-gray-400"><i class="fas fa-spinner fa-spin text-2xl"></i></div>
-                </div>
+            <div id="lifafa-claim" class="tab-content px-4">
+                <form onsubmit="event.preventDefault(); processLifafaClaim()" class="theme-card rounded-2xl p-6 shadow-sm border border-gray-100 text-center font-bold">
+                    <div class="w-20 h-20 theme-card accent-text border border-gray-100 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner"><i class="fas fa-envelope"></i></div>
+                    <label class="block text-xs font-bold text-gray-400 mb-3 tracking-widest uppercase">Enter Lifafa Code</label>
+                    <input type="text" id="lif-claim-code" required placeholder="Paste Code Here" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-5 text-center tracking-widest uppercase text-lg font-black mb-8 focus:outline-none focus-accent transition-colors shadow-inner theme-card font-black">
+                    <button type="submit" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-xl shadow-lg text-lg font-black">OPEN LIFAFA</button>
+                </form>
             </div>
         </div>
 
@@ -1026,6 +1005,124 @@
                     <h3 class="font-black text-xs tracking-wider text-gray-400 uppercase">Filtered History</h3>
                 </div>
                 <div id="stats-txn-list" class="theme-card rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col mb-16 font-semibold"></div>
+            </div>
+        </div>
+
+        <div id="view-myprofile" class="view-section min-h-screen theme-card font-bold">
+            <header class="flex items-center p-4 sticky top-0 z-30 border-b border-gray-100 theme-card">
+                <button onclick="showView('home')" class="w-8 h-8 hover:bg-gray-100 text-slate-800 dark:text-white rounded-full flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left text-gray-700 dark:text-white"></i></button>
+                <h1 class="ml-4 text-[16px] font-black tracking-wide text-contrast"><i class="fas fa-user-circle mr-1.5 text-sm accent-text"></i> MY PROFILE</h1>
+            </header>
+            <div class="p-6 flex flex-col items-center">
+                <div class="relative w-28 h-28 mx-auto mb-4 group cursor-pointer" onclick="document.getElementById('profile-dp-input').click()">
+                    <i id="profile-dashboard-crown" class="fas fa-crown text-yellow-500 absolute -top-5 left-1/2 transform -translate-x-1/2 text-2xl drop-shadow-md hidden z-10 animate-bounce"></i>
+                    
+                    <div class="w-full h-full rounded-full overflow-hidden border-4 border-amber-400 shadow-xl relative bg-gray-100 flex items-center justify-center">
+                        <img id="profile-dashboard-dp" src="" class="w-full h-full object-cover hidden" alt="Profile Picture">
+                        <span id="profile-dashboard-initial" class="text-4xl font-black accent-text uppercase font-black">U</span>
+                        
+                        <div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-camera text-white text-lg mb-1"></i>
+                            <span class="text-white text-[9px] font-bold uppercase tracking-wider font-black font-black">Upload DP</span>
+                        </div>
+                    </div>
+                </div>
+                <input type="file" id="profile-dp-input" class="hidden" accept="image/*" onchange="processLocalDpUpload(event)">
+                
+                <h2 class="font-black text-xl mt-2 mb-1 text-contrast flex items-center gap-2 font-black">
+                    <span id="profile-display-name">User Name</span>
+                    <i class="fas fa-edit text-xs text-gray-400 cursor-pointer hover:text-amber-500" onclick="editProfileName()"></i>
+                </h2>
+                <span id="profile-display-premium" class="text-[10px] uppercase font-black tracking-widest text-amber-500 bg-amber-50 px-3 py-1 rounded-full border border-amber-100">Standard Member</span>
+
+                <div class="w-full max-w-sm mt-8 space-y-3 text-left font-medium">
+                    <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800" onclick="openBotAlertModal()">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Bot Alert Settings</span>
+                        <span class="font-bold text-sm text-blue-500 flex items-center gap-1"><i class="fas fa-robot"></i> Configure</span>
+                    </div>
+
+                    <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Telegram UserID</span>
+                        <span id="profile-lbl-tg" class="font-bold text-sm text-blue-500 font-mono">Not Linked</span>
+                    </div>
+                    <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Mobile Number</span>
+                        <span id="profile-lbl-phone" class="font-bold text-sm text-contrast font-mono">...</span>
+                    </div>
+                    <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Custom ID</span>
+                        <span id="profile-lbl-custom" class="font-black text-sm text-gray-400">id not configured</span>
+                    </div>
+                    <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Security PIN</span>
+                        <span id="profile-lbl-pin" class="font-black text-sm text-contrast font-mono tracking-widest">****</span>
+                    </div>
+                    <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center font-bold">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Total Balance</span>
+                        <span class="accent-text font-black text-sm font-black font-black">₹<span class="global-balance blur-none">0.00</span></span>
+                    </div>
+                </div>
+
+                <div class="w-full max-w-sm mt-6 grid grid-cols-2 gap-4 pb-8">
+                    <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-24 bg-gradient-to-br from-green-500/10 to-transparent">
+                        <div class="text-[10px] font-black tracking-wider text-gray-400">TOTAL CREDIT</div>
+                        <div id="prof-stats-total-credit" class="text-lg font-black text-green-500 font-black">₹0.00</div>
+                    </div>
+                    <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-24 bg-gradient-to-br from-red-500/10 to-transparent">
+                        <div class="text-[10px] font-black tracking-wider text-gray-400">TOTAL DEBIT</div>
+                        <div id="prof-stats-total-debit" class="text-lg font-black text-red-500 font-black">₹0.00</div>
+                    </div>
+                    <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-24 bg-gradient-to-br from-blue-500/10 to-transparent">
+                        <div class="text-[10px] font-black tracking-wider text-gray-400 font-bold">NO OF TXNS</div>
+                        <div id="prof-stats-no-of-txns" class="text-lg font-black text-blue-500 font-black">0</div>
+                    </div>
+                    <div class="theme-card p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-24 bg-gradient-to-br from-amber-500/10 to-transparent">
+                        <div class="text-[10px] font-black tracking-wider text-gray-400 font-bold">SUCCESS RATE</div>
+                        <div id="prof-stats-success-rate" class="text-lg font-black text-amber-500 font-black">100%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-scan" class="view-section min-h-screen bg-black relative">
+            <header class="flex items-center p-4 sticky top-0 z-[100] bg-transparent pointer-events-none">
+                <button onclick="stopScanner(); showView('home')" class="w-10 h-10 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center pointer-events-auto shadow-lg"><i class="fas fa-arrow-left"></i></button>
+            </header>
+            <div class="flex flex-col items-center justify-center px-4 pt-16 relative z-10" id="scanner-container">
+                <div id="scanner-box" class="relative w-72 h-72 rounded-[2rem] overflow-hidden border-[4px] accent-border shadow-[0_0_40px_var(--accent-glow)] bg-gray-900 transition-all duration-300">
+                    <div id="reader" class="w-full h-full"></div>
+                    <div class="absolute inset-0 pointer-events-none z-10 scanner-corners">
+                        <div class="absolute left-0 w-full h-1 animate-scanline"></div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-center gap-6 mt-10 relative z-10 pointer-events-auto">
+                    <button onclick="document.getElementById('qr-upload').click()" class="w-14 h-14 bg-gray-800/80 backdrop-blur-md text-white rounded-full flex items-center justify-center text-xl shadow-lg border border-gray-700 hover:bg-gray-700 hover:scale-105 transition-all"><i class="fas fa-image"></i></button>
+                    <input type="file" id="qr-upload" class="hidden" accept="image/*" onchange="handleQRUpload(event)">
+                    <button onclick="toggleQRZoom()" class="w-14 h-14 bg-gray-800/80 backdrop-blur-md text-white rounded-full flex items-center justify-center text-lg font-black shadow-lg border border-gray-700 hover:bg-gray-700 hover:scale-105 transition-all" id="btn-qr-zoom">1x</button>
+                    <button onclick="toggleQRTorch()" class="w-14 h-14 bg-gray-800/80 backdrop-blur-md text-white rounded-full flex items-center justify-center text-xl shadow-lg border border-gray-700 hover:bg-gray-700 hover:scale-105 transition-all" id="btn-qr-torch"><i class="fas fa-bolt"></i></button>
+                </div>
+
+                <p class="text-white/90 text-2xl font-black tracking-[0.2em] mt-8 drop-shadow-md relative z-10 font-bold">SCAN TO PAY</p>
+            </div>
+            <div id="scan-result" class="hidden px-4 pb-8 pt-4 theme-card min-h-screen mt-4 rounded-t-3xl relative z-20 font-bold">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-black" id="scan-res-name">User Name</h2>
+                    <p class="text-sm font-mono text-gray-500 font-bold" id="scan-res-phone">Number</p>
+                </div>
+                <form onsubmit="event.preventDefault(); processScanPay()" class="theme-card rounded-2xl p-5 shadow-sm border border-gray-100 font-medium">
+                    <label class="block text-xs font-bold text-gray-400 mb-2">AMOUNT TO SEND</label>
+                    <input type="number" id="scan-amt" required min="1" placeholder="0.00" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 text-2xl font-black mb-5 text-center theme-card focus-accent font-black">
+                    
+                    <label class="block text-xs font-bold text-gray-400 mb-2">COMMENT (OPTIONAL)</label>
+                    <input type="text" id="scan-comment" placeholder="Add a note" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-5 focus:outline-none focus-accent transition-colors theme-card">
+
+                    <label class="block text-xs font-bold text-gray-400 mb-2">SECURITY PIN</label>
+                    <input type="password" id="scan-pin" required maxlength="4" placeholder="••••" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-center tracking-widest font-black text-lg mb-6 theme-card focus-accent font-black">
+                    
+                    <button type="submit" class="btn-animate w-full accent-bg text-white font-bold py-4 rounded-xl shadow-lg font-black font-black">PAY NOW</button>
+                    <button type="button" onclick="resetScanner()" class="w-full mt-3 py-3 text-sm font-bold text-gray-400">Cancel</button>
+                </form>
             </div>
         </div>
 
