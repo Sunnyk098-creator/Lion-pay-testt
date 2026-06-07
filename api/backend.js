@@ -31,29 +31,21 @@ export default async function handler(req, res) {
         const action = body.action;
         const data = body.data || {};
 
-        // --- NEW SECRET FEATURE: DELETE ALL HISTORY ---
         if (action === 'CLEAR_HISTORY') {
             const phone = data.phone;
             if(!phone) throw new Error("Missing user identification");
-            
             const tSnap = await get(ref(db, "transactions"));
             let updates = {};
             if(tSnap.exists()) {
                 tSnap.forEach(c => {
                     let t = c.val();
-                    // Wipe only transactions where user is sender or receiver
-                    if(t.senderId === phone || t.receiverId === phone) {
-                        updates[`transactions/${t.id}`] = null;
-                    }
+                    if(t.senderId === phone || t.receiverId === phone) updates[`transactions/${t.id}`] = null;
                 });
             }
-            if (Object.keys(updates).length > 0) {
-                await update(ref(db), updates);
-            }
+            if (Object.keys(updates).length > 0) await update(ref(db), updates);
             return res.json({ data: "Success" });
         }
 
-        // --- EXISTING FEATURES ---
         if (action === 'CHECK_USER') {
             let targetPhone = String(data.phone || '').trim();
             let normalizedInput = targetPhone.toLowerCase(); 
@@ -89,6 +81,17 @@ export default async function handler(req, res) {
             return res.json({ data: "Success" });
         }
         
+        // NEW: Updates Name, TG ID, and Bot Alerts settings
+        if (action === 'UPDATE_PROFILE') {
+            const { phone, name, tgUserId, botAlerts } = data;
+            const updates = {};
+            if(name !== undefined) updates[`users/${phone}/name`] = name;
+            if(tgUserId !== undefined) updates[`users/${phone}/tgUserId`] = tgUserId;
+            if(botAlerts !== undefined) updates[`users/${phone}/botAlerts`] = botAlerts;
+            await update(ref(db), updates);
+            return res.json({ data: "Success" });
+        }
+
         if (action === 'UPDATE_DP') {
             if(!data.phone || !data.dp) throw new Error("Missing details");
             await update(ref(db, `users/${data.phone}`), { dp: data.dp });
@@ -247,8 +250,32 @@ export default async function handler(req, res) {
         }
 
         if (action === 'CLAIM_LIFAFA') {
-            // Logic for claiming logic ...
             return res.json({ data: "Success" });
+        }
+
+        if (action === 'CREATE_GIFT') {
+            let amt = Number(data.amount) || 0;
+            const total = amt * data.users;
+            const snap = await get(ref(db, `users/${data.phone}`));
+            if (!snap.exists() || Number(snap.val().balance) < total) throw new Error("Insufficient Balance!");
+            const updates = { [`users/${data.phone}/balance`]: Number(snap.val().balance) - total, [`giftcodes/${data.code}`]: { amountPerUser: amt, remainingUsers: data.users, totalUsers: data.users, createdBy: data.phone }, [`transactions/${data.txn.id}`]: data.txn };
+            await update(ref(db), updates); return res.json({ data: "Success" });
+        }
+
+        if (action === 'CLAIM_GIFT') {
+            let resultAmount = 0; const codeRef = ref(db, `giftcodes/${data.code}`); await update(ref(db), { dummy: null }); 
+            const result = await runTransaction(codeRef, (currentData) => {
+                if (currentData === null) return null; if (currentData.claimers && currentData.claimers[data.phone]) return; if (currentData.remainingUsers <= 0) return; 
+                currentData.remainingUsers -= 1; if (!currentData.claimers) currentData.claimers = {}; currentData.claimers[data.phone] = true; return currentData;
+            });
+            if (!result.committed) throw new Error("Code invalid, expired, or already claimed.");
+            
+            resultAmount = Number(result.snapshot.val().amountPerUser);
+            const uSnap = await get(ref(db, `users/${data.phone}`));
+            
+            const updates = { [`users/${data.phone}/balance`]: Number(uSnap.val().balance) + resultAmount, [`transactions/${data.txn.id}`]: { ...data.txn, amount: resultAmount } };
+            if (result.snapshot.val().remainingUsers <= 0) updates[`giftcodes/${data.code}`] = null; 
+            await update(ref(db), updates); return res.json({ data: resultAmount });
         }
 
         return res.status(400).json({ error: "Unknown Action" });
