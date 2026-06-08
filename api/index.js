@@ -16,6 +16,10 @@ const db = getDatabase(app);
 
 const BOT_TOKEN = "7980852115:AAF_Tf6WL-mGm_IMkt4QP3Yu8LKZoc6JSUg";
 
+function getExactDate() {
+    return new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+}
+
 async function sendTelegramMsg(chatId, text) {
     try {
         if (!chatId) return false;
@@ -36,10 +40,8 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     try {
-        // Collect parameters from both query (GET) and body (POST) to ensure API works everywhere
         const data = { ...req.query, ...(req.body || {}) };
 
-        // REDIRECT IF DIRECT ACCESS WITHOUT ANY API PARAMETERS
         if (req.method === 'GET' && Object.keys(data).length === 0) {
             return res.redirect(302, 'https://lion-pay.vercel.app');
         }
@@ -53,7 +55,7 @@ export default async function handler(req, res) {
             const userSnap = await get(query(usersRef, orderByChild("tgUserId"), equalTo(tgId)));
             
             if (!userSnap.exists()) {
-                return res.status(200).json({ status: "error", message: "User not found with this Telegram ID." });
+                return res.status(200).json({ status: "error", message: "invalid" });
             }
             
             let userInfo = null;
@@ -101,7 +103,7 @@ export default async function handler(req, res) {
             const txnSnap = await get(ref(db, `transactions/${txnId}`));
             
             if (!txnSnap.exists()) {
-                return res.status(200).json({ status: "error", message: "Transaction not found." });
+                return res.status(200).json({ status: "error", message: "invalid" });
             }
             
             return res.status(200).json({ status: "success", data: txnSnap.val() });
@@ -116,14 +118,14 @@ export default async function handler(req, res) {
         const safeComment = String(comment || "").trim();
         
         if (!safeKey) {
-            return res.status(200).json({ status: "error", message: "Missing API Key or Token!" });
+            return res.status(200).json({ status: "error", message: "invalid" });
         }
 
         const usersRef = ref(db, "users");
         const adminSnap = await get(query(usersRef, orderByChild("apiKey"), equalTo(safeKey)));
         
         if (!adminSnap.exists()) {
-            return res.status(200).json({ status: "error", message: "Invalid API Key! Old key is expired or incorrect." });
+            return res.status(200).json({ status: "error", message: "invalid" });
         }
 
         let adminPhone = null, adminData = {};
@@ -143,10 +145,10 @@ export default async function handler(req, res) {
                 return res.status(200).json({ status: "error", message: "Minimum withdrawal amount is ₹10." });
             }
             if (currentAdminBal < withdrawAmount) {
-                return res.status(200).json({ status: "error", message: "Insufficient Balance in API Owner's wallet!" });
+                return res.status(200).json({ status: "error", message: "Insufficient Balance!" });
             }
 
-            const exactDate = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+            const exactDate = getExactDate();
             const txnId = "TXN" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase();
 
             const updates = {};
@@ -188,12 +190,12 @@ export default async function handler(req, res) {
         let targetNumber = String(paytm || number || "").trim(); 
         
         if (!targetNumber || !amount) {
-            return res.status(200).json({ status: "error", message: "Missing target number or amount required." });
+            return res.status(200).json({ status: "error", message: "invalid" });
         }
 
         const withdrawAmount = Number(amount);
         if (isNaN(withdrawAmount) || withdrawAmount <= 0) {
-            return res.status(200).json({ status: "error", message: "Invalid amount!" });
+            return res.status(200).json({ status: "error", message: "invalid amount" });
         }
 
         const customSnap = await get(ref(db, `custom_ids/${targetNumber.toLowerCase()}`));
@@ -202,20 +204,20 @@ export default async function handler(req, res) {
         }
 
         if (String(adminPhone) === targetNumber) {
-            return res.status(200).json({ status: "error", message: "API Owner cannot send payment to their own number!" });
+            return res.status(200).json({ status: "error", message: "Cannot send payment to your own number!" });
         }
 
         if (currentAdminBal < withdrawAmount) {
-            return res.status(200).json({ status: "error", message: "Insufficient Balance in API Owner's wallet!" });
+            return res.status(200).json({ status: "error", message: "Insufficient Balance!" });
         }
 
         const receiverSnap = await get(ref(db, "users/" + targetNumber));
         if (!receiverSnap.exists()) {
-            return res.status(200).json({ status: "error", message: "Receiver mobile number or Custom ID is not registered in wallet!" });
+            return res.status(200).json({ status: "error", message: "invalid" });
         }
         let receiverData = receiverSnap.val() || {};
 
-        const exactDate = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+        const exactDate = getExactDate();
         const txnId = "TXN" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase();
 
         const updates = {};
@@ -265,6 +267,6 @@ export default async function handler(req, res) {
         });
 
     } catch (error) { 
-        return res.status(200).json({ status: "error", message: "Server Error: " + (error.message || "Unknown error") }); 
+        return res.status(200).json({ status: "error", message: "invalid" }); 
     }
 }
