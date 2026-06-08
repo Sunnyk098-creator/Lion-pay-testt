@@ -90,11 +90,7 @@ async function apiCall(action, data = {}) {
 async function sendTelegramMsg(chatId, text, isTxnAlert = true) {
     try {
         if(!chatId) return false;
-        
-        if (isTxnAlert && currentUser && currentUser.botAlerts === false) {
-            return true; 
-        }
-
+        if (isTxnAlert && currentUser && currentUser.botAlerts === false) { return true; }
         let res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'HTML' }) }); 
         return (await res.json()).ok;
     } catch (e) { return false; }
@@ -108,6 +104,7 @@ function formatTgMsg(isPrem, type, title, amount, extra) {
     }
 }
 
+function formatDateTime() { return new Date().toLocaleString('en-IN', { hour12: true, day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
 function generateApiKey() { return 'LP-' + Math.random().toString(36).substring(2, 10).toUpperCase(); }
 function generateTxnId() { return 'TXN' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase(); }
 function checkSecurityPin(inputPin) { if(inputPin === currentUser?.pin) return true; showToast("Incorrect Security PIN!"); return false; }
@@ -654,7 +651,6 @@ function markPostsAsRead() {
 
 function handleMessageNotificationClick() { markPostsAsRead(); showView('official'); }
 
-// Profile Updates
 async function editProfileName() {
     let newName = prompt("Enter new Name:", currentUser.name);
     if (newName && newName.trim() !== "" && newName !== currentUser.name) {
@@ -670,7 +666,6 @@ async function editProfileName() {
     }
 }
 
-// Full Screen Bot Alert Settings
 async function saveBotAlertSettingsFS() {
     let isEnabled = document.getElementById('toggle-bot-alert-check-fs').checked;
     let newTgId = document.getElementById('bot-alert-tg-id-fs').value.trim();
@@ -894,10 +889,8 @@ function initApp() {
         document.getElementById('sidebar-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=LIONPAY:${currentUser.phone}:${encodeURIComponent(currentUser.name)}`;
     }
     updateApiKeyUI();
-    
     applyPremiumUI();
     updateProfileDashboardUI();
-    
     syncLoop(); 
     
     const urlParams = new URLSearchParams(window.location.search);
@@ -1198,7 +1191,7 @@ async function processWithdraw() {
 }
 
 // ----------------------------------------------------
-// ADVANCED LIFAFA SYSTEM 
+// ADVANCED LIFAFA SYSTEM
 // ----------------------------------------------------
 
 function toggleLifafaTypeUI() {
@@ -1232,7 +1225,7 @@ function resetLifafaCreationForm() {
     document.getElementById('lif-min-amt').value=''; 
     document.getElementById('lif-max-amt').value=''; 
     document.getElementById('lif-users').value=''; 
-    document.getElementById('lif-refer-amt').value='';
+    if(document.getElementById('lif-refer-amt')) document.getElementById('lif-refer-amt').value='';
     document.getElementById('lif-pin').value=''; 
     document.getElementById('lif-password').value='';
     document.getElementById('lif-channels-container').innerHTML = '<div class="flex items-center gap-2"><input type="text" class="lif-channel-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus-accent theme-card font-mono" placeholder="e.g. @yourchannel"><button type="button" onclick="removeLifafaChannelInput(this)" class="text-red-500 p-2"><i class="fas fa-trash"></i></button></div>';
@@ -1244,6 +1237,7 @@ async function processLifafaCreate() {
     
     let type = document.getElementById('lif-type').value;
     let users = parseInt(document.getElementById('lif-users').value); 
+    if (isNaN(users) || users <= 0) return showActionError({ amount: 0, name: "Lifafa", message: "Invalid users limit!"});
     
     let amountPerUser = 0, minAmount = 0, maxAmount = 0;
     if(type === 'standard' || type === 'coin') {
@@ -1271,7 +1265,7 @@ async function processLifafaCreate() {
     
     let maxBaseDeduction = 0;
     if(type === 'standard') maxBaseDeduction = amountPerUser * users;
-    else if(type === 'coin') maxBaseDeduction = (amountPerUser * 2) * users; // max possible payout if everyone wins
+    else if(type === 'coin') maxBaseDeduction = (amountPerUser * 2) * users; 
     else if(type === 'scratch') maxBaseDeduction = maxAmount * users;
 
     let totalReferDeduction = referActive ? (referAmount * users) : 0;
@@ -1317,7 +1311,7 @@ async function renderMyLifafas() {
         let res = await fetch(`https://lion-pay-a9557-default-rtdb.firebaseio.com/lifafas.json?orderBy="createdBy"&equalTo="${currentUser.phone}"`);
         let data = await res.json();
         container.innerHTML = '';
-        if(!data || Object.keys(data).length === 0) {
+        if(!data || Object.keys(data).length === 0 || data.error) {
             container.innerHTML = '<p class="text-center text-gray-400 text-xs py-4 font-bold">No Lifafas created yet.</p>';
             return;
         }
@@ -1383,7 +1377,6 @@ async function showPublicLifafa(code) {
 async function verifyLifafaUser() {
     let input = document.getElementById('public-lif-phone').value.trim();
     if(!input) return showToast("Enter your Phone or ID");
-    if(input.length < 10) return showToast("Enter a valid 10-digit number.");
     
     let btn = document.querySelector('#lif-public-step-1 button');
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
@@ -1791,7 +1784,7 @@ function filterStatsTransactions() {
                     <div class="w-11 h-11 rounded-2xl theme-card flex items-center justify-center text-lg border border-gray-200"><i class="fas ${txn.icon}"></i></div>
                     <div>
                         <p class="text-sm font-bold text-gray-800 dark:text-gray-200">${txn.title}</p>
-                        <p class="text-[10px] ${statusColor} font-bold mt-0.5">${txn.status} • ${txn.date.split(',')[0]}</p>
+                        <p class="text-[10px] ${statusColor} font-bold mt-0.5">${txn.status} • ${txn.date}</p>
                     </div>
                 </div>
                 <p class="font-black ${amountClass}">${sign}₹${parseFloat(txn.amount).toFixed(2)}</p>
@@ -1854,7 +1847,7 @@ function updateUI() {
                 else { statusColor = 'text-green-500'; amountClass = 'text-red-500'; sign = '-'; }
             }
             
-            listEl.innerHTML += `<div onclick="openTxnModal('${txn.id}')" class="flex justify-between items-center p-4 border-b border-gray-100 hover:bg-gray-50 theme-card cursor-pointer transition-colors"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl theme-card accent-text flex items-center justify-center text-lg border border-gray-200"><i class="fas ${txn.icon}"></i></div><div><p class="text-sm font-bold ${titleClass}">${txn.title}</p><p class="text-[10px] ${statusColor} font-bold mt-0.5">${txn.status} • ${txn.date.split(',')[0]}</p></div></div><p class="font-black ${amountClass}">${sign}₹${parseFloat(txn.amount).toFixed(2)}</p></div>`;
+            listEl.innerHTML += `<div onclick="openTxnModal('${txn.id}')" class="flex justify-between items-center p-4 border-b border-gray-100 hover:bg-gray-50 theme-card cursor-pointer transition-colors"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl theme-card accent-text flex items-center justify-center text-lg border border-gray-200"><i class="fas ${txn.icon}"></i></div><div><p class="text-sm font-bold ${titleClass}">${txn.title}</p><p class="text-[10px] ${statusColor} font-bold mt-0.5">${txn.status} • ${txn.date}</p></div></div><p class="font-black ${amountClass}">${sign}₹${parseFloat(txn.amount).toFixed(2)}</p></div>`;
         });
     }
 }
@@ -1948,9 +1941,7 @@ async function showView(viewId) {
     if (currentUser) {
         try {
             await syncData(); 
-        } catch(e) {
-            console.error("Sync error:", e);
-        }
+        } catch(e) {}
     }
 
     if (viewId === 'official') {
