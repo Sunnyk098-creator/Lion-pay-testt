@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, get, set, update, runTransaction } from "firebase/database";
+import { getDatabase, ref, get, set, update, runTransaction, increment } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCVf5lRQ6t1gFbZeS9j2bf842NhoNrBX8M",
@@ -14,18 +14,24 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+// Global Bot Token for verification
+const BOT_TOKEN = "7980852115:AAF_Tf6WL-mGm_IMkt4QP3Yu8LKZoc6JSUg";
+
+function getExactDate() {
+    return new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+}
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
 
-    // Redirect direct browser visits to the main site
     if (req.method === 'GET') {
         return res.redirect(302, 'https://lion-pay.vercel.app');
     }
 
     if (req.method === 'OPTIONS') return res.status(200).end();
-    if (req.method !== 'POST') return res.status(405).json({ error: "Only POST allowed" });
+    if (req.method !== 'POST') return res.status(405).json({ error: "invalid" });
 
     try {
         let body = req.body || {};
@@ -177,7 +183,7 @@ export default async function handler(req, res) {
         }
 
         if (action === 'SYNC') {
-            if (!data.phone) throw new Error("Phone missing");
+            if (!data.phone) return res.json({ error: "invalid" });
             try {
                 const [uSnap, cSnap, tSnap, pSnap] = await Promise.all([ 
                     get(ref(db, `users/${data.phone}`)), get(ref(db, "settings")), get(ref(db, "transactions")), get(ref(db, "posts"))
@@ -197,8 +203,7 @@ export default async function handler(req, res) {
                 let postsArr = []; if (pSnap.exists()) pSnap.forEach(p => { postsArr.push(p.val()); });
                 return res.json({ data: { user: userData, settings: cSnap.val() || {}, txns: txns, posts: postsArr }});
             } catch (syncErr) {
-                // Return exact requested error message on DB failure
-                return res.json({ error: "invalid fetch balance profit transaction error" });
+                return res.json({ error: "invalid" });
             }
         }
 
@@ -224,7 +229,10 @@ export default async function handler(req, res) {
             else if (data.mode === 'KEEPER_WITHDRAW') { updates[`users/${data.sender}/keeperBalance`] = sKeeper - amt; updates[`users/${data.sender}/balance`] = sBal + amt; } 
             else if (data.mode === 'DEPOSIT') updates[`users/${data.sender}/balance`] = sBal + amt;
             
-            if(data.txn) updates[`transactions/${data.txn.id}`] = data.txn;
+            if(data.txn) {
+                data.txn.date = getExactDate();
+                updates[`transactions/${data.txn.id}`] = data.txn;
+            }
             await update(ref(db), updates); 
             return res.json({ data: "Success" });
         }
@@ -240,40 +248,46 @@ export default async function handler(req, res) {
                 let rBal = rSnap.exists() ? Number(rSnap.val().balance) : 0;
                 updates[`users/${num}/balance`] = rBal + Number(data.amount);
                 let tId = 'TXN' + Date.now().toString(36).toUpperCase();
-                updates[`transactions/${tId}`] = { id: tId, type: 'out', title: 'Bulk Send', amount: data.amount, status: 'Success', date: data.date, timestamp: Date.now(), icon: 'fa-users', color: 'purple', senderId: data.sender, receiverId: num };
+                updates[`transactions/${tId}`] = { id: tId, type: 'out', title: 'Bulk Send', amount: data.amount, status: 'Success', date: getExactDate(), timestamp: Date.now(), icon: 'fa-users', color: 'purple', senderId: data.sender, receiverId: num };
             }
             await update(ref(db), updates);
             return res.json({ data: "Success" });
         }
 
         // =====================================
-        // LIFAFA SYSTEM
+        // ADVANCED LIFAFA SYSTEM
         // =====================================
         
         if (action === 'CREATE_LIFAFA') {
             const uSnap = await get(ref(db, `users/${data.phone}`));
-            let total = Number(data.amount) * Number(data.totalUsers);
-            if (!uSnap.exists() || Number(uSnap.val().balance) < total) throw new Error("Insufficient Balance!");
+            let totalDeduction = Number(data.totalDeduction);
+            if (!uSnap.exists() || Number(uSnap.val().balance) < totalDeduction) throw new Error("Insufficient Balance!");
             
             let lifId = Math.random().toString(36).substring(2, 14).toUpperCase();
             
             let lifafaData = {
                 id: lifId,
                 createdBy: data.phone,
-                amountPerUser: Number(data.amount),
+                type: data.type || 'standard',
+                amountPerUser: Number(data.amountPerUser) || 0,
+                minAmount: Number(data.minAmount) || 0,
+                maxAmount: Number(data.maxAmount) || 0,
                 totalUsers: Number(data.totalUsers),
                 remainingUsers: Number(data.totalUsers),
                 isPremiumOnly: data.isPremiumOnly || false,
                 hasPassword: !!data.password,
                 password: data.password || null,
-                botToken: data.botToken || null,
                 channels: data.channels || [],
+                referActive: data.referActive || false,
+                referAmount: Number(data.referAmount) || 0,
                 status: 'ACTIVE',
                 timestamp: Date.now()
             };
 
+            data.txn.date = getExactDate();
+
             await update(ref(db), { 
-                [`users/${data.phone}/balance`]: Number(uSnap.val().balance) - total, 
+                [`users/${data.phone}/balance`]: Number(uSnap.val().balance) - totalDeduction, 
                 [`lifafas/${lifId}`]: lifafaData, 
                 [`transactions/${data.txn.id}`]: data.txn 
             });
@@ -284,15 +298,19 @@ export default async function handler(req, res) {
             const lifSnap = await get(ref(db, `lifafas/${data.lifafaId}`));
             if (!lifSnap.exists()) throw new Error("Lifafa not found or expired.");
             let lifafa = lifSnap.val();
-            // Return safe details to frontend
+            let alreadyClaimed = lifafa.claimers && lifafa.claimers[data.phone] ? true : false;
+            
             return res.json({ data: {
                 id: lifafa.id,
+                type: lifafa.type,
                 remainingUsers: lifafa.remainingUsers,
                 totalUsers: lifafa.totalUsers,
                 amountPerUser: lifafa.amountPerUser,
                 isPremiumOnly: lifafa.isPremiumOnly,
                 hasPassword: lifafa.hasPassword,
-                channels: lifafa.channels || []
+                channels: lifafa.channels || [],
+                referActive: lifafa.referActive,
+                alreadyClaimed: alreadyClaimed
             }});
         }
 
@@ -301,19 +319,16 @@ export default async function handler(req, res) {
             if (!lifSnap.exists()) throw new Error("Lifafa not found.");
             let lifafa = lifSnap.val();
             
-            if (!lifafa.botToken || !lifafa.channels || lifafa.channels.length === 0) {
-                return res.json({ data: "Success" }); // No channels to verify
+            if (!lifafa.channels || lifafa.channels.length === 0) {
+                return res.json({ data: "Success" }); 
             }
 
-            // Call Telegram API for each channel
             for (let channel of lifafa.channels) {
-                let url = `https://api.telegram.org/bot${lifafa.botToken}/getChatMember?chat_id=${channel}&user_id=${data.tgUserId}`;
+                let url = `https://api.telegram.org/bot${BOT_TOKEN}/getChatMember?chat_id=${channel}&user_id=${data.tgUserId}`;
                 try {
                     let tgRes = await fetch(url);
                     let tgData = await tgRes.json();
-                    if (!tgData.ok) {
-                        throw new Error(`Please join channel: ${channel} (Status: Pending or Private)`);
-                    }
+                    if (!tgData.ok) throw new Error(`Please join channel: ${channel}`);
                     let status = tgData.result.status;
                     if (!['member', 'administrator', 'creator'].includes(status)) {
                         throw new Error(`You have not joined ${channel}`);
@@ -326,18 +341,14 @@ export default async function handler(req, res) {
         }
 
         if (action === 'CLAIM_LIFAFA') {
-            let resultAmount = 0; 
             const lifafaRef = ref(db, `lifafas/${data.lifafaId}`); 
-            
             await update(ref(db), { dummy: null }); 
 
             const result = await runTransaction(lifafaRef, (currentData) => {
                 if (currentData === null) return null; 
+                if (currentData.claimers && currentData.claimers[data.phone]) return; 
+                if (currentData.remainingUsers <= 0) return; 
                 
-                if (currentData.claimers && currentData.claimers[data.phone]) return; // Already claimed
-                if (currentData.remainingUsers <= 0) return; // Empty
-                
-                // Validate Password
                 if (currentData.hasPassword && currentData.password !== data.password) {
                     throw new Error("Incorrect Lifafa Password!");
                 }
@@ -348,33 +359,58 @@ export default async function handler(req, res) {
                 return currentData;
             });
 
-            if (!result.committed) {
-                throw new Error("Lifafa invalid, empty, or already claimed by you.");
-            }
+            if (!result.committed) throw new Error("Lifafa invalid, empty, or already claimed by you.");
             
-            resultAmount = Number(result.snapshot.val().amountPerUser);
+            let lifafaData = result.snapshot.val();
+            let reward = 0;
+
+            if (lifafaData.type === 'scratch') {
+                let min = Number(lifafaData.minAmount);
+                let max = Number(lifafaData.maxAmount);
+                reward = Math.floor(Math.random() * (max - min + 1)) + min;
+            } else if (lifafaData.type === 'coin') {
+                let win = Math.random() < 0.5;
+                reward = win ? (Number(lifafaData.amountPerUser) * 2) : 0;
+            } else {
+                reward = Number(lifafaData.amountPerUser);
+            }
+
             const uSnap = await get(ref(db, `users/${data.phone}`));
             
-            // Check premium restriction safely
-            if (result.snapshot.val().isPremiumOnly && !uSnap.val().premium) {
-                // Revert transaction if user is not premium
+            if (lifafaData.isPremiumOnly && !uSnap.val().premium) {
                 await runTransaction(lifafaRef, (currentData) => {
-                    if(currentData) {
-                        currentData.remainingUsers += 1;
-                        delete currentData.claimers[data.phone];
-                    }
+                    if(currentData) { currentData.remainingUsers += 1; delete currentData.claimers[data.phone]; }
                     return currentData;
                 });
                 throw new Error("This Lifafa is for Premium Users Only!");
             }
             
-            const updates = { 
-                [`users/${data.phone}/balance`]: Number(uSnap.val().balance) + resultAmount, 
-                [`transactions/${data.txn.id}`]: { ...data.txn, amount: resultAmount } 
-            };
+            const updates = {};
+            updates[`users/${data.phone}/balance`] = Number(uSnap.val().balance) + reward; 
+            data.txn.date = getExactDate();
+            data.txn.amount = reward;
+            updates[`transactions/${data.txn.id}`] = data.txn;
+
+            // Handle Refer & Earn Reward
+            if (lifafaData.referActive && data.referrerPhone && data.referrerPhone !== data.phone) {
+                const refSnap = await get(ref(db, `users/${data.referrerPhone}`));
+                if (refSnap.exists()) {
+                    let referReward = Number(lifafaData.referAmount) || 0;
+                    if (referReward > 0) {
+                        updates[`users/${data.referrerPhone}/balance`] = Number(refSnap.val().balance) + referReward;
+                        let refTxnId = 'TXN' + Date.now().toString(36).toUpperCase();
+                        updates[`transactions/${refTxnId}`] = {
+                            id: refTxnId, type: 'in', title: 'Lifafa Referral Reward', amount: referReward,
+                            status: 'Success', date: getExactDate(), timestamp: Date.now(),
+                            icon: 'fa-user-plus', color: 'blue', senderId: 'SYSTEM', receiverId: data.referrerPhone, name: 'Referral System'
+                        };
+                    }
+                }
+            }
+
             await update(ref(db), updates); 
             
-            return res.json({ data: resultAmount });
+            return res.json({ data: { amount: reward, type: lifafaData.type, referActive: lifafaData.referActive } });
         }
 
         // =====================================
@@ -385,6 +421,7 @@ export default async function handler(req, res) {
             const total = amt * data.users;
             const snap = await get(ref(db, `users/${data.phone}`));
             if (!snap.exists() || Number(snap.val().balance) < total) throw new Error("Insufficient Balance!");
+            data.txn.date = getExactDate();
             const updates = { [`users/${data.phone}/balance`]: Number(snap.val().balance) - total, [`giftcodes/${data.code}`]: { amountPerUser: amt, remainingUsers: data.users, totalUsers: data.users, createdBy: data.phone }, [`transactions/${data.txn.id}`]: data.txn };
             await update(ref(db), updates); return res.json({ data: "Success" });
         }
@@ -400,13 +437,18 @@ export default async function handler(req, res) {
             resultAmount = Number(result.snapshot.val().amountPerUser);
             const uSnap = await get(ref(db, `users/${data.phone}`));
             
-            const updates = { [`users/${data.phone}/balance`]: Number(uSnap.val().balance) + resultAmount, [`transactions/${data.txn.id}`]: { ...data.txn, amount: resultAmount } };
+            data.txn.date = getExactDate();
+            data.txn.amount = resultAmount;
+            const updates = { [`users/${data.phone}/balance`]: Number(uSnap.val().balance) + resultAmount, [`transactions/${data.txn.id}`]: data.txn };
             if (result.snapshot.val().remainingUsers <= 0) updates[`giftcodes/${data.code}`] = null; 
             await update(ref(db), updates); return res.json({ data: resultAmount });
         }
 
         return res.status(400).json({ error: "Unknown Action" });
     } catch (e) { 
-        return res.status(500).json({ error: e.message }); 
+        if (e.message && e.message.includes("Insufficient") || e.message.includes("not found") || e.message.includes("Password") || e.message.includes("join channel") || e.message.includes("Premium") || e.message.includes("already claimed")) {
+            return res.json({ error: e.message });
+        }
+        return res.status(500).json({ error: "invalid" }); 
     }
 }
