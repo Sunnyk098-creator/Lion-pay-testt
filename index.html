@@ -57,6 +57,7 @@
         </div>
     </div>
 
+    <!-- ORIGINAL TRANSACTION SUCCESS RECEIPT OVERLAY -->
     <div id="txn-result-overlay" class="fixed inset-0 z-[9998] paytm-receipt-bg hidden flex-col items-center p-6 text-center overflow-y-auto">
         <div class="w-full flex justify-between items-center pt-4 mb-2">
             <span class="text-xs font-black tracking-widest text-gray-400 uppercase">Transaction Details</span>
@@ -106,7 +107,7 @@
         <button onclick="closeSuccessOverlay()" class="mt-8 mb-6 w-full max-w-sm theme-card border border-gray-200 dark:border-gray-700 text-contrast font-black py-4 rounded-xl shadow-sm tracking-wide animate-[slideUpFade_0.5s_ease-out_0.5s] opacity-0" style="animation-fill-mode: forwards;">BACK TO DASHBOARD</button>
     </div>
 
-    <!-- Public Lifafa Wrapper with Enhanced Flow -->
+    <!-- NEW PUBLIC LIFAFA CLAIM FLOW -->
     <div id="public-lifafa-wrapper" class="fixed inset-0 theme-card z-[1000] hidden flex-col items-center justify-center p-6 text-center overflow-y-auto backdrop-blur-md bg-opacity-95">
         <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-3xl mx-auto flex items-center justify-center text-4xl mb-6 shadow-xl border border-amber-200 animate-[slideDown_0.5s_ease-out] relative lifafa-float">
             <i class="fas fa-envelope-open-text relative z-10"></i>
@@ -115,7 +116,6 @@
         <h1 class="text-3xl font-black italic tracking-tight mb-2 animate-[slideUpFade_0.5s_ease-out_0.1s] opacity-0" style="animation-fill-mode: forwards;">LIFAFA <span class="text-amber-500">CLAIM</span></h1>
         <p class="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-8 animate-[slideUpFade_0.5s_ease-out_0.2s] opacity-0" style="animation-fill-mode: forwards;">Claim your free reward</p>
         
-        <!-- Step 1: Phone -->
         <div id="lif-public-step-1" class="w-full max-w-sm theme-card rounded-3xl p-6 shadow-2xl border border-gray-100 text-left animate-[slideUpFade_0.5s_ease-out_0.3s] opacity-0" style="animation-fill-mode: forwards;">
             <label class="block text-xs font-bold text-gray-400 mb-2 tracking-wide uppercase">Your Number (10 Digits)</label>
             <input type="tel" id="public-lif-phone" maxlength="10" placeholder="Enter Registered Phone" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 text-sm mb-5 focus-accent theme-card font-bold">
@@ -123,29 +123,21 @@
             <div class="text-center mt-4"><button type="button" onclick="window.location.href='/'" class="text-gray-400 hover:text-amber-600 text-xs font-bold transition-colors">Go to Home</button></div>
         </div>
         
-        <!-- Step 2: Verification -->
         <div id="lif-public-step-2" class="hidden w-full max-w-sm theme-card rounded-3xl p-6 shadow-2xl border border-gray-100 text-left animate-[slideUpFade_0.5s_ease-out]">
             <label class="block text-xs font-bold text-gray-400 mb-4 tracking-wide uppercase text-center">Join Required Channels</label>
-            
             <a href="https://t.me/Lion_Pay_Alert_Bot" target="_blank" class="block w-full bg-blue-100 hover:bg-blue-200 text-blue-700 font-black py-3 rounded-xl mb-4 text-center text-xs transition-colors border border-blue-200"><i class="fas fa-robot mr-1"></i> Start Verification Bot First</a>
-            
-            <div id="public-channels-grid" class="grid grid-cols-2 gap-3 mb-6">
-                <!-- Channels will be populated here -->
-            </div>
+            <div id="public-channels-grid" class="grid grid-cols-2 gap-3 mb-6"></div>
             <button type="button" id="btn-lif-verify-channels" onclick="verifyLifafaChannelsJoined()" class="btn-animate w-full bg-blue-500 hover:bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg transition-colors tracking-wide flex items-center justify-center gap-2"><i class="fas fa-sync-alt"></i> CHECK MEMBERSHIP</button>
             <div class="text-center mt-4"><button type="button" onclick="resetPublicLifafa()" class="text-gray-400 hover:text-amber-600 text-xs font-bold transition-colors">Back</button></div>
         </div>
         
-        <!-- Step 3: Password & Claim -->
         <div id="lif-public-step-3" class="hidden w-full max-w-sm theme-card rounded-3xl p-6 shadow-2xl border border-gray-100 text-left animate-[slideUpFade_0.5s_ease-out] relative overflow-hidden">
             <div class="absolute top-0 right-0 p-4 opacity-10"><i class="fas fa-check-circle text-6xl text-green-500"></i></div>
             <h3 class="text-green-500 font-black text-sm mb-4 tracking-wide uppercase"><i class="fas fa-shield-check"></i> Verification Successful</h3>
-            
             <div id="public-lif-password-box" class="hidden mb-6">
                 <label class="block text-xs font-bold text-gray-400 mb-2 tracking-wide uppercase"><i class="fas fa-lock text-amber-500"></i> Access Code</label>
                 <input type="text" id="public-lif-password" placeholder="Enter Password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 text-center tracking-widest text-lg focus-accent theme-card font-black">
             </div>
-            
             <button type="button" onclick="executePublicLifafaClaim()" class="btn-animate w-full accent-bg text-white font-black py-4 rounded-xl shadow-lg transition-colors tracking-wide text-lg relative overflow-hidden group">
                 <div class="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
                 <i class="fas fa-gift animate-pulse mr-2"></i> CLAIM NOW
@@ -153,7 +145,6 @@
             <div class="text-center mt-4"><button type="button" onclick="resetPublicLifafa()" class="text-gray-400 hover:text-amber-600 text-[10px] font-bold transition-colors uppercase tracking-wider">Cancel</button></div>
         </div>
 
-        <!-- Refer & Earn State for already claimed users -->
         <div id="lif-public-refer-step" class="hidden w-full max-w-sm theme-card rounded-3xl p-6 shadow-2xl border border-gray-100 text-center animate-[slideUpFade_0.5s_ease-out]">
             <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 border border-blue-100"><i class="fas fa-share-alt"></i></div>
             <h2 class="text-xl font-black mb-1">Refer & Earn!</h2>
@@ -165,12 +156,10 @@
             <div class="text-center mt-6"><button type="button" onclick="window.location.href='/'" class="text-gray-400 hover:text-amber-600 text-xs font-bold transition-colors">Go to Home</button></div>
         </div>
 
-        <!-- Result / Animation Box -->
-        <div id="lif-public-result" class="hidden w-full max-w-sm theme-card rounded-3xl p-6 shadow-2xl border border-gray-100 text-center animate-[slideUpFade_0.5s_ease-out]">
-            <!-- Dynamic Content injected via JS -->
-        </div>
+        <div id="lif-public-result" class="hidden w-full max-w-sm theme-card rounded-3xl p-6 shadow-2xl border border-gray-100 text-center animate-[slideUpFade_0.5s_ease-out]"></div>
     </div>
 
+    <!-- ORIGINAL SYSTEM MODALS & WRAPPERS -->
     <div id="new-message-popup" class="fixed top-6 left-1/2 transform -translate-x-1/2 w-11/12 max-w-sm bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl p-4 shadow-2xl z-[400] hidden flex-row items-center gap-4 cursor-pointer hover:scale-[1.02] transition-all duration-300 animate-[slideDown_0.5s_ease-out]" onclick="handleMessageNotificationClick()">
         <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0 shadow-inner"><i class="fas fa-bell text-xl animate-pulse"></i></div>
         <div class="flex-1"><h3 class="font-black text-sm tracking-wide">New messages by admin</h3><p class="text-xs text-blue-100 opacity-90 truncate font-medium">Tap to view official posts</p></div><i class="fas fa-chevron-right opacity-70"></i>
@@ -239,6 +228,7 @@
         </div>
     </div>
 
+    <!-- ORIGINAL AUTH WRAPPER -->
     <div id="auth-wrapper" class="fixed inset-0 theme-card z-[200] overflow-y-auto hidden">
         <div id="auth-login" class="min-h-screen flex flex-col p-6 items-center justify-center relative font-bold">
             <div class="w-20 h-20 bg-yellow-50 text-yellow-500 rounded-3xl flex items-center justify-center text-4xl mb-6 shadow-inner border border-yellow-100"><i class="fas fa-paw animate-bounce"></i></div>
@@ -295,6 +285,7 @@
         </div>
     </div>
 
+    <!-- MAIN APP CONTAINER -->
     <main id="app-container">
         <div id="view-home" class="view-section active">
             <header class="flex justify-between items-center p-4 theme-card shadow-sm sticky top-0 z-30">
@@ -362,7 +353,6 @@
                     <button onclick="showView('txn')" class="col-txn anim-txn btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 color-txn hover:shadow-lg transition-all"><i class="fas fa-search-dollar"></i></div><span class="text-[10px] font-bold text-gray-600">TXN Find</span></button>
                     
                     <button onclick="showView('botalert')" class="col-bot anim-bot btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 color-bot hover:shadow-lg transition-all"><i class="fas fa-robot"></i></div><span class="text-[10px] font-bold text-gray-600">Bot Alert</span></button>
-                    
                     <button id="btn-premium-menu" onclick="showView('premium')" class="col-premium anim-premium btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 text-yellow-500 hover:shadow-lg transition-all"><i class="fas fa-crown"></i></div><span class="text-[10px] font-bold text-gray-600 font-bold">Premium</span></button>
                     <button id="btn-theme-menu" onclick="showView('themes')" class="col-theme hidden btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-palette"></i></div><span class="text-[10px] font-bold text-gray-600 font-bold">Themes</span></button>
                     <button id="btn-tags-menu" onclick="showView('tags')" class="col-tags hidden btn-animate flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-full bg-gray-50 theme-card flex items-center justify-center text-xl shadow-md border border-gray-100 accent-text hover:shadow-lg transition-all"><i class="fas fa-tags"></i></div><span class="text-[10px] font-bold text-gray-600 font-bold">Tags</span></button>
