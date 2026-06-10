@@ -111,11 +111,11 @@ function checkSecurityPin(inputPin) { if(inputPin === currentUser?.pin) return t
 
 function updateApiKeyUI() {
     let key = currentUser?.apiKey || 'LP-PENDING'; 
-    let domain = window.location.host;
     
     let elUrlFull = document.getElementById('ui-api-url-full'); 
-    if(elUrlFull) elUrlFull.innerHTML = `https://${domain}/api?key=<span class="accent-text">${key}</span>&transaction=<span class="text-green-400">{number}</span>&amount=<span class="text-green-400">{amount}</span>&comment=<span class="text-green-400">{comment}</span>`;
+    if(elUrlFull) elUrlFull.innerHTML = `https://lion-pay.vercel.app/api?key=<span class="accent-text">${key}</span>&paytm=<span class="text-green-400">{number}</span>&amount=<span class="text-green-400">{amount}</span>&comment=<span class="text-green-400">{comment}</span>`;
     
+    let domain = window.location.host;
     let elUrlUpi = document.getElementById('ui-api-url-upi'); 
     if(elUrlUpi) elUrlUpi.innerHTML = `https://${domain}/api?token=<span class="accent-text">${key}</span>&upi_id=<span class="text-green-400">{upi_id}</span>&amount=<span class="text-green-400">{amount}</span>&comment=<span class="text-green-400">{comment}</span>`;
 
